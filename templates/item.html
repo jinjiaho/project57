@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block sidebar %}
+<div class="sidebar-wrapper">
+    <div class="logo">
+        <a href="http://www.creative-tim.com" class="simple-text" style="text-align:left;">
+        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
+            Supervisor
+        </a>
+    </div>
+
+    <ul class="nav">
+        <li>
+            <a href="/">
+                <i class="pe-7s-graph"></i>
+                <p>Dashboard</p>
+            </a>
+        </li>
+        <li class="active">
+            <a href="/inventory">
+                <i class="pe-7s-rocket"></i>
+                <p>Inventory</p>
+            </a>
+        </li>
+        <li>
+            <a href="/logs">
+                <i class="pe-7s-news-paper"></i>
+                <p>Logs</p>
+            </a>
+        </li>
+        <li>
+            <a href="/">
+                <i class="pe-7s-power"></i>
+                <p>Log Out</p>
+            </a>
+        </li>
+        
+    </ul>
+</div>
+{% endblock %}
+
+{% block title %}Inventory: {{item}}{% endblock %}
+
+{% block content %}
+<style>
+    
+  .buttons {
+    padding: 15px;
+  }
+
+  .btn-success {
+    color: #81eb50;
+    border-color: #81eb50;
+  }
+</style>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+			<div class="col-md-9">
+			    <div class="card">
+			        <div class="header">
+			            <h4 class="title">Ascott Pen</h4>
+			        </div>
+			        <div class="content">
+			            <div id="chartHours" class="ct-chart"></div>
+			            <div class="footer">
+                            <div class="legend">
+                                <i class="fa fa-circle text-info"></i> Quantity
+                                <i class="fa fa-circle text-danger"></i> Room Occupancy
+                            </div>
+                            <hr>
+			                <div class="stats">
+			                    <i class="fa fa-history"></i> Updated 3 minutes ago
+			                </div>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+		</div>
+
+        <div class="row">
+            <div class="col-md-3"><button class="btn btn-success btn-block" id="btn_getData">New Stock</button></div>
+            <div class="col-md-3"><button class="btn btn-default btn-block" id="btn_getData">Get Data</button></div>
+            <div class="col-md-3"><button class="btn btn-danger btn-block" id="btn_newItem">Use</button></div>
+        </div>
+
+
+    	
+	</div>
+</div>
+{% endblock %}
