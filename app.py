@@ -5,6 +5,8 @@ app.config['DEBUG'] = True
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
 
+# "supervisor" or "ra"
+role = "ra" 
 
 @app.route('/', methods=["GET", "POST"])
 def login():
@@ -14,11 +16,13 @@ def login():
 		password = request.form['password']
 		if username == "supervisor":
 			if password == "supervisor":
+				role = "supervisor"
 				return redirect(url_for('hello'))
 			else:
 				error = "Password does not match username!"
 		if username == "attendant":
 			if password == "room":
+				role = "ra"
 				return redirect(url_for('scanner'))
 			else:
 				error = "Password does not match username!"
@@ -49,7 +53,11 @@ def scanner():
 
 @app.route('/storeroom')
 def storeroom():
-	return render_template('storeroom.html')
+	return render_template('storeroom.html', role=role)
+
+@app.route('/cart')
+def cart():
+	return render_template('cart.html', role=role)
 
 @app.route('/tasks')
 def tasks():
