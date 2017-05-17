@@ -33,6 +33,7 @@
 		<script src="/static/js/html5shiv.min.js"></script>
 		<script src="/static/js/respond.min.js"></script>
 		<![endif]-->
+    	<link href="/static/css/custom.css" rel="stylesheet" />
 	</head>
 	<style>
 		.content {
@@ -53,11 +54,25 @@
 			font-size: 48pt;
 			line-height: 1.14;
 		}
+
+		#footer .footer-text {
+			color: #555;
+			font-size: 24pt;
+			padding-top: 8px;
+		}
 	</style>
-	<body class="login-layout"><a href="/storeroom">
-		<div class="content">
-			<span class="scanTag">PLACE PHONE ON TAG</span>
-		</div></a>
+	<body class="login-layout">
+		<div id="container">
+			<div id="body">
+				<a href="/storeroom"><div class="content">
+					<span class="scanTag">PLACE PHONE ON TAG</span>
+				</div></a>
+			</div>
+			
+			<a href=""><div id="footer">
+				<div class="footer-text">History</div>
+			</div></a>
+		</div>
 		<!-- <script type="text/javascript">
 			$(document).ready(function () {
 
@@ -78,44 +93,6 @@
 			if('ontouchstart' in document.documentElement) document.write("<script src='/static/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
 		</script>
 
-		<!-- inline scripts related to this page -->
-		<script type="text/javascript">
-			jQuery(function($) {
-			 $(document).on('click', '.toolbar a[data-target]', function(e) {
-				e.preventDefault();
-				var target = $(this).data('target');
-				$('.widget-box.visible').removeClass('visible');//hide others
-				$(target).addClass('visible');//show target
-			 });
-			});
-			
-			
-			
-			//you don't need this, just used for changing background
-			jQuery(function($) {
-			 $('#btn-login-dark').on('click', function(e) {
-				$('body').attr('class', 'login-layout');
-				$('#id-text2').attr('class', 'white');
-				$('#id-company-text').attr('class', 'blue');
-				
-				e.preventDefault();
-			 });
-			 $('#btn-login-light').on('click', function(e) {
-				$('body').attr('class', 'login-layout light-login');
-				$('#id-text2').attr('class', 'grey');
-				$('#id-company-text').attr('class', 'blue');
-				
-				e.preventDefault();
-			 });
-			 $('#btn-login-blur').on('click', function(e) {
-				$('body').attr('class', 'login-layout blur-login');
-				$('#id-text2').attr('class', 'white');
-				$('#id-company-text').attr('class', 'light-blue');
-				
-				e.preventDefault();
-			 });
-			 
-			});
-		</script>
+		
 	</body>
 </html>
