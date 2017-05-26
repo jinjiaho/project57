@@ -1,17 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask.ext.cache import Cache
-from datetime import datetime
-
+from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
-cache = Cache(app, config={'CACHE_TYPE':'simple'})
 app.config['DEBUG'] = True
 
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
 
 # "supervisor" or "ra"
-role = "ra"
-cart = []
+role = "ra" 
 
 @app.route('/', methods=["GET", "POST"])
 def login():
@@ -56,38 +51,13 @@ def logs():
 def scanner():
 	return render_template('scanner.html')
 
-# RA shelf view
-@app.route('/shelves/<tag_id>', methods=['GET', 'POST'])
-@cache.cached(timeout=50)
-def shelf(tag_id):
-	if request.method == 'GET':
-		# TODO: query for items in tag
-		return render_template('storeroom.html', role=role, cart_qty = cart.size())
-	else: 
-		item = request.form['item']
-		qty = request.form['qty']
-		cart.add({'item':item, 'qty': qty})
-		return render_template('storeroom.html', role=role, cart_qty = cart.size())
+@app.route('/storeroom')
+def storeroom():
+	return render_template('storeroom.html', role=role)
 
-
-@app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
-def cart(tag_id):
-	if request.method == 'GET':
-		return render_template('cart.html', role=role, cart=cart)
-	else:
-		now = datetime.now()
-		form = request.form
-		items = d.getlist['item']
-		qtys = d.getlist['qty']
-		for i in range(0, d.size()):
-			# HARDCODED: Username
-			query = "INSERT INTO Logs (datetime, user, item, qty, type, tag_id) VALUES ('"+now+"', 'ra', "+items[i]+"', '"+qtys[i]+"', 'withdrawal', '"+tag_id"');"
-			# TODO: Execute query to create log
-		cache = []
-		flash("Success!")
-		return redirect('scanner.html')
-
-
+@app.route('/cart')
+def cart():
+	return render_template('cart.html', role=role)
 
 @app.route('/tasks')
 def tasks():
