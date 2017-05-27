@@ -38,7 +38,15 @@
 </div>
 {% endblock %}
 
-{% block title %}Inventory: {{item}}{% endblock %}
+{% block title %}
+<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+</button>
+<a class="navbar-brand" href="#">Inventory: {{item}}</a>
+{% endblock %}
 
 {% block content %}
 <style>

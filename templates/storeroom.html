@@ -1,11 +1,23 @@
 {% extends "base.html" %}
 {% block sidebar %}
 {% endblock %}
-{% block title %}Store 1 Shelf 1{% endblock %}
+
+{% block title %}
+<a class="cart-icon" href="cart">
+    <span><img src="/static/img/cart.png" /></span>
+</a>
+<a class="navbar-brand" href="#">Store 1 Shelf 1</a>
+{% endblock %}
 
 {% block content%}
-
 <style>
+    
+    .cart-icon span img {
+        float: right !important;
+        max-width: 40px;
+        max-height: 30px;
+        margin: 15px 25px 15px 0;
+    }
     .font-icon-detail img {
         /*width: 50px;*/
         height: 50px;
