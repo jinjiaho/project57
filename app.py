@@ -57,21 +57,21 @@ def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
-@app.route('/shelves/<tag_id>', methods=['GET', 'POST'])
+@app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
 @cache.cached(timeout=50)
 def shelf(tag_id):
 	if request.method == 'GET':
 		# TODO: query for items in tag
-		return render_template('storeroom.html', role=role, cart_qty = cart.size())
+		return render_template('storeroom.html', role=role, cart_qty = len(cart))
 	else: 
 		item = request.form['item']
 		qty = request.form['qty']
 		cart.add({'item':item, 'qty': qty})
-		return render_template('storeroom.html', role=role, cart_qty = cart.size())
+		return render_template('storeroom.html', role=role, cart_qty = len(cart))
 
 
 @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
-def cart(tag_id):
+def checkout(tag_id):
 	if request.method == 'GET':
 		return render_template('cart.html', role=role, cart=cart)
 	else:
@@ -79,14 +79,13 @@ def cart(tag_id):
 		form = request.form
 		items = d.getlist['item']
 		qtys = d.getlist['qty']
-		for i in range(0, d.size()):
+		#  for i in range(0, d.size()):
 			# HARDCODED: Username
-			query = "INSERT INTO Logs (datetime, user, item, qty, type, tag_id) VALUES ('"+now+"', 'ra', "+items[i]+"', '"+qtys[i]+"', 'withdrawal', '"+tag_id"');"
+			# query = "INSERT INTO Logs (datetime, user, item, qty, type, tag_id) VALUES ('"+now+"', 'ra', "+items[i]+"', '"+qtys[i]+"', 'withdrawal', '"+tag_id"');"
 			# TODO: Execute query to create log
 		cache = []
 		flash("Success!")
 		return redirect('scanner.html')
-
 
 
 @app.route('/tasks')
@@ -129,7 +128,6 @@ def upgrade():
 def page_not_found(e):
     """Return a custom 404 error."""
     return 'Sorry, nothing at this URL.', 404
-
 
 
 ## testing
