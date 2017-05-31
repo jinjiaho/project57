@@ -29,3 +29,14 @@ body {
    text-align: center;
    vertical-align: middle;
 }
+
+
+.button-wrapper {
+  padding: 0px auto 15px auto;
+  width: 100%;
+}
+
+.modal {
+   position: relative;
+   z-index: 20;
+}

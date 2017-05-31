@@ -3,21 +3,55 @@
 {% endblock %}
 
 {% block title %}
-<a class="cart-icon" href="cart">
-    <span><img src="/static/img/cart.png" /></span>
-</a>
+    
+<span class="cart-group">
+    <a class="cart-icon" href="cart">
+        <div class="cart-notif">
+            <span class="cart-qty">{{cart_qty}}</span>
+        </div>
+        <img src="/static/img/cart.png" />
+    </a>
+</span>
+
 <a class="navbar-brand" href="#">Store 1 Shelf 1</a>
 {% endblock %}
 
 {% block content%}
 <style>
     
-    .cart-icon span img {
+    span.cart-group {
         float: right !important;
-        max-width: 40px;
-        max-height: 30px;
         margin: 15px 25px 15px 0;
     }
+
+    span.cart-group img {
+        max-width: 40px;
+        max-height: 30px;
+        margin-right: -7px;
+        z-index: 1;
+    }
+
+    .cart-icon .cart-notif {
+        float:right;
+        width: 14px;
+        height: 14px;
+        background-color: red;
+        border: 1px solid red;
+        border-radius: 8px;
+        margin-top: -3px;
+        z-index: 2;
+        position: relative;
+    }
+
+    .cart-icon .cart-notif .cart-qty {
+        color: white;
+        z-index: 9;
+        position: relative;
+        top: -6px;
+        right: -3px;
+        font-size: x-small;
+    }
+
     .font-icon-detail img {
         /*width: 50px;*/
         height: 50px;
@@ -27,6 +61,16 @@
     .font-icon-detail .name {
         color: #000;
         height: 37px;
+    }
+
+    .item-pic {
+        width: 100%;
+        position: fixed;
+        top: 8%;
+    }
+
+    .item-pic img {
+        height: 50px;
     }
 
 
@@ -39,50 +83,50 @@
                     <div class="content all-icons">
                         <div class="row">
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a href="" data-toggle="modal" data-target="#qtyModal" id="openModal">
+                                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal">
                                     <div class="font-icon-detail">
                                         <img src="/static/img/items/Guest supplies/Ascott pen.jpg"/><br/>
-                                        <span class="name">Pen</span>
+                                        <span class="name" data-name="pen">Pen</span>
                                     </div>
                                 </a>
                             </div>
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Ascott umbrella.jpg"/><br/>
+                                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_2"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Ascott umbrella.jpg"/><br/>
                                     <span class="name">Umbrella</span>
                                 </div></a>
                             </div>
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Body lotion 35ml.jpg"/><br/>
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_3"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Body lotion 35ml.jpg"/><br/>
                                     <span class="name">Body Lotion</span>
                                 </div></a>
                             </div>
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Comb.jpg"/><br/>
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_4"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Comb.jpg"/><br/>
                                     <span class="name">Comb</span>
                                 </div></a>
                             </div>
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Conditioner 35ml.jpg"><br/>
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_5"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Conditioner 35ml.jpg"><br/>
                                     <span class="name">Conditioner</span>
                                 </div></a>
                             </div>
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Cotton buds.jpg"/><br/>
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_6"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Cotton buds.jpg"/><br/>
                                 <span class="name">Cotton Buds</span>
                                 </div></a>
                             </div>
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Dish washing bottle.jpg"/><br/>
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_7"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Dish washing bottle.jpg"/><br/>
                                     <span class="name">Dish Soap</span>
                                 </div></a>
                             </div>
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Guest slippers.jpg"/><br/>
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Guest slippers.jpg"/><br/>
                                     <span class="name">Slippers</span>
                                 </div></a>
                             </div>
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Hand soap bottle.jpg"/><br/>
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Hand soap bottle.jpg"/><br/>
                                     <span class="name">Hand Soap</span>
                                 </div></a>
                             </div>
@@ -108,28 +152,32 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $(".openModal").click(function() {
+        var name = $(this).find("span").innerHTML();
+        var img = $(this).find("img").attr('src');
+        $("#qtyModal form .item-pic img").attr('src', img);
+        $("#qtyModal form .qty-display input['item']").val(name);
+    });
+})
+    
+    
+</script>
+
 <div id="qtyModal" class="modal" data-backdrop="false">
     <span class="close" data-dismiss="modal">&times;</span>
-    <div class="qty-display">
-    <p>Enter quantity:</p>
-    <input id="quantity" type="number" name="qty">
-    </div>
-  <div class="numpad">
-    <ul id="keypad">   
-        <li class="letter">1</li>  
-        <li class="letter">2</li>  
-        <li class="letter">3</li>  
-        <li class="letter clearl">4</li>  
-        <li class="letter">5</li>  
-        <li class="letter">6</li> 
-      
-        <li class="letter clearl">7</li>  
-        <li class="letter">8</li>  
-        <li class="letter">9</li> 
-        <li class="delete clearl"><</li> 
-        <li class="letter">0</li>
-        <li class="enter">Enter</li> 
-    </ul>  
-  </div>
+    <form method="POST">
+        <div class='item-pic' align="center"><img src=""/></div>
+        <div class="qty-display">
+            <p>Enter quantity:</p>
+            <input id="quantity" type="number" name="qty">
+            <input type="hidden" name="item" value="">
+            <div class="button-wrapper" align="center" style="margin-top: 15px;">
+                <button type="submit" class="btn btn-success" style="">Submit</button>
+            </div>
+        </div>
+    </form>
 </div>
 {% endblock %}

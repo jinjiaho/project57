@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, sessions
 # from flask.ext.cache import Cache
 from datetime import datetime
 
@@ -66,7 +66,13 @@ def shelf(tag_id):
 	else: 
 		item = request.form['item']
 		qty = request.form['qty']
-		cart.add({'item':item, 'qty': qty})
+		updated = False
+		for item in cart:
+			if item['name']==item:
+				item['qty'] = item['qty'] + qty
+			updated = True
+		if updated == False:
+			cart.append({'name':item, 'qty': qty})
 		return render_template('storeroom.html', role=role, cart_qty = len(cart))
 
 
