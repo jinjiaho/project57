@@ -18,16 +18,16 @@
         padding: 20px 5px !important;
     }
 
-    .font-icon-detail img {
-        /*width: 50px;*/
+    .content img {
         height: 50px;
-        margin-bottom: 5px;
+        max-width: 76px;
     }
 
-    .font-icon-detail .name {
-        color: #000;
-        height: 37px;
+    .button-wrapper {
+        padding: 0px auto 15px auto;
+        width: 100%;
     }
+
 
 
 </style>
@@ -37,75 +37,70 @@
                 <div class="col-md-12">
                     <div class="card">
                         <form>
-                            <div class="content all-icons">
-                                <div class="row">
-                                    <span class="close">&times;</span>
-                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                        <a href="" data-toggle="modal" data-target="#qtyModal" id="openModal">
-                                            <div class="font-icon-detail">
-                                                <img src="/static/img/items/Guest supplies/Ascott pen.jpg"/><br/>
-                                                <span class="name">Pen</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                        3
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Body lotion 35ml.jpg"/><br/>
-                                            <span class="name">Body Lotion</span>
-                                        </div></a>
-                                    </div>
-                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Comb.jpg"/><br/>
-                                            <span class="name">Comb</span>
-                                        </div></a>
-                                    </div>
-                                </div>
-                                
-                                <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                    <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Conditioner 35ml.jpg"><br/>
-                                        <span class="name">Conditioner</span>
-                                    </div></a>
-                                </div>
-                                <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                    <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Cotton buds.jpg"/><br/>
-                                    <span class="name">Cotton Buds</span>
-                                    </div></a>
-                                </div>
-                                <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                    <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Dish washing bottle.jpg"/><br/>
-                                        <span class="name">Dish Soap</span>
-                                    </div></a>
-                                </div>
-                                <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                    <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Guest slippers.jpg"/><br/>
-                                        <span class="name">Slippers</span>
-                                    </div></a>
-                                </div>
-                                <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                    <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Hand soap bottle.jpg"/><br/>
-                                        <span class="name">Hand Soap</span>
-                                    </div></a>
-                                </div>
-                                <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                    <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/L'occitaine.png" style="width: 80px;"/>
-                                        <span class="name">L'occitane</span>
-                                    </div></a>
-                                </div>
-                                <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                    <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Laundry bag plastic.jpg"/><br/>
-                                        <span class="name">Laundry bag</span>
-                                    </div></a>
-                                </div>
-                                <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                    <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Laundry detergent box.jpg"/><br/>
-                                        <span class="name">Detergent</span>
-                                    </div></a>
-                                </div>
+                            <div class="content table-responsive table-full-width">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <th></th>
+                                        <th>Item</th>
+                                        <th>Qty</th>
+                                        <th></th>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Ascott pen.jpg"/></td>
+                                            <td>Pen</td>
+                                            <td><a href="" data-toggle="modal" data-target="#qtyModal" id="openModal">3</a></td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Body lotion 35ml.jpg"/></td>
+                                            <td>Body Lotion</td>
+                                            <a href="" data-toggle="modal" data-target="#qtyModal" id="openModal"><td>5</td></a>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Comb.jpg"/></td>
+                                            <td>Comb</td>
+                                            <td>10</td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Conditioner 35ml.jpg"></td>
+                                            <td>Conditioner</td>
+                                            <td>1</td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Cotton buds.jpg"/></td>
+                                            <td>Cotton Buds</td>
+                                            <td>10</td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Dish washing bottle.jpg"/></td>
+                                            <td>Dish Soap</td>
+                                            <td>20</td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Guest slippers.jpg"/></td>
+                                            <td>Slippers</td>
+                                            <td>5</td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                                <div class='button-wrapper' align="center">
+                                <button type='submit' class='btn btn-success'>Confirm</button></div>
                             </div>
+                            
                         </form>
                         
                     </div>

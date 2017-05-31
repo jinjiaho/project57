@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from flask.ext.cache import Cache
+# from flask.ext.cache import Cache
 from datetime import datetime
 
 app = Flask(__name__)
-cache = Cache(app, config={'CACHE_TYPE':'simple'})
+# cache = Cache(app, config={'CACHE_TYPE':'simple'})
 app.config['DEBUG'] = True
 
 # Note: We don't need to call run() since our application is embedded within
@@ -58,7 +58,7 @@ def scanner():
 
 # RA shelf view
 @app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
-@cache.cached(timeout=50)
+# @cache.cached(timeout=50)
 def shelf(tag_id):
 	if request.method == 'GET':
 		# TODO: query for items in tag
