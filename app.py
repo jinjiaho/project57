@@ -47,9 +47,11 @@ def logs():
 def scanner():
 	return render_template('scanner.html')
 
-@app.route('/storeroom')
-def storeroom():
-	return render_template('storeroom.html')
+@app.route('/storeroom/<tag_id>') #/<tag_id>
+def storeroom(tag_id): #tag_id
+    # MINMIN: Query items with tag id
+    items = ['item one', 'item two', 'item three']
+    return render_template('storeroom.html', items=items)
 
 @app.route('/tasks')
 def tasks():
