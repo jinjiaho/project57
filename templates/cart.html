@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block sidebar %}
+{% endblock %}
+{% block title %}
+<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+</button>
+<a class="navbar-brand" href="#">Cart</a>
+{% endblock %}
+
+{% block content%}
+
+<style>
+    .main-panel > .content {
+        padding: 20px 5px !important;
+    }
+
+    .content img {
+        height: 50px;
+        max-width: 76px;
+    }
+
+    .button-wrapper {
+        padding: 0px auto 15px auto;
+        width: 100%;
+    }
+
+
+
+</style>
+<div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <form>
+                            <div class="content table-responsive table-full-width">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <th></th>
+                                        <th>Item</th>
+                                        <th>Qty</th>
+                                        <th></th>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Ascott pen.jpg"/></td>
+                                            <td>Pen</td>
+                                            <td><a href="" data-toggle="modal" data-target="#qtyModal" id="openModal">3</a></td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Body lotion 35ml.jpg"/></td>
+                                            <td>Body Lotion</td>
+                                            <a href="" data-toggle="modal" data-target="#qtyModal" id="openModal"><td>5</td></a>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Comb.jpg"/></td>
+                                            <td>Comb</td>
+                                            <td>10</td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Conditioner 35ml.jpg"></td>
+                                            <td>Conditioner</td>
+                                            <td>1</td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Cotton buds.jpg"/></td>
+                                            <td>Cotton Buds</td>
+                                            <td>10</td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Dish washing bottle.jpg"/></td>
+                                            <td>Dish Soap</td>
+                                            <td>20</td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="/static/img/items/Guest supplies/Guest slippers.jpg"/></td>
+                                            <td>Slippers</td>
+                                            <td>5</td>
+                                            <td>&times;</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                                <div class='button-wrapper' align="center">
+                                <button type='submit' class='btn btn-success'>Confirm</button></div>
+                            </div>
+                            
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+<div id="qtyModal" class="modal" data-backdrop="false">
+    <span class="close" data-dismiss="modal">&times;</span>
+    <div class="qty-display">
+    <p>Enter quantity:</p>
+    <input id="quantity" type="number" name="qty">
+    </div>
+  <div class="numpad">
+    <ul id="keypad">   
+        <li class="letter">1</li>  
+        <li class="letter">2</li>  
+        <li class="letter">3</li>  
+        <li class="letter clearl">4</li>  
+        <li class="letter">5</li>  
+        <li class="letter">6</li> 
+      
+        <li class="letter clearl">7</li>  
+        <li class="letter">8</li>  
+        <li class="letter">9</li> 
+        <li class="delete clearl"><</li> 
+        <li class="letter">0</li>
+        <li class="enter">Enter</li> 
+    </ul>  
+  </div>
+</div>
+{% endblock %}
