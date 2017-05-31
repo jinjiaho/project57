@@ -10,7 +10,7 @@
 
     <ul class="nav">
         <li>
-            <a href="/">
+            <a href="/dashboard">
                 <i class="pe-7s-graph"></i>
                 <p>Dashboard</p>
             </a>
@@ -38,15 +38,7 @@
 </div>
 {% endblock %}
 
-{% block title %}
-<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
-    <span class="sr-only">Toggle navigation</span>
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-</button>
-<a class="navbar-brand" href="#">Inventory</a>
-{% endblock %}
+{% block title %}Inventory{% endblock %}
 
 {% block content %}
 <style>
@@ -102,7 +94,6 @@
   }
 
 </style>
-
 <div class="content">
     <div class="container-fluid">
         <div class="row">
@@ -113,295 +104,39 @@
                     </button>
                     <div class="content all-icons panel">
                         <div class="row">
-                          <a href="pen"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="pen"><div class="alert alert-danger">
-                              <img src="/static/img/items/Guest supplies/Ascott pen.jpg"/>
-                              <div class="alert-label">Pen<br><span>47</span></div>
+                          
+                          {% for item in all_guest_supplies %}
+                          <a href="{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="{{item.name}}"><div class="alert alert-danger">
+                              <img src="/static/img/items/supplies/{{item.name}}.jpg"/>
+                              <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
                             </div></a>
+                          </div>
+                          {% endfor %}
 
                           </div>
-                          <a href="umbrella"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="umbrella"><div class="alert alert-success">
-                              <img src="/static/img/items/Guest supplies/Ascott umbrella.jpg"/>
-                              <div class="alert-label">Umbrella<br><span>45</span></div>
-                            </div>
 
-                          </div>
-                          <a href="body lotion"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="body lotion"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Body lotion 35ml.jpg"/>
-                              <div class="alert-label">Body Lotion<br><span>140</span></div>
-                            </div>
-
-                          </div>
-                          <a href="comb"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="comb"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Comb.jpg"/>
-                              <div class="alert-label">Comb<br><span>480</span></div>
-                            </div>
-
-                          </div>
-                          <a href="conditoner"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="conditioner"><div class="alert alert-warning"><img src="/static/img/items/Guest supplies/Conditioner 35ml.jpg">
-                              <div class="alert-label">Conditioner<br><span>98</span></div>
-                            </div>
-
-                          </div>
-                          <a href="cotton buds"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="cotton buds"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Cotton buds.jpg"/>
-                            <div class="alert-label">Cotton Buds<br><span>154</span></div>
-                            </div>
-                          </div>
-                          <a href="dish soap"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="dish soap"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Dish washing bottle.jpg"/>
-                              <div class="alert-label">Dish Soap<br><span>92</span></div>
-                            </div></a>
-
-                          </div>
-                          <a href="slippers"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="slippers"><div class="alert alert-warning"><img src="/static/img/items/Guest supplies/Guest slippers.jpg"/>
-                              <div class="alert-label">Slippers<br><span>145</span></div>
-                            </div>
-
-                          </div>
-                          <a href="hand soap"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="hand soap"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Hand soap bottle.jpg"/>
-                              <div class="alert-label">Hand Soap<br><span>265</span></div>
-                            </div>
-
-                          </div>
-                          <a href="L'occitaine"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="L'occitaine"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/L'occitaine.png"/>
-                              <div class="alert-label">L'occitane<br><span>95</span></div>
-                            </div>
-
-                          </div>
-                          <a href="laundry bag"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="laundry bag"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Laundry bag plastic.jpg"/>
-                              <div class="alert-label">Laundry bag<br><span>72</span></div>
-                            </div>
-
-                          </div>
-                          <a href="detergent"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="detergent"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Laundry detergent box.jpg"/>
-                              <div class="alert-label">Detergent<br><span>51</span></div>
-                            </div>
-
-                          </div>
-                          <a href="sanitary bag"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="sanitary bag"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Sanitary bag.jpg"/>
-                              <div class="alert-label">Sanitary bag<br><span>123</span></div>
-                            </div>
-                          </div>
-                          <a href="shampoo"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="shampoo"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Shampoo 35ml.jpg"/>
-                              <div class="alert-label">Shampoo<br><span>134</span></div>
-                            </div>
-                          </div>
-
-                          <a href="shaving kit"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="shaving kit"><div class="alert alert-danger"><img src="/static/img/items/Guest supplies/Shaving kit.jpg"/>
-                              <div class="alert-label">Shaving kit<br><span>50</span></div>
-                            </div>
-                          </div>
-
-                          <a href="shower cap"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="shower cap"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Shower cap.jpg"/>
-                              <div class="alert-label">Shower cap<br><span>124</span></div>
-                            </div>
-
-                          </div>
-                          <a href="shower gel"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="shower gel"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Shower gel 35ml.jpg"/>
-                              <div class="alert-label">Shower gel<br><span>145</span></div>
-                            </div>
-                          </div>
-
-                          <a href="bar soap 25g"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="bar soap 25g"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Soap 25g.png"/>
-                              <div class="alert-label">Bar soap 25g<br><span>145</span></div>
-                            </div>
-                          </div>
-
-                          <a href="bar soap 50g"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="bar soap 50g"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Soap 50g.jpg"/>
-                              <div class="alert-label">Bar soap 50g<br><span>155</span></div>
-                            </div>
-                          </div>
-
-                          <a href="tissue box"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="tissue box"><div class="alert alert-warning"><img src="/static/img/items/Guest supplies/Tissue box.jpg"/>
-                              <div class="alert-label">Tissue box<br><span>180</span></div>
-                            </div>
-                          </div>
-
-                          <a href="toilet roll"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="toilet roll"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Toilet roll.jpg"/>
-                              <div class="alert-label">Toilet roll<br><span>243</span></div>
-                            </div>
-                          </div>
-
-                          <a href="toothbrush"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="toothbrush"><div class="alert alert-success"><img src="/static/img/items/Guest supplies/Toothbrush.jpg"/>
-                              <div class="alert-label">Toothbrush<br><span>253</span></div>
-                            </div>
-
-                          </div>
+                        </div>
                         </div>
                     </div>
                 </div>
                 <div class="card">
                     <button class="header accordion">
-                        <h4 class="title">Guest Hamper</h4>
+                        <h4 class="title">Guest Hampers</h4>
                     </button>
                     <div class="content all-icons panel">
                         <div class="row">
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Butternut squash.jpg"/>
-                              <div class="alert-label">Butternut Squash<br><span></span></div>
-                            </div>
+                          
 
+                          {% for item in all_guest_hampers %}
+                          <a href="{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="{{item.name}}"><div class="alert alert-warning">
+                              <img src="/static/img/items/hampers/{{item.file}}.jpg"/>
+                              <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
+                            </div></a>
                           </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-warning"><img src="/static/img/items/Guest hamper/Cereals small.jpg"/>
-                              <div class="alert-label">Cereal<br><span></span></div>
-                            </div>
+                          {% endfor %}
 
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Coffee creamer.jpg"/>
-                              <div class="alert-label">Creamer<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Coke zero 1.5L.jpg" />
-                              <div class="alert-label">Coke (large)<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Coke zero 330ml.jpg"/>
-                              <div class="alert-label">Coke (small)<br><span></span></div>
-                            </div>
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Farm crackers.jpg"/>
-                              <div class="alert-label">Crackers<br><span></span></div>
-                            </div>
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Fiji water.jpg"/>
-                              <div class="alert-label">Fiji<br><span></span></div>
-                            </div>
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Golden crystal sugar.jpg"/>
-                              <div class="alert-label">Golden Sugar<br><span></span></div>
-                            </div>
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-warning"><img src="/static/img/items/Guest hamper/Honey mustard onion chips.jpg"/>
-                              <div class="alert-label">Honey mustard chips<br><span></span></div>
-                            </div>
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Instant oatmeal.jpg"/>
-                              <div class="alert-label">Oatmeal<br><span></span></div>
-                            </div>
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-danger"><img src="/static/img/items/Guest hamper/Milk.jpg"/>
-                              <div class="alert-label">Milk<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Nescafe gold blend decaf.jpg"/>
-                              <div class="alert-label">Nescafe Gold<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Nespresso Livanto.jpg"/>
-                              <div class="alert-label">Nespresso Livanto<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Nespresso Ristretto.jpg"/>
-                              <div class="alert-label">Nespresso Ristretto<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Raw honey.jpg"/>
-                              <div class="alert-label">Raw honey<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/RIPE satchet sugar.jpg"/>
-                              <div class="alert-label">RIPE sugar<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Sea salt small chips.jpg"/>
-                              <div class="alert-label">Sea salt chips<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Snapple juice.jpg"/>
-                              <div class="alert-label">Snapple juice<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Sprite 1.5L.jpg"/>
-                              <div class="alert-label">Sprite 1.5L<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Sprite 330ml.jpg"/>
-                              <div class="alert-label">Sprite 330ml<br><span></span></div>
-                            </div>
-
-                          </div>    
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Strawberry jam.jpg"/>
-                              <div class="alert-label">Strawberry jam<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Toblerone milk.jpg"/>
-                              <div class="alert-label">Toblerone<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/TWG Earl Grey.jpg"/>
-                              <div class="alert-label">TWG Earl Grey<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/TWG english breakfast.jpg"/>
-                              <div class="alert-label">TWG Eng Bfast<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/TWG jasmine.jpg"/>
-                              <div class="alert-label">TWG Jasmine<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Guest hamper/Wine.jpg"/>
-                              <div class="alert-label">Wine<br><span></span></div>
-                            </div>
 
                           </div>
                           
@@ -414,402 +149,20 @@
                     </button>
                     <div class="content all-icons panel">
                         <div class="row">
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/BRAUN HT 400 Multitoast.jpg"/>
-                             <div class="alert-label">Toaster<br><span></span></div>
-                            </div>
+                          
 
+                          {% for item in all_kitchenware %}
+                          <a href="{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="{{item.name}}"><div class="alert alert-warning">
+                              <img src="/static/img/items/kitchenware/{{item.name}}.jpg"/>
+                              <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
+                            </div></a>
                           </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Broad Coat Hanger.jpg"/>
-                              <div class="alert-label">Coat hanger<br><span></span></div>
-                            </div>
+                          {% endfor %}
 
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Chopsticks.jpg"/>
-                              <div class="alert-label">Chopsticks<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Food strainer.jpg"/>
-                              <div class="alert-label">Food strainer<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Hot Pot Mat.jpg"/>
-                              <div class="alert-label">Hot pot mat<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/ILLUMINOR Torch,LED Light with bracket black.jpg"/>
-                              <div class="alert-label">Torchlight<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/IMPLUSE USA Resin Tissue Box Cover.jpg"/>
-                              <div class="alert-label">Tissue box<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Iron - Tefal.jpg"/>
-                              <div class="alert-label">Iron<span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Ironing Board cover.jpg"/>
-                              <div class="alert-label">Ironing board cover<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Ironing Board.jpg"/>
-                              <div class="alert-label">Ironing board<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Ivory Satin Hanger with Chrome Plated.jpg"/>
-                              <div class="alert-label">Hanger<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Kitchen Sponge - 3m.jpg"/>
-                              <div class="alert-label">Sponge<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Kitchen Sponge Holder.jpg"/>
-                              <div class="alert-label">Sponge holder<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Kitchen Waste bin with lid.jpg"/>
-                              <div class="alert-label">Waste bin<br><span></span></div>
-                            </div>
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI 10cm Chinese Rice Bowl.jpg"/>
-                              <div class="alert-label">Chinese rice bowl<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI 19cm Service Bowl.jpg"/>
-                              <div class="alert-label">Service bowl<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI 21cm (Esprit) Side Dessert  Salad Plate.jpg"/>
-                              <div class="alert-label">Side dessert plate<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI 23cm (Esprit) Coupe Soup Cereal Plate.jpg"/>
-                              <div class="alert-label">Soup cereal plate<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI 27cm (Esprit) Dinner Plate.jpg"/>
-                              <div class="alert-label">Dinner plate<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI 32cm Cosmo Oval Fish Platter.jpg"/>
-                              <div class="alert-label">Oval fish platter<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Ashtray.jpg"/>
-                              <div class="alert-label">Ashtray<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Coffee  Tea Cup Saucer.jpg"/>
-                              <div class="alert-label">Saucer<span><br></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Coffee Mug (Esprit).jpg"/>
-                              <div class="alert-label">Coffee mug<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Coffee Tea Cup (Esprit).jpg"/>
-                              <div class="alert-label">Tea cup<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Coffee Tea Pot.jpg"/>
-                              <div class="alert-label">Coffee tea pot<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Milk Creamer Jug.jpg"/>
-                              <div class="alert-label">Milk creamer jug<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Pepper Shaker.jpg"/>
-                              <div class="alert-label">Pepper shaker<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Salt shaker.jpg"/>
-                              <div class="alert-label">Salt shaker<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Soup Spoon.jpg"/>
-                              <div class="alert-label">Soup spoon<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Sugar Pot with Cover.jpg"/>
-                              <div class="alert-label">Sugar pot with cover<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/NARUMI Toothpick Holder.jpg"/>
-                              <div class="alert-label">Toothpick holder<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-warning"><img src="/static/img/items/Kitchenware/Nespresso coffee machine.jpg"/>
-                              <div class="alert-label">Coffee machine<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Can Opener.jpg"/>
-                              <div class="alert-label">Can opener<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Double Level Corkscrew.jpg"/>
-                              <div class="alert-label">Corkscrew<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Frying pan with cover.jpg"/>
-                              <div class="alert-label">Frying pan with cover<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Frying Pan.jpg"/>
-                              <div class="alert-label">Frying pan<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO ice bucket with Tong.jpg"/>
-                              <div class="alert-label">Ice bucket with tong<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Kitchen Food Tong.jpg"/>
-                              <div class="alert-label">Kitchen food with tong<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Kitchen Scissors.jpg"/>
-                              <div class="alert-label">Kitchen scissors<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Meat Fork.jpg"/>
-                              <div class="alert-label">Meat fork<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Parking Fruit Knife.jpg"/>
-                              <div class="alert-label">Fruit knife<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Potato Peeler.jpg"/>
-                              <div class="alert-label">Potato peeler<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO sauce Pot with one handles and cover.jpg"/>
-                              <div class="alert-label">One handle sauce pot<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Sauce Pot with two handles and cover.jpg"/>
-                              <div class="alert-label">Two handle sauce pot<br><span></span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PADERNO Utility Knife.jpg"/>
-                              <div class="alert-label">Utility knife<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/PANASONIC 1500W Hair Dryer.jpg"/>
-                              <div class="alert-label">Hairdryer<br><span></span></div>
-                            </div>
-
-                          </div>
-                          <!-- <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Plastic Chopping Board.jpg"/>
-                              <div class="alert-label"><span>Chopping board</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Plastic Cutlery Tray.jpg"/>
-                              <div class="alert-label"><span>Cutlery tray</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Pot Holder Oven Mitt.jpg"/>
-                              <div class="alert-label"><span>Oven mitt</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Regular Wooden Hanger with anti-slip bar.jpg"/>
-                              <div class="alert-label"><span>Anti slip hanger</span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/RONA GLASS Globo 12 High Ball Tumbler.jpg"/>
-                              <div class="alert-label"><span>High ball tumbler</span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/RONA GLASS Globo 15 Cocktail Tumbler.jpg"/>
-                              <div class="alert-label"><span>Cocktail tumbler</span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/RONA GLASS Globo 16 Old-Fashioned Tumbler.jpg"/>
-                              <div class="alert-label"><span>Old fashioned tumbler</span></div>
-                            </div>
-                          </div>
-
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/RONA GLASS Scena-Crystalline Wine Glass.jpg"/>
-                              <div class="alert-label"><span>Wine glass</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/SAMBONET Dessert Fork.jpg"/>
-                              <div class="alert-label"><span>Dessert fork</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/SAMBONET Dessert Knife.png"/>
-                              <div class="alert-label"><span>Dessert knife</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/SAMBONET Dessert Spoon.jpg"/>
-                              <div class="alert-label"><span>Dessert spoon</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/SAMBONET Serving Spoon.jpg"/>
-                              <div class="alert-label"><span>Serving spoon</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/SAMBONET Table Dinner Fork.jpg"/>
-                              <div class="alert-label"><span>Table dinner fork</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/SAMBONET Table Dinner Knife.jpg"/>
-                              <div class="alert-label"><span>Table dinner knife</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/SAMBONET Table Dinner Spoon.jpg"/>
-                              <div class="alert-label"><span>Table dinner spoon</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/SAMBONET Tea Spoon.jpg"/>
-                              <div class="alert-label"><span>Tea spoon</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/TANITA Precision Weighing Scale.jpg"/>
-                              <div class="alert-label"><span>Weighing scale</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/TEFAL PHILIPS Rice and slow cooker.jpg"/>
-                              <div class="alert-label"><span>Rice and slow cooker</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Trouser Hanger with notches and skirt clips.jpg"/>
-                              <div class="alert-label"><span>Hanger with clips</span></div>
-                            </div>
-
-                          </div>
-                          <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <div class="alert alert-success"><img src="/static/img/items/Kitchenware/Wooden Pan Tuner Spatula.jpg"/>
-                              <div class="alert-label"><span>Wooden spatula</span></div>
-                            </div>
 
                           
-                          </div> -->
+                          </div>
                           
                         </div>
                     </div>
