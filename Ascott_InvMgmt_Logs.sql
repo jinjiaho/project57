@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `Ascott_InvMgmt` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `Ascott_InvMgmt`;
 -- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
 -- Host: localhost    Database: Ascott_InvMgmt
@@ -16,25 +14,6 @@ USE `Ascott_InvMgmt`;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `Logs`
---
-
-DROP TABLE IF EXISTS `Logs`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Logs` (
-  `idLogs` int(11) NOT NULL,
-  `uid` int(11) NOT NULL,
-  `dateTime` datetime NOT NULL,
-  `action` varchar(45) NOT NULL,
-  `qty` varchar(45) NOT NULL,
-  `idItem` varchar(45) NOT NULL,
-  `idNFC` varchar(45) NOT NULL,
-  PRIMARY KEY (`idLogs`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `Logs`
@@ -54,4 +33,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-05-21  2:32:05
+-- Dump completed on 2017-05-31 14:27:31
