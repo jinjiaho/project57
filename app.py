@@ -157,8 +157,21 @@ def scanner():
 # @cache.cached(timeout=50)
 def shelf(tag_id):
 	if request.method == 'GET':
-		# TODO: query for items in tag
-		return render_template('storeroom.html', role=role, cart_qty = len(cart))
+		conn = mysql.connect()
+		cursor = conn.cursor()
+
+		cursor.execute("SELECT idItem, item, category, idNFC, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(idNFC))
+
+		data=cursor.fetchall()
+		things = []
+		for item in data:
+			things.append(
+				{"item_id": item[0],
+				"name": item[1],
+				"category": item[2],
+				"idNFC":item[3],
+				"picture":item[4]})
+		return render_template('storeroom.html', role=role, things=things, cart_qty = len(cart))
 	else: 
 		item = request.form['item']
 		qty = request.form['qty']
@@ -219,45 +232,15 @@ def retrieval(things):
 	elif request.method=="GET":
 		return render_template('retrieval.html',things=things, form=form)
 
-
-	
-	return render_template("retrieval.html",things=things)
+	return render_template("retrieval.html", things=things)
 
 @app.route('/tasks')
 def tasks():
 	return render_template('tasks.html')
-	
-@app.route('/user', methods=["GET"])
-def user():
-	return render_template('user.html')
-
-@app.route('/icons')
-def icons():
-	return render_template('icons.html')
-
-@app.route('/maps')
-def maps():
-	return render_template('maps.html')
-
-@app.route('/notifications')
-def notifications():
-	return render_template('notifications.html')
-
-@app.route('/table')
-def table():
-	return render_template('table.html')
 
 @app.route('/template')
 def template():
 	return render_template('template.html')
-
-@app.route('/typography')
-def typography():
-	return render_template('typography.html')
-
-@app.route('/upgrade.html')
-def upgrade():
-	return render_template('upgrade.html')
 
 @app.errorhandler(404)
 def page_not_found(e):
