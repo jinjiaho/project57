@@ -33,6 +33,7 @@ CREATE TABLE `Items` (
   `batchSize` int(11) NOT NULL,
   `category` char(25) NOT NULL,
   `picture` char(100) NOT NULL,
+  `unitSize` char(100) NOT NULL,
   PRIMARY KEY (`idItem`,`idNFC`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;

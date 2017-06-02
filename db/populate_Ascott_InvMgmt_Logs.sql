@@ -19,6 +19,7 @@
 -- Dumping data for table `Logs`
 --
 
+USE `Ascott_invMgmt`;
 LOCK TABLES `Logs` WRITE;
 /*!40000 ALTER TABLE `Logs` DISABLE KEYS */;
 /*!40000 ALTER TABLE `Logs` ENABLE KEYS */;
