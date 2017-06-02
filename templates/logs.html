@@ -48,7 +48,7 @@
     <span class="icon-bar"></span>
     <span class="icon-bar"></span>
 </button>
-<a class="navbar-brand" href="#">Logs</a>
+<a class="navbar-brand" href="#">Logs in current month</a>
 {% endblock %}
 
 {% block content %}
@@ -99,7 +99,11 @@
     // Download CSV file
     downloadCSV(csv.join("\n"), filename);
 }
+
 </script>
+
+
+
 <div class="container-fluid">
     <div class="row">
 		<div class="col-md-12">
@@ -109,72 +113,32 @@
 		            <p class="category">Movement of Inventory</p>
 		        </div> -->
 		        <div class="content table-responsive table-full-width" style="margin-top: 20px;">
-		            <table class="table table-hover">
+                
+		            <table id="table" class="table table-hover">
 		                <thead>
 		                	<th>Name</th>
 		                	<th>Item</th>
+                            <th>Category</th>
 		                	<th>Qty</th>
 		                	<th>In/Out</th>
 		                	<th>Date-Time</th>
-		                	<th>Qty Left</th>
+                            <th>Location</th>
+
+
 		                </thead>
 		                <tbody>
+                        {% for log in logs %}
 		                	<tr>
-                                <td>Ah Moi</td>
-                                <td>Conditioner</td>
-                                <td>3</td>
-                                <td>Out</td>
-                                <td>3 minutes ago</td>
-                                <td>98</td>
+                                <td>{{log.name}}</td>
+                                <td>{{log.item}}</td>
+                                <td>{{log.category}}</td>
+                                <td>{{log.qty}}</td>
+                                <td>{{log.action}}</td>
+                                <td>{{log.dateTime}}</td>
+                                <td>{{log.location}}</td>
                             </tr>
-                            <tr>
-                                <td>Nisha</td>
-                                <td>Shampoo</td>
-                                <td>5</td>
-                                <td>Out</td>
-                                <td>2 hours ago</td>
-                                <td>134</td>
-                            </tr>
-                            <tr>
-                                <td>Sok Ting</td>
-                                <td>Toothbrush</td>
-                                <td>10</td>
-                                <td>Out</td>
-                                <td>4pm yesterday</td>
-                                <td>253</td>
-                            </tr>
-		                    <tr>
-		                    	<td>Sita</td>
-		                    	<td>Tissue Box</td>
-		                    	<td>1</td>
-		                    	<td>Out</td>
-		                    	<td>3:50pm yesterday</td>
-		                    	<td>180</td>
-		                    </tr>
-		                    <tr>
-		                    	<td>Alina</td>
-		                    	<td>Shower Cap</td>
-		                    	<td>10</td>
-		                    	<td>Out</td>
-		                    	<td>2:15pm yesterday</td>
-		                    	<td>124</td>
-		                    </tr>
-		                    <tr>
-		                    	<td>Musi</td>
-		                    	<td>Pens</td>
-		                    	<td>20</td>
-		                    	<td>Out</td>
-		                    	<td>1.20pm 20/03/2017</td>
-		                    	<td>47</td>
-		                    </tr>
-		                    <tr>
-		                    	<td>Sim Lim</td>
-		                    	<td>Slippers</td>
-		                    	<td>5</td>
-		                    	<td>Out</td>
-		                    	<td>2.20pm 19/03/2017</td>
-		                    	<td>145</td>
-		                    </tr>
+                        {% endfor %}
+                            
 
 		                </tbody>
 		            </table>
@@ -182,8 +146,22 @@
 		    </div>
 		</div>
 	</div>
+        <script type="text/javascript" language="javascript" src="TableFilter/tablefilter.js">
+        var tf10 = setFilterGrid("table"); 
+        </script>  
+        
+
+
+
 	<div class="row" style="padding-bottom:30px;">
 		<div class="col-xs-12" align="center">
+         <ul class="pagination">
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+        </ul> 
 			<button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
 		</div>
 

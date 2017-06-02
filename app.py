@@ -23,22 +23,43 @@ adminmode = False
 
 
 #----------------------------METHODS-------------------------
-#methods gives me all the items based on category
+#methods gives me all the items based on category and amount in or out within the last month for each item
 def getAllInventory(category):
-    conn = mysql.connect()
-    cursor = conn.cursor()
+	conn = mysql.connect()
+	cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT item, qtyLeft, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
-    data = cursor.fetchall()
-    items = []
-    for item in data:
-    	items.append(
-    		{"name": item[0],
-			"qty": item[1],
-			"file": item[2]})
-    
-    return items
+	cursor.execute(
+		"SELECT idItem, item, qtyLeft, unit, picture, value FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+
+	data = cursor.fetchall()
+	print(data)
+	items = []
+	for item in data:
+		cursor.execute(
+			"SELECT qty,action FROM ascott_invmgmt.logs WHERE dateTime between date_sub(NOW(), INTERVAL 1 month) AND NOW() AND idItem='{}';".format(item[0]))
+		in_out_data = cursor.fetchall()
+		delivered_out = 0
+		recieved = 0
+		for i in in_out_data:
+			if i[1].encode('ascii') == 'out':
+				delivered_out = delivered_out + int(i[0].encode('ascii'))
+			else:
+				recieved = recieved + int(i[0].encode('ascii'))
+		remaining_quantity = item[2]
+		initial_quantity = remaining_quantity + delivered_out - recieved
+		items.append(
+			{"name": item[1],
+			"remaining": item[2],
+			"unit": item[3],
+			"starting": initial_quantity,
+			"recieved": recieved,
+			"demand": delivered_out,
+			"file": item[4],
+			"value": item[5]})
+	
+	return items
+
+
 
 #methods gives me all the items based on NFC id.
 def getFromLevels(idNFC):
@@ -54,6 +75,38 @@ def getFromLevels(idNFC):
 			{"name": item[0],
 			"category": item[1],
 			"idNFC":item[2]})
+	return things
+
+
+#methods gives me all the logs that occurred within the last 24 hours.
+def getAllLogs():
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	cursor.execute(
+		"SELECT uid, dateTime, action, qty, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
+
+	data=cursor.fetchall()
+	things = []
+	
+	for row in data:
+		cursor.execute(
+			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
+		user_data=cursor.fetchall()
+		
+
+		cursor.execute(
+			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[4]))
+		item_data=cursor.fetchall()
+
+		things.append(
+			{"name": user_data[0][0].encode('ascii'),
+			"dateTime": row[1],
+			"action":row[2],
+			"qty":row[3],
+			"item":item_data[0][0].encode('ascii'),
+			"category":item_data[0][1].encode('ascii'),
+			"location":row[5]})
+
 	return things
 		
 
@@ -121,30 +174,37 @@ def login():
 @app.route('/dashboard')
 def hello():
 
-    return render_template('dashboard.html')
+	return render_template('dashboard.html')
 
 
 @app.route('/inventory/')
 def inventory():
 
-    # get current list of all items listed in db
-    supplies = getAllInventory('supplies')
-    hampers = getAllInventory('hampers')
-    kitchenware = getAllInventory('kitchenware')
+	# get current list of all items listed in db
+	supplies = getAllInventory('supplies')
+	hampers = getAllInventory('hampers')
+	kitchenware = getAllInventory('kitchenware')
+	return render_template('inventory.html',
+		supplies = supplies,
+		hampers = hampers,
+		kitchenware = kitchenware)
 
-    return render_template('inventory.html',
-        all_guest_supplies = supplies,
-        all_guest_hampers = hampers,
-        all_kitchenware = kitchenware)
-
-@app.route('/inventory/<item>')
-def item(item):
+@app.route('/inventory/<category>/<item>')
+def item(item, category):
 	item = item
-	return render_template('item.html', item=item)
+	category = category
+	return render_template('item.html', item=item, category=category)
+
+@app.route('/inventory/<category>')
+def category(category):
+	category = category
+	itemtype = getAllInventory(category)
+	return render_template('category.html', category=category, itemtype=itemtype)
 
 @app.route('/logs')
 def logs():
-	return render_template('logs.html')
+	logs=getAllLogs()
+	return render_template('logs.html',logs=logs)
 
 @app.route('/scanner')
 def scanner():
@@ -222,8 +282,8 @@ def upgrade():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    """Return a custom 404 error."""
-    return 'Sorry, nothing at this URL.', 404
+	"""Return a custom 404 error."""
+	return 'Sorry, nothing at this URL.', 404
 
 
 

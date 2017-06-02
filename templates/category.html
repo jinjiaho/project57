@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block sidebar %}
+<link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+<div class="sidebar-wrapper">
+    <div class="logo">
+        <a href="http://www.creative-tim.com" class="simple-text" style="text-align:left;">
+        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
+            Supervisor
+        </a>
+    </div>
+
+    <ul class="nav">
+        <li>
+            <a href="/">
+                <i class="pe-7s-graph"></i>
+                <p>Dashboard</p>
+            </a>
+        </li>
+        
+        <li>
+            <a href="/inventory">
+                <i class="pe-7s-rocket"></i>
+                <p>Inventory</p>
+            </a>
+        </li>
+
+        <li>
+            <a href="/tasks">
+                <i class="pe-7s-note2"></i>
+                <p>Tasks</p>
+            </a>
+        </li>
+        <li>
+            <a href="/">
+                <i class="pe-7s-power"></i>
+                <p>Log Out</p>
+            </a>
+        </li>
+        
+    </ul>
+</div>
+{% endblock %}
+
+{% block title %}
+<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+
+</button>
+<a class="navbar-brand" href="#">{{category}}</a>
+
+
+
+{% endblock %}
+
+{% block content %}
+<style>
+    .card .content {
+        padding:0;
+    }
+</style>
+<script type="text/javascript">
+
+var dayarray=new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+var montharray=new Array("January","February","March","April","May","June","July","August","September","October","November","December")
+
+function getthedate(){
+var mydate=new Date()
+var year=mydate.getYear()
+if (year < 1000)
+year+=1900
+var day=mydate.getDay()
+var month=mydate.getMonth()
+var daym=mydate.getDate()
+if (daym<10)
+daym="0"+daym
+var hours=mydate.getHours()
+var minutes=mydate.getMinutes()
+var seconds=mydate.getSeconds()
+var dn="AM"
+if (hours>=12)
+dn="PM"
+if (hours>12){
+hours=hours-12
+}
+if (hours==0)
+hours=12
+if (minutes<=9)
+minutes="0"+minutes
+if (seconds<=9)
+seconds="0"+seconds
+//change font size here
+var cdate="<small><font color='000000' face='Arial'><b>"+dayarray[day]+", "+montharray[month]+" "+daym+", "+year+" "+hours+":"+minutes+":"+seconds+" "+dn
++"</b></font></small>"
+if (document.all)
+document.all.clock.innerHTML=cdate
+else if (document.getElementById)
+document.getElementById("clock").innerHTML=cdate
+else
+document.write(cdate)
+}
+if (!document.all&&!document.getElementById)
+getthedate()
+function goforit(){
+if (document.all||document.getElementById)
+setInterval("getthedate()",1000)
+}
+
+    function downloadCSV(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    // CSV file
+    csvFile = new Blob([csv], {type: "text/csv"});
+
+    // Download link
+    downloadLink = document.createElement("a");
+
+    // File name
+    downloadLink.download = filename;
+
+    // Create a link to the file
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+
+    // Hide download link
+    downloadLink.style.display = "none";
+
+    // Add the link to DOM
+    document.body.appendChild(downloadLink);
+
+    // Click download link
+    downloadLink.click();
+}
+    function exportTableToCSV(filename) {
+    var csv = [];
+    var rows = document.querySelectorAll("table tr");
+    
+    for (var i = 0; i < rows.length; i++) {
+        var row = [], cols = rows[i].querySelectorAll("td, th");
+        
+        for (var j = 0; j < cols.length; j++) 
+            row.push(cols[j].innerText);
+        
+        csv.push(row.join(","));        
+    }
+
+    // Download CSV file
+    downloadCSV(csv.join("\n"), filename);
+}
+
+</script>
+<span id="clock"></span>
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card card-plain">
+               <!--  <div class="header">
+                    <h4 class="title">Logs</h4>
+                    <p class="category">Movement of Inventory</p>
+                </div> -->
+                <div class="content table-responsive table-full-width" style="margin-top: 20px;">
+                    <table class="table table-hover">
+                        <thead>
+                            <th>Name</th>
+                            <th>Unit</th>
+                            <th>Unit Value</th>
+                            <th>Initial Quantity</th>
+                            <th>In</th>
+                            <th>Out</th>
+                            <th>Remaining Quantity</th>
+                            <th>Total Value</th>
+                        </thead>
+                        <tbody>
+                        {% for item in itemtype %}
+                            <tr>
+                                <td>{{item.name}}</td>
+                                <td>{{item.unit}}</td>
+                                <td>{{item.value}}</td>
+                                <td>{{item.starting}}</td>
+                                <td>{{item.recieved}}</td>
+                                <td>{{item.demand}}</td>
+                                <td>{{item.remaining}}</td>
+                                <td>$60</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-bottom:30px;">
+        <div class="col-xs-12" align="center">
+            <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+            <body onLoad="goforit()">
+        </div>
+
+    </div>
+</div>
+{% endblock %}

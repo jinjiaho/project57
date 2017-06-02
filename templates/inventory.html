@@ -10,7 +10,7 @@
 
     <ul class="nav">
         <li>
-            <a href="/dashboard">
+            
                 <i class="pe-7s-graph"></i>
                 <p>Dashboard</p>
             </a>
@@ -97,7 +97,6 @@
 <div class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
                 <div class="card">
                     <button class="header accordion">
                         <h4 class="title">Guest Supplies</h4>
@@ -105,21 +104,22 @@
                     <div class="content all-icons panel">
                         <div class="row">
                           
-                          {% for item in all_guest_supplies %}
-                          <a href="{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="{{item.name}}"><div class="alert alert-danger">
+                          {% for item in supplies %}
+                          <a href="supplies/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="supplies/{{item.name}}"><div class="alert alert-danger">
                               <img src="/static/img/items/supplies/{{item.name}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
+                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                             </div></a>
                           </div>
                           {% endfor %}
+                            <a href="supplies">
+                            <button class="btn btn-default btn-block" id="btn_getData" >Get Data</button></a>
 
                           </div>
 
-                        </div>
-                        </div>
                     </div>
-                </div>
+                  </div>
+                
                 <div class="card">
                     <button class="header accordion">
                         <h4 class="title">Guest Hampers</h4>
@@ -128,14 +128,16 @@
                         <div class="row">
                           
 
-                          {% for item in all_guest_hampers %}
-                          <a href="{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="{{item.name}}"><div class="alert alert-warning">
+                          {% for item in hampers %}
+                          <a href="hampers/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="hampers/{{item.name}}"><div class="alert alert-warning">
                               <img src="/static/img/items/hampers/{{item.file}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
+                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                             </div></a>
                           </div>
                           {% endfor %}
+                          <a href="hampers">
+                          <button class="btn btn-default btn-block" id="btn_getData">Get Data</button></a>
 
 
                           </div>
@@ -151,27 +153,28 @@
                         <div class="row">
                           
 
-                          {% for item in all_kitchenware %}
-                          <a href="{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="{{item.name}}"><div class="alert alert-warning">
-                              <img src="/static/img/items/kitchenware/{{item.name}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
+                          {% for item in kitchenware %}
+                          <a href="kitchenware/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="kitchenware/{{item.name}}"><div class="alert alert-warning">
+                              <img src="/static/img/items/kitchenware/{{item.file}}.jpg"/>
+                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                             </div></a>
                           </div>
                           {% endfor %}
+                          <a href="kitchenware">
+                          <button class="btn btn-default btn-block" id="btn_getData">Get Data</button></a>
 
-
-                          
                           </div>
                           
-                        </div>
                     </div>
                 </div>
-            </div>
+                <!-- </div>
+                </div>
+            </div> -->
 
         </div>
         <div class="row buttons">
-          <button class="btn btn-default btn-block" id="btn_getData">Get Data</button>
+          
           <button class="btn btn-primary btn-block" id="btn_newItem">New Item</button>
         </div>
     </div>
@@ -192,5 +195,7 @@ for (i = 0; i < acc.length; i++) {
         }
     }
 }
+
 </script>
+
 {% endblock %}
