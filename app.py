@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, session, redirect, url_for, flash
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
+from datetime import datetime
 import os
 import copy
 from forms import LoginForm, RetrievalForm
+# from flask.ext.cache import Cache
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -149,6 +151,43 @@ def logs():
 @app.route('/scanner')
 def scanner():
 	return render_template('scanner.html')
+
+# RA shelf view
+@app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
+# @cache.cached(timeout=50)
+def shelf(tag_id):
+	if request.method == 'GET':
+		# TODO: query for items in tag
+		return render_template('storeroom.html', role=role, cart_qty = len(cart))
+	else: 
+		item = request.form['item']
+		qty = request.form['qty']
+		updated = False
+		for item in cart:
+			if item['name']==item:
+				item['qty'] = item['qty'] + qty
+			updated = True
+		if updated == False:
+			cart.append({'name':item, 'qty': qty})
+		return render_template('storeroom.html', role=role, cart_qty = len(cart))
+
+
+@app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
+def checkout(tag_id):
+	if request.method == 'GET':
+		return render_template('cart.html', role=role, cart=cart)
+	else:
+		now = datetime.now()
+		form = request.form
+		items = d.getlist['item']
+		qtys = d.getlist['qty']
+		#  for i in range(0, d.size()):
+			# HARDCODED: Username
+			# query = "INSERT INTO Logs (datetime, user, item, qty, type, tag_id) VALUES ('"+now+"', 'ra', "+items[i]+"', '"+qtys[i]+"', 'withdrawal', '"+tag_id"');"
+			# TODO: Execute query to create log
+		cache = []
+		flash("Success!")
+		return redirect('scanner.html')
 
 @app.route('/storeroom/')
 def storeroom():

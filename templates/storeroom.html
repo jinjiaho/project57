@@ -1,3 +1,151 @@
+<<<<<<< HEAD
+{% extends "base.html" %}
+{% block sidebar %}
+{% endblock %}
+
+{% block title %}
+    
+<span class="cart-group">
+    <a class="cart-icon" href="cart">
+        <div class="cart-notif">
+            <span class="cart-qty">{{cart_qty}}</span>
+        </div>
+        <img src="/static/img/cart.png" />
+    </a>
+</span>
+
+<a class="navbar-brand" href="#">Store 1 Shelf 1</a>
+{% endblock %}
+
+{% block content%}
+<style>
+    
+    span.cart-group {
+        float: right !important;
+        margin: 15px 25px 15px 0;
+    }
+
+    span.cart-group img {
+        max-width: 40px;
+        max-height: 30px;
+        margin-right: -7px;
+        z-index: 1;
+    }
+
+    .cart-icon .cart-notif {
+        float:right;
+        width: 14px;
+        height: 14px;
+        background-color: red;
+        border: 1px solid red;
+        border-radius: 8px;
+        margin-top: -3px;
+        z-index: 2;
+        position: relative;
+    }
+
+    .cart-icon .cart-notif .cart-qty {
+        color: white;
+        z-index: 9;
+        position: relative;
+        top: -6px;
+        right: -3px;
+        font-size: x-small;
+    }
+
+    .font-icon-detail img {
+        /*width: 50px;*/
+        height: 50px;
+        margin-bottom: 5px;
+    }
+
+    .font-icon-detail .name {
+        color: #000;
+        height: 37px;
+    }
+
+    .item-pic {
+        width: 100%;
+        position: fixed;
+        top: 8%;
+    }
+
+    .item-pic img {
+        height: 50px;
+    }
+
+
+</style>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="content all-icons">
+                        <div class="row">
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal">
+                                    <div class="font-icon-detail">
+                                        <img src="/static/img/items/Guest supplies/Ascott pen.jpg"/><br/>
+                                        <span class="name" data-name="pen">Pen</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_2"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Ascott umbrella.jpg"/><br/>
+                                    <span class="name">Umbrella</span>
+                                </div></a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_3"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Body lotion 35ml.jpg"/><br/>
+                                    <span class="name">Body Lotion</span>
+                                </div></a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_4"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Comb.jpg"/><br/>
+                                    <span class="name">Comb</span>
+                                </div></a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_5"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Conditioner 35ml.jpg"><br/>
+                                    <span class="name">Conditioner</span>
+                                </div></a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_6"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Cotton buds.jpg"/><br/>
+                                <span class="name">Cotton Buds</span>
+                                </div></a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_7"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Dish washing bottle.jpg"/><br/>
+                                    <span class="name">Dish Soap</span>
+                                </div></a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Guest slippers.jpg"/><br/>
+                                    <span class="name">Slippers</span>
+                                </div></a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a class="open-modal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Hand soap bottle.jpg"/><br/>
+                                    <span class="name">Hand Soap</span>
+                                </div></a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/L'occitaine.png" style="width: 80px;"/>
+                                    <span class="name">L'occitane</span>
+                                </div></a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Laundry bag plastic.jpg"/><br/>
+                                    <span class="name">Laundry bag</span>
+                                </div></a>
+                            </div>
+                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                                <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Laundry detergent box.jpg"/><br/>
+                                    <span class="name">Detergent</span>
+                                </div></a>
+=======
  <!doctype html>
 <html lang="en">
 <head>
@@ -76,7 +224,6 @@
                             <div class="col-md-12">
                                 <div class="card">
                                         <div class="content all-icons">
-                                            {% for item in items %}
                                                 <div class="row">
         <!-- for all the items in the category-->
 
@@ -92,91 +239,9 @@
                 </div>
                 
             {% endfor %}
-
-            
-            <!--  <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Comb.jpg"/><br/>
-                                                            <span class="name">Comb</span>
-                                                        </div></a>
-                                                    </div>
- -->
-
-
-                
-
-
-
-
-
-                                                    <!-- <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="" data-toggle="modal" data-target="#qtyModal" id="openModal">
-                                                            <div class="font-icon-detail">
-                                                                <img src="/static/img/items/Guest supplies/Ascott pen.jpg"/><br/> <!--image filename to be taken from database-->
-                                                                <span class="name">{{ item }}</span>
-                                                            </div>
-                                                        </a>
-                                                    </div>
-<<<<<<< HEAD
-                                            {% endfor %}
-=======
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Ascott umbrella.jpg"/><br/>
-                                                            <span class="name">Umbrella</span>
-                                                        </div></a>
-                                                    </div>
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Body lotion 35ml.jpg"/><br/>
-                                                            <span class="name">Body Lotion</span>
-                                                        </div></a>
-                                                    </div>
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Comb.jpg"/><br/>
-                                                            <span class="name">Comb</span>
-                                                        </div></a>
-                                                    </div>
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Conditioner 35ml.jpg"><br/>
-                                                            <span class="name">Conditioner</span>
-                                                        </div></a>
-                                                    </div>
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Cotton buds.jpg"/><br/>
-                                                        <span class="name">Cotton Buds</span>
-                                                        </div></a>
-                                                    </div>
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Dish washing bottle.jpg"/><br/>
-                                                            <span class="name">Dish Soap</span>
-                                                        </div></a>
-                                                    </div>
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Guest slippers.jpg"/><br/>
-                                                            <span class="name">Slippers</span>
-                                                        </div></a>
-                                                    </div>
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Hand soap bottle.jpg"/><br/>
-                                                            <span class="name">Hand Soap</span>
-                                                        </div></a>
-                                                    </div>
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/L'occitaine.png" style="width: 80px;"/>
-                                                            <span class="name">L'occitane</span>
-                                                        </div></a>
-                                                    </div>
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Laundry bag plastic.jpg"/><br/>
-                                                            <span class="name">Laundry bag</span>
-                                                        </div></a>
-                                                    </div>
-                                                    <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                                        <a href="#popupNumpad" data-rel="popup"><div class="font-icon-detail"><img src="/static/img/items/Guest supplies/Laundry detergent box.jpg"/><br/>
-                                                            <span class="name">Detergent</span>
-                                                        </div></a>
-                                                    </div> -->
-                                                </div>
->>>>>>> f6058efe9a5ba3fe7e624dad302d797308f2710b
                                         </div>
                                 </div>
+>>>>>>> 72ca3f12da3cde6e1e143f2bea3cdd8bec94db25
                             </div>
                         </div>
                 </div>
@@ -218,6 +283,36 @@
     </div>
 </div>
 
+<<<<<<< HEAD
+<script type="text/javascript">
+$(document).ready(function() {
+    $(".openModal").click(function() {
+        var name = $(this).find("span").innerHTML();
+        var img = $(this).find("img").attr('src');
+        $("#qtyModal form .item-pic img").attr('src', img);
+        $("#qtyModal form .qty-display input['item']").val(name);
+    });
+})
+    
+    
+</script>
+
+<div id="qtyModal" class="modal" data-backdrop="false">
+    <span class="close" data-dismiss="modal">&times;</span>
+    <form method="POST">
+        <div class='item-pic' align="center"><img src=""/></div>
+        <div class="qty-display">
+            <p>Enter quantity:</p>
+            <input id="quantity" type="number" name="qty">
+            <input type="hidden" name="item" value="">
+            <div class="button-wrapper" align="center" style="margin-top: 15px;">
+                <button type="submit" class="btn btn-success" style="">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+=======
 
 </body>
 
@@ -263,3 +358,4 @@
     </script>
 
 </html>
+>>>>>>> 72ca3f12da3cde6e1e143f2bea3cdd8bec94db25
