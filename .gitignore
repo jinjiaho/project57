@@ -1,5 +1,5 @@
 # Flask core python files
-flask/*
+flask/
 
 # python compiled files
 *.pyc

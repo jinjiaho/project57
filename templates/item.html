@@ -2,7 +2,7 @@
 {% block sidebar %}
 <div class="sidebar-wrapper">
     <div class="logo">
-        <a href="http://www.creative-tim.com" class="simple-text" style="text-align:left;">
+        <a href="" class="simple-text" style="text-align:left;">
         <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
             Supervisor
         </a>
@@ -52,21 +52,16 @@
     border-color: #81eb50;
   }
 </style>
+<link rel="stylesheet" type="text/css" href="../static/css/loading.css"/>
+
 <div class="content">
     <div class="container-fluid">
         <div class="row">
 			<div class="col-md-9">
 			    <div class="card">
-			        <div class="header">
-			            <h4 class="title">{{item}}</h4>
-			        </div>
 			        <div class="content">
-			            <div id="chartHours" class="ct-chart"></div>
-			            <div class="footer">
-                            <div class="legend">
-                                <i class="fa fa-circle text-info"></i> Quantity
-                                <i class="fa fa-circle text-danger"></i> Room Occupancy
-                            </div>
+                        <div id="chart" style="margin: 0 auto"></div>
+			            <div class="footer" id="update" style="display:none">
                             <hr>
 			                <div class="stats">
 			                    <i class="fa fa-history"></i> Updated 3 minutes ago
@@ -87,4 +82,94 @@
     	
 	</div>
 </div>
+
+<script>
+$.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=new-intraday.json&callback=?', function (data) {
+
+    // create the chart
+    Highcharts.stockChart('chart', {
+
+        chart: {
+            events: {
+                load: function () {
+                    console.log("chart loaded");
+                    $("#update").css("display", "inline");
+                }
+            }
+        },
+
+        title: {
+            text: '{{item}}'
+        },
+
+        subtitle: {
+            text: 'Quantity remaining'
+        },
+
+        xAxis: {
+            gapGridLineWidth: 0
+        },
+
+        rangeSelector: {
+            buttons: [{
+                type: 'hour',
+                count: 1,
+                text: '1h'
+            }, {
+                type: 'day',
+                count: 1,
+                text: '1D'
+            }, {
+                type: 'all',
+                count: 1,
+                text: 'All'
+            }],
+            selected: 1,
+            inputEnabled: false
+        },
+        credits: {
+            enabled: false
+        },
+        series: [{
+            name: 'Quantity',
+            type: 'area',
+            data: data,
+            gapSize: 5,
+            tooltip: {
+                valueDecimals: 2
+            },
+            fillColor: {
+                linearGradient: {
+                    x1: 0,
+                    y1: 0,
+                    x2: 0,
+                    y2: 1
+                },
+                stops: [
+                    [0, Highcharts.getOptions().colors[0]],
+                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+            },
+            threshold: null
+        }],
+        plotOptions: {
+            series: {
+                events: {
+                  afterAnimate: function (ev) {
+                    // console.log(data)
+                    // console.log(ev)
+                    // console.log('fired only once for each series');
+                    $("#update").css("display", "inline");
+                  }
+                }
+            }
+        }
+    });
+});
+
+$(document).ready(function(){
+    // insert any required code here
+});
+
+</script>
 {% endblock %}
