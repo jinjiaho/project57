@@ -40,7 +40,6 @@ CREATE TABLE `User` (
 
 LOCK TABLES `User` WRITE;
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;
-INSERT INTO `User` VALUES (1,'mabeltan','nuggets','attendant','Mabel Tan'),(2,'henrylai','henry','supervisor','Henry Lai'),(3,'supervisor','supervisor','supervisor','supervisor'),(4,'room','attendant','attendant','room attendant');
 /*!40000 ALTER TABLE `User` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
