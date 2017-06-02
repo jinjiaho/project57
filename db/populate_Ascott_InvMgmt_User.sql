@@ -19,9 +19,13 @@
 -- Dumping data for table `User`
 --
 
+USE `Ascott_invMgmt`;
 LOCK TABLES `User` WRITE;
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;
-INSERT INTO `User` VALUES (1,'mabeltan','nuggets','attendant','Mabel Tan'),(2,'henrylai','henry','supervisor','Henry Lai'),(3,'supervisor','supervisor','supervisor','supervisor'),(4,'room','attendant','attendant','room attendant');
+INSERT INTO `User` VALUES (1,'mabeltan','nuggets','attendant','Mabel Tan'),
+(2,'henrylai','henry','supervisor','Henry Lai'),
+(3,'suroot','password','supervisor','Supervisor (root)'),
+(4,'raroot','password','attendant','Room Attendant (root)');
 /*!40000 ALTER TABLE `User` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

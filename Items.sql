@@ -4,6 +4,7 @@ LIMIT 0, 1000
 
 -- Date: 2017-05-31 14:28
 */
+USE `Ascott_InvMgmt`;
 INSERT INTO `Items` (`idItem`,`item`,`idNFC`,`qtyLeft`,`reorderPt`,`batchSize`,`category`,`picture`,`unitSize`) VALUES (1,'Butternut Squash','Level4C2',35,0,1,'Guest Hampers','Butternut Squash.jpg','Per Pkt');
 INSERT INTO `Items` (`idItem`,`item`,`idNFC`,`qtyLeft`,`reorderPt`,`batchSize`,`category`,`picture`,`unitSize`) VALUES (2,'Snapple Juice','Level4C2',48,0,1,'Guest Hampers','Snapple Juice.jpg','Per Bottle');
 INSERT INTO `Items` (`idItem`,`item`,`idNFC`,`qtyLeft`,`reorderPt`,`batchSize`,`category`,`picture`,`unitSize`) VALUES (3,'Cereals (small)','Level4C2',384,0,1,'Guest Hampers','Cereals (small).jpg','Per Pkt');
