@@ -23,7 +23,7 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 adminmode = False
 
-
+role = ""
 #----------------------------METHODS-------------------------
 #methods gives me all the items based on category
 def getAllInventory(category):
@@ -76,10 +76,6 @@ def login():
 			password = form.password.data
 			role = form.role.data
 		
-			# cursor = mysql.connect().cursor()
-			# sql = "SELECT username, password, role FROM Ascott_InvMgmt.User WHERE username="'+username+'";"
-			# cursor.execute(sql)
-			# db = MySQLdb.connect(host="localhost", port = 3306, user = "root", password="classroom",db="Ascott_InvMgmt")
 			cursor=mysql.connect().cursor()
 			cursor.execute("SELECT username, password, role FROM User WHERE username= '" + username + "';")
 
@@ -106,10 +102,12 @@ def login():
 				if data[2] == "supervisor":
 					session['logged_in'] = True
 					session['username'] = username
+					role = "supervisor"
 					return redirect(url_for('hello'))
 				elif data[2] =="attendant":
 					session['logged_in'] = True
 					session['username'] = username
+					role = "ra"
 					return redirect(url_for('scanner'))
 				else:
 					flash('Role is incorrect')
@@ -156,21 +154,21 @@ def scanner():
 @app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
 # @cache.cached(timeout=50)
 def shelf(tag_id):
+	if not session['logged_in']:
+		return redirect(url_for('login'))
 	if request.method == 'GET':
 		conn = mysql.connect()
 		cursor = conn.cursor()
 
-		cursor.execute("SELECT idItem, item, category, idNFC, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(idNFC))
+		cursor.execute("SELECT name, category, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(tag_id))
 
 		data=cursor.fetchall()
 		things = []
 		for item in data:
 			things.append(
-				{"item_id": item[0],
-				"name": item[1],
-				"category": item[2],
-				"idNFC":item[3],
-				"picture":item[4]})
+				{"name": item[0],
+				"category": item[1],
+				"picture":item[2]})
 		return render_template('storeroom.html', role=role, things=things, cart_qty = len(cart))
 	else: 
 		item = request.form['item']
@@ -194,10 +192,14 @@ def checkout(tag_id):
 		form = request.form
 		items = d.getlist['item']
 		qtys = d.getlist['qty']
-		#  for i in range(0, d.size()):
-			# HARDCODED: Username
-			# query = "INSERT INTO Logs (datetime, user, item, qty, type, tag_id) VALUES ('"+now+"', 'ra', "+items[i]+"', '"+qtys[i]+"', 'withdrawal', '"+tag_id"');"
-			# TODO: Execute query to create log
+		user = session['username']
+
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		for i in range(0, len(items)):
+			cursor.execute("SELECT name FROM Items WHERE name={} AND idNFC={};".format(items[i], tag_id))
+			item = cursor.fetchone()[0]
+			cursor.execute("INSERT INTO Logs (user, dateTime, action, qty, item, idNFC) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qtys[i], tag_id))
 		cache = []
 		flash("Success!")
 		return redirect('scanner.html')
@@ -234,6 +236,13 @@ def retrieval(things):
 
 	return render_template("retrieval.html", things=things)
 
+@app.route('/logout')
+def logout():
+	session.pop('logged_in', None)
+	session.pop('username', None)
+	session.clear()
+	role = ""
+
 @app.route('/tasks')
 def tasks():
 	return render_template('tasks.html')
@@ -246,7 +255,6 @@ def template():
 def page_not_found(e):
     """Return a custom 404 error."""
     return 'Sorry, nothing at this URL.', 404
-
 
 
 ## testing
