@@ -25,14 +25,16 @@ DROP TABLE IF EXISTS `Logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Logs` (
-  `idLogs` int(11) NOT NULL,
-  `uid` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user` varchar(45) NOT NULL,
   `dateTime` datetime NOT NULL,
-  `action` varchar(45) NOT NULL,
+  `action` varchar(45) CHECK (`action` = 'Retrieval' or `action` = 'Stock check' or `action` = 'Incoming'),
   `qty` varchar(45) NOT NULL,
-  `idItem` varchar(45) NOT NULL,
+  `item` varchar(45) NOT NULL,
   `idNFC` varchar(45) NOT NULL,
-  PRIMARY KEY (`idLogs`)
+  FOREIGN KEY (`user`) references User (`username`) on delete cascade on update cascade,
+  FOREIGN KEY (`item`) references Item (`name`) on delete cascade on update cascade,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

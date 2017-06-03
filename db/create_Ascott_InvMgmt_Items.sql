@@ -25,16 +25,16 @@ DROP TABLE IF EXISTS `Items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Items` (
-  `idItem` int(11) NOT NULL,
-  `item` varchar(45) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
   `idNFC` varchar(45) NOT NULL,
   `qtyLeft` int(11) NOT NULL,
   `reorderPt` int(11) NOT NULL,
   `batchSize` int(11) NOT NULL,
-  `category` char(25) NOT NULL,
+  `category` char(25) NOT NULL CHECK (`category` = 'Guest Supplies' or `category` = 'Guest Hampers' or `category` = 'Kitchenware'),
   `picture` char(100) NOT NULL,
   `unitSize` char(100) NOT NULL,
-  PRIMARY KEY (`idItem`,`idNFC`)
+  PRIMARY KEY (`id`,`idNFC`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
