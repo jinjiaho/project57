@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 import copy
 from forms import LoginForm, RetrievalForm
+import csv
 # from flask.ext.cache import Cache
 
 app = Flask(__name__)
@@ -57,7 +58,14 @@ def getFromLevels(idNFC):
 			"category": item[1],
 			"idNFC":item[2]})
 	return things
-		
+
+# TEST: extract dummy inventory qty data for Highcharts
+def extract():
+	with open("inventory.csv", 'rU') as f:  #opens file
+	    reader = csv.reader(f)
+	    data = list(list(rec) for rec in csv.reader(f, delimiter=',')) #reads csv into a list of lists
+	return data
+
 
 #----------------------------ROUTING ------------------------
 
@@ -142,7 +150,8 @@ def inventory():
 @app.route('/inventory/<item>')
 def item(item):
 	item = item
-	return render_template('item.html', item=item)
+	qty = extract()
+	return render_template('item.html', item=item, qty=qty)
 
 @app.route('/logs')
 def logs():
