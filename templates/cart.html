@@ -45,11 +45,11 @@
                                     </thead>
                                     <tbody>
                                         {% for item in cart %}
-                                        <tr>
-                                            <td><img src="/static/img/items/Guest supplies/Ascott pen.jpg"/></td>
-                                            <td style="text-transform:capitalize;">{{item.name}}</td>
-                                            <td><a href="" data-toggle="modal" data-target="#qtyModal" id="openModal">{{item.qty}}</a></td>
-                                            <td>&times;</td>
+                                        <tr id="{{item.id}}_row">
+                                            <td><img src="/static/img/items/Guest supplies/{{item.picture}}"/></td>
+                                            <td><span style="text-transform:capitalize;">{{item.name}}</span></td>
+                                            <td><input type="number" name="{{item.name}}" value="{{item.qty}}" /></td>
+                                            <td id="{{item.id}}" class="x">&times;</td>
                                         </tr>
                                         {% endfor %}
                                         <tr>
@@ -72,6 +72,15 @@
             </div>
         </div>
 </div>
+
+<script>
+    $("td .x").click(function() {
+        var item_id = $(this).attr('id');
+        $("tr #"+item_id+"_row").remove();
+    })
+</script>
+
+<!-- 
 <div id="qtyModal" class="modal" data-backdrop="false">
     <span class="close" data-dismiss="modal">&times;</span>
     <div class="qty-display">
@@ -95,5 +104,5 @@
         <li class="enter">Enter</li> 
     </ul>  
   </div>
-</div>
+</div> -->
 {% endblock %}

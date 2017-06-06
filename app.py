@@ -155,20 +155,21 @@ def scanner():
 # @cache.cached(timeout=50)
 def shelf(tag_id):
 	if not session['logged_in']:
-		return redirect(url_for('login'))
+		return redirect('/login')
 	if request.method == 'GET':
 		conn = mysql.connect()
 		cursor = conn.cursor()
 
-		cursor.execute("SELECT name, category, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(tag_id))
+		cursor.execute("SELECT id, name, category, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(tag_id))
 
 		data=cursor.fetchall()
 		things = []
 		for item in data:
 			things.append(
-				{"name": item[0],
-				"category": item[1],
-				"picture":item[2]})
+				{"id" : item[0],
+				"name": item[1],
+				"category": item[2],
+				"picture":item[3]})
 		return render_template('storeroom.html', role=role, things=things, cart_qty = len(cart))
 	else: 
 		item = request.form['item']
@@ -186,21 +187,19 @@ def shelf(tag_id):
 @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
 def checkout(tag_id):
 	if request.method == 'GET':
+
 		return render_template('cart.html', role=role, cart=cart)
 	else:
 		now = datetime.now()
-		form = request.form
-		items = d.getlist['item']
-		qtys = d.getlist['qty']
+		form_data = request.form
 		user = session['username']
-
+		
 		conn = mysql.connect()
 		cursor = conn.cursor()
-		for i in range(0, len(items)):
-			cursor.execute("SELECT name FROM Items WHERE name={} AND idNFC={};".format(items[i], tag_id))
-			item = cursor.fetchone()[0]
-			cursor.execute("INSERT INTO Logs (user, dateTime, action, qty, item, idNFC) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qtys[i], tag_id))
-		cache = []
+		for item, qty in form_data.iteritems():
+			cursor.execute("INSERT INTO Logs (user, dateTime, action, qty, name, idNFC) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
+
+		cart = []
 		flash("Success!")
 		return redirect('scanner.html')
 
