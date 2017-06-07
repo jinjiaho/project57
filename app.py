@@ -196,33 +196,36 @@ def scanner():
 @app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
 # @cache.cached(timeout=50)
 def shelf(tag_id):
-	if request.method == 'GET':
-		conn = mysql.connect()
-		cursor = conn.cursor()
+	if not session.get('logged_in'):
+		return redirect(url_for('login'))
+	else:
+		if request.method == 'GET':
+			conn = mysql.connect()
+			cursor = conn.cursor()
 
-		cursor.execute("SELECT idItem, item, category, idNFC, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(idNFC))
+			cursor.execute("SELECT idItem, item, category, idNFC, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(tag_id))
 
-		data=cursor.fetchall()
-		things = []
-		for item in data:
-			things.append(
-				{"item_id": item[0],
-				"name": item[1],
-				"category": item[2],
-				"idNFC":item[3],
-				"picture":item[4]})
-		return render_template('storeroom.html', role=role, things=things, cart_qty = len(cart))
-	else: 
-		item = request.form['item']
-		qty = request.form['qty']
-		updated = False
-		for item in cart:
-			if item['name']==item:
-				item['qty'] = item['qty'] + qty
-			updated = True
-		if updated == False:
-			cart.append({'name':item, 'qty': qty})
-		return render_template('storeroom.html', role=role, cart_qty = len(cart))
+			data=cursor.fetchall()
+			things = []
+			for item in data:
+				things.append(
+					{"item_id": item[0],
+					"name": item[1],
+					"category": item[2],
+					"idNFC":item[3],
+					"picture":item[4]})
+			return render_template('storeroom.html', things=things) #removed role=role and cart_qty=len(cart) for now, since undefined
+		else: 
+			item = request.form['item']
+			qty = request.form['qty']
+			updated = False
+			for item in cart:
+				if item['name']==item:
+					item['qty'] = item['qty'] + qty
+				updated = True
+			if updated == False:
+				cart.append({'name':item, 'qty': qty})
+			return render_template('storeroom.html', role=role, cart_qty = len(cart))
 
 
 @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
@@ -281,6 +284,12 @@ def tasks():
 @app.route('/template')
 def template():
 	return render_template('template.html')
+
+@app.route('/logout') #added this to test logging in, no logout buttons in the html files at the moment
+def logout():
+	session.pop('logged_in', None)
+	session.pop('username', None)
+	return redirect(url_for('login'))
 
 @app.errorhandler(404)
 def page_not_found(e):
