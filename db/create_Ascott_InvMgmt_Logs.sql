@@ -29,7 +29,8 @@ CREATE TABLE `Logs` (
   `uid` int(11) NOT NULL,
   `dateTime` datetime NOT NULL,
   `action` varchar(45) NOT NULL,
-  `qty` varchar(45) NOT NULL,
+  `change` int(45) NOT NULL,
+  `qtyAfter` int(45) NOT NULL,
   `idItem` varchar(45) NOT NULL,
   `idNFC` varchar(45) NOT NULL,
   PRIMARY KEY (`idLogs`)

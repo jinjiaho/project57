@@ -33,19 +33,20 @@ def getAllInventory(category):
 
 	cursor.execute(
 		"SELECT idItem, item, qtyLeft, unit, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
-
 	data = cursor.fetchall()
 	print(data)
 	items = []
 	for item in data:
 		cursor.execute(
-			"SELECT qty,action FROM ascott_invmgmt.logs WHERE dateTime between date_sub(NOW(), INTERVAL 1 month) AND NOW() AND idItem='{}';".format(item[0]))
+			"SELECT action,'change' FROM ascott_invmgmt.logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now()) AND idItem='{}';".format(item[0]))
 		in_out_data = cursor.fetchall()
 		delivered_out = 0
 		recieved = 0
 		for i in in_out_data:
-			if i[1].encode('ascii') == 'out':
-				delivered_out = delivered_out + int(i[0].encode('ascii'))
+			print(i[1].encode('ascii'))
+			print(i[0].encode('ascii'))
+			if i[0].encode('ascii') == 'out':
+				delivered_out = delivered_out + (int(i[1].encode('ascii')))
 			else:
 				recieved = recieved + int(i[0].encode('ascii'))
 		remaining_quantity = item[2]
@@ -86,7 +87,7 @@ def getAllLogs():
 	conn = mysql.connect()
 	cursor = conn.cursor()
 	cursor.execute(
-		"SELECT uid, dateTime, action, qty, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
+		"SELECT uid, dateTime, action, 'change', qtyAfter, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
 
 	data=cursor.fetchall()
 	things = []
@@ -98,19 +99,18 @@ def getAllLogs():
 		
 
 		cursor.execute(
-			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[4]))
+			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[5]))
 		item_data=cursor.fetchall()
 
 		things.append(
 			{"name": user_data[0][0].encode('ascii'),
 			"dateTime": row[1],
 			"action":row[2],
-			"qty":row[3],
+			"change":row[3],
+			"remaining":row[4],
 			"item":item_data[0][0].encode('ascii'),
 			"category":item_data[0][1].encode('ascii'),
-			"location":row[5]})
-
-	
+			"location":row[6]})
 	print(things)
 	return things
 

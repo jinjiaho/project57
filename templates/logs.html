@@ -270,8 +270,9 @@ $(document).ready(function() {
                             <th class="filter-select filter-onlyAvail" data-placeholder="All">Name</th>
                             <th class="filter-select filter-onlyAvail" data-placeholder="All">Item</th>
                             <th>Category</th>
-                            <th>Qty</th>
                             <th class="filter-select filter-onlyAvail">In/Out</th>
+                            <th>Quantity change</th>
+                            <th>Quantity remaining</th>
                             <th>Date-Time (two inputs; range)</th>
                             <th>Location</th>
                             </tr>
@@ -282,8 +283,9 @@ $(document).ready(function() {
                                 <td>{{log.name}}</td>
                                 <td>{{log.item}}</td>
                                 <td>{{log.category}}</td>
-                                <td>{{log.qty}}</td>
                                 <td>{{log.action}}</td>
+                                <td>{{log.change}}</td>
+                                <td>{{log.remaining}}</td>
                                 <td>{{log.dateTime}}</td>
                                 <td>{{log.location}}</td>
                             </tr>
