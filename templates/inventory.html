@@ -96,8 +96,8 @@
                         <div class="row">
                           
                           {% for item in all_guest_supplies %}
-                          <a href="{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="{{item.name}}"><div class="alert alert-danger">
+                          <a href="./{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="./{{item.name}}"><div class="alert alert-danger">
                               <img src="/static/img/items/supplies/{{item.name}}.jpg"/>
                               <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
                             </div></a>
@@ -119,8 +119,8 @@
                           
 
                           {% for item in all_guest_hampers %}
-                          <a href="{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="{{item.name}}"><div class="alert alert-warning">
+                          <a href="./{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="./{{item.name}}"><div class="alert alert-warning">
                               <img src="/static/img/items/hampers/{{item.file}}.jpg"/>
                               <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
                             </div></a>
@@ -141,8 +141,8 @@
                           
 
                           {% for item in all_kitchenware %}
-                          <a href="{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="{{item.name}}"><div class="alert alert-warning">
+                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="inventory/{{item.name}}"><div class="alert alert-warning">
                               <img src="/static/img/items/kitchenware/{{item.name}}.jpg"/>
                               <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
                             </div></a>

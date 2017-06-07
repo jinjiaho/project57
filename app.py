@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash
+from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -65,6 +65,37 @@ def extract():
 	    reader = csv.reader(f)
 	    data = list(list(rec) for rec in csv.reader(f, delimiter=',')) #reads csv into a list of lists
 	return data
+
+# POST for getting chart data
+@app.route('/api/getData/', methods=["POST"])
+def getData():
+
+	print "content_type: ", request.content_type
+	print "request.json: ", request.json
+
+	data = str(request.get_json())
+	# print(data, type(data))
+
+	if not request.json:
+	    print "Bad json format"
+	    abort(400)
+	else:
+		conn = mysql.connect()
+		cursor = conn.cursor()
+
+		query = "SELECT iditem FROM Ascott_Invmgmt.Items WHERE item = '{}';".format(request.json)
+
+		cursor.execute(query)
+		idItem = cursor.fetchone()[0]
+		# print(idItem)
+
+		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {0}".format(idItem)
+		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = 1"
+		# print query
+		cursor.execute(query)
+		responseData = cursor.fetchall()
+
+		return jsonify(responseData)
 
 
 #----------------------------ROUTING ------------------------
@@ -134,7 +165,7 @@ def hello():
     return render_template('dashboard.html')
 
 
-@app.route('/inventory/')
+@app.route('/inventory')
 def inventory():
 
     # get current list of all items listed in db
