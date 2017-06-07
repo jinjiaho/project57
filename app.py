@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, session, redirect, url_for, flash
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
+from datetime import datetime
 import os
 import copy
 from forms import LoginForm, RetrievalForm
+# from flask.ext.cache import Cache
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -78,7 +80,7 @@ def getFromLevels(idNFC):
 	return things
 
 
-#methods gives me all the logs that occurred within the last 24 hours.
+#methods gives me all the logs that occurred within the current month.
 def getAllLogs():
 	conn = mysql.connect()
 	cursor = conn.cursor()
@@ -107,7 +109,58 @@ def getAllLogs():
 			"category":item_data[0][1].encode('ascii'),
 			"location":row[5]})
 
+	
+	print(things)
 	return things
+
+#methods gives me all the unique names in logs that occurred within the current month.
+# def getUniqueNames():
+# 	conn = mysql.connect()
+# 	cursor = conn.cursor()
+# 	cursor.execute(
+# 		"SELECT uid, dateTime, action, qty, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
+
+# 	data=cursor.fetchall()
+# 	names=[]
+	
+# 	for row in data:
+# 		cursor.execute(
+# 			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
+# 		user_data=cursor.fetchall()
+		
+
+# 		cursor.execute(
+# 			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[4]))
+# 		item_data=cursor.fetchall()
+
+# 		names.append({"name":user_data[0][0].encode('ascii')})
+# 	names = set( val for dic in names for val in dic.values())
+# 	print(names)
+# 	return names
+
+# def getUniqueItems():
+# 	conn = mysql.connect()
+# 	cursor = conn.cursor()
+# 	cursor.execute(
+# 		"SELECT uid, dateTime, action, qty, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
+
+# 	data=cursor.fetchall()
+# 	items=[]
+	
+# 	for row in data:
+# 		cursor.execute(
+# 			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
+# 		user_data=cursor.fetchall()
+		
+
+# 		cursor.execute(
+# 			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[4]))
+# 		item_data=cursor.fetchall()
+
+# 		items.append({"item":item_data[0][0].encode('ascii')})
+# 	items = set( val for dic in items for val in dic.values())
+
+# 	return items
 		
 
 #----------------------------ROUTING ------------------------
@@ -204,11 +257,64 @@ def category(category):
 @app.route('/logs')
 def logs():
 	logs=getAllLogs()
+	# names=getUniqueNames()
+	# items=getUniqueItems()
 	return render_template('logs.html',logs=logs)
+	# names=names, items=items)
 
 @app.route('/scanner')
 def scanner():
 	return render_template('scanner.html')
+
+# RA shelf view
+@app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
+# @cache.cached(timeout=50)
+def shelf(tag_id):
+	if request.method == 'GET':
+		conn = mysql.connect()
+		cursor = conn.cursor()
+
+		cursor.execute("SELECT idItem, item, category, idNFC, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(idNFC))
+
+		data=cursor.fetchall()
+		things = []
+		for item in data:
+			things.append(
+				{"item_id": item[0],
+				"name": item[1],
+				"category": item[2],
+				"idNFC":item[3],
+				"picture":item[4]})
+		return render_template('storeroom.html', role=role, things=things, cart_qty = len(cart))
+	else: 
+		item = request.form['item']
+		qty = request.form['qty']
+		updated = False
+		for item in cart:
+			if item['name']==item:
+				item['qty'] = item['qty'] + qty
+			updated = True
+		if updated == False:
+			cart.append({'name':item, 'qty': qty})
+		return render_template('storeroom.html', role=role, cart_qty = len(cart))
+
+
+@app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
+def checkout(tag_id):
+	if request.method == 'GET':
+		return render_template('cart.html', role=role, cart=cart)
+	else:
+		now = datetime.now()
+		form = request.form
+		items = d.getlist['item']
+		qtys = d.getlist['qty']
+		#  for i in range(0, d.size()):
+			# HARDCODED: Username
+			# query = "INSERT INTO Logs (datetime, user, item, qty, type, tag_id) VALUES ('"+now+"', 'ra', "+items[i]+"', '"+qtys[i]+"', 'withdrawal', '"+tag_id"');"
+			# TODO: Execute query to create log
+		cache = []
+		flash("Success!")
+		return redirect('scanner.html')
 
 @app.route('/storeroom/')
 def storeroom():
@@ -240,45 +346,15 @@ def retrieval(things):
 	elif request.method=="GET":
 		return render_template('retrieval.html',things=things, form=form)
 
-
-	
-	return render_template("retrieval.html",things=things)
+	return render_template("retrieval.html", things=things)
 
 @app.route('/tasks')
 def tasks():
 	return render_template('tasks.html')
-	
-@app.route('/user', methods=["GET"])
-def user():
-	return render_template('user.html')
-
-@app.route('/icons')
-def icons():
-	return render_template('icons.html')
-
-@app.route('/maps')
-def maps():
-	return render_template('maps.html')
-
-@app.route('/notifications')
-def notifications():
-	return render_template('notifications.html')
-
-@app.route('/table')
-def table():
-	return render_template('table.html')
 
 @app.route('/template')
 def template():
 	return render_template('template.html')
-
-@app.route('/typography')
-def typography():
-	return render_template('typography.html')
-
-@app.route('/upgrade.html')
-def upgrade():
-	return render_template('upgrade.html')
 
 @app.errorhandler(404)
 def page_not_found(e):

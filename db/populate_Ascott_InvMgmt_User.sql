@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `Ascott_InvMgmt` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `Ascott_InvMgmt`;
 -- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
 -- Host: localhost    Database: Ascott_InvMgmt
@@ -18,29 +16,16 @@ USE `Ascott_InvMgmt`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `User`
---
-
-DROP TABLE IF EXISTS `User`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `User` (
-  `uid` int(11) NOT NULL,
-  `username` varchar(45) NOT NULL,
-  `password` varchar(45) NOT NULL,
-  `role` varchar(15) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  PRIMARY KEY (`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `User`
 --
 
+USE `Ascott_invMgmt`;
 LOCK TABLES `User` WRITE;
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;
-INSERT INTO `User` VALUES (1,'mabeltan','nuggets','attendant','Mabel Tan'),(2,'henrylai','henry','supervisor','Henry Lai'),(3,'supervisor','supervisor','supervisor','supervisor'),(4,'room','attendant','attendant','room attendant');
+INSERT INTO `User` VALUES (1,'mabeltan','nuggets','attendant','Mabel Tan'),
+(2,'henrylai','henry','supervisor','Henry Lai'),
+(3,'suroot','password','supervisor','Supervisor (root)'),
+(4,'raroot','password','attendant','Room Attendant (root)');
 /*!40000 ALTER TABLE `User` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +38,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-05-21  2:32:05
+-- Dump completed on 2017-05-31 14:27:31

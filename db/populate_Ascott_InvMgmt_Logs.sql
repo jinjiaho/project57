@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `Ascott_InvMgmt` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `Ascott_InvMgmt`;
 -- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
 -- Host: localhost    Database: Ascott_InvMgmt
@@ -18,32 +16,13 @@ USE `Ascott_InvMgmt`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `Items`
+-- Dumping data for table `Logs`
 --
 
-DROP TABLE IF EXISTS `Items`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Items` (
-  `idItem` int(11) NOT NULL,
-  `item` varchar(45) NOT NULL,
-  `idNFC` varchar(45) NOT NULL,
-  `qtyLeft` int(11) NOT NULL,
-  `reorderPt` int(11) NOT NULL,
-  `batchSize` int(11) NOT NULL,
-  `category` char(25) NOT NULL,
-  `picture` char(100) NOT NULL,
-  PRIMARY KEY (`idItem`,`idNFC`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Items`
---
-
-LOCK TABLES `Items` WRITE;
-/*!40000 ALTER TABLE `Items` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Items` ENABLE KEYS */;
+USE `Ascott_invMgmt`;
+LOCK TABLES `Logs` WRITE;
+/*!40000 ALTER TABLE `Logs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Logs` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -55,4 +34,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-05-21  2:32:05
+-- Dump completed on 2017-05-31 14:27:31

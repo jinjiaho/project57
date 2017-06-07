@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block sidebar %}
-<link rel="stylesheet" type="text/css" href="bootstrap.min.css">
 <div class="sidebar-wrapper">
+<link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
     <div class="logo">
         <a href="http://www.creative-tim.com" class="simple-text" style="text-align:left;">
         <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
@@ -49,6 +49,8 @@
     <span class="icon-bar"></span>
 </button>
 <a class="navbar-brand" href="#">Logs in current month</a>
+
+
 {% endblock %}
 
 {% block content %}
@@ -57,7 +59,101 @@
 		padding:0;
 	}
 </style>
-<script type="text/javascript">
+
+
+<script>
+
+// $(function() {
+
+//   // call the tablesorter plugin
+//   $("logs").tablesorter({
+//     theme: 'blue',
+
+//     // hidden filter input/selects will resize the columns, so try to minimize the change
+//     widthFixed : true,
+
+//     // initialize zebra striping and filter widgets
+//     widgets: ["zebra", "filter"],
+
+//     // headers: { 5: { sorter: false, filter: false } },
+
+//     widgetOptions : {
+
+//       // extra css class applied to the table row containing the filters & the inputs within that row
+//       filter_cssFilter   : '',
+
+//       // If there are child rows in the table (rows with class name from "cssChildRow" option)
+//       // and this option is true and a match is found anywhere in the child row, then it will make that row
+//       // visible; default is false
+//       filter_childRows   : false,
+
+//       // if true, filters are collapsed initially, but can be revealed by hovering over the grey bar immediately
+//       // below the header row. Additionally, tabbing through the document will open the filter row when an input gets focus
+//       filter_hideFilters : false,
+
+//       // Set this option to false to make the searches case sensitive
+//       filter_ignoreCase  : true,
+
+//       // jQuery selector string of an element used to reset the filters
+//       filter_reset : '.reset',
+
+//       // Use the $.tablesorter.storage utility to save the most recent filters
+//       filter_saveFilters : true,
+
+//       // Delay in milliseconds before the filter widget starts searching; This option prevents searching for
+//       // every character while typing and should make searching large tables faster.
+//       filter_searchDelay : 300,
+
+//       // Set this option to true to use the filter to find text from the start of the column
+//       // So typing in "a" will find "albert" but not "frank", both have a's; default is false
+//       filter_startsWith  : false,
+
+//       // Add select box to 4th column (zero-based index)
+//       // each option has an associated function that returns a boolean
+//       // function variables:
+//       // e = exact text from cell
+//       // n = normalized value returned by the column parser
+//       // f = search filter input value
+//       // i = column index
+//       filter_functions : {
+
+//         // Add select menu to this column
+//         // set the column value to true, and/or add "filter-select" class name to header
+//         // '.Name' : true,
+
+//         // // Exact match only
+//         // 1 : function(e, n, f, i, $r, c, data) {
+//         //   return e === f;
+//         // },
+
+//         // // Add these options to the select dropdown (regex example)
+//         // 2 : {
+//         //   "A - D" : function(e, n, f, i, $r, c, data) { return /^[A-D]/.test(e); },
+//         //   "E - H" : function(e, n, f, i, $r, c, data) { return /^[E-H]/.test(e); },
+//         //   "I - L" : function(e, n, f, i, $r, c, data) { return /^[I-L]/.test(e); },
+//         //   "M - P" : function(e, n, f, i, $r, c, data) { return /^[M-P]/.test(e); },
+//         //   "Q - T" : function(e, n, f, i, $r, c, data) { return /^[Q-T]/.test(e); },
+//         //   "U - X" : function(e, n, f, i, $r, c, data) { return /^[U-X]/.test(e); },
+//         //   "Y - Z" : function(e, n, f, i, $r, c, data) { return /^[Y-Z]/.test(e); }
+//         // },
+
+//         // // Add these options to the select dropdown (numerical comparison example)
+//         // // Note that only the normalized (n) value will contain numerical data
+//         // // If you use the exact text, you'll need to parse it (parseFloat or parseInt)
+//         // 4 : {
+//         //   "< $10"      : function(e, n, f, i, $r, c, data) { return n < 10; },
+//         //   "$10 - $100" : function(e, n, f, i, $r, c, data) { return n >= 10 && n <=100; },
+//         //   "> $100"     : function(e, n, f, i, $r, c, data) { return n > 100; }
+//         // }
+//       }
+
+//     }
+
+//   });
+
+// });
+    
+
 	function downloadCSV(csv, filename) {
     var csvFile;
     var downloadLink;
@@ -88,7 +184,7 @@
     var rows = document.querySelectorAll("table tr");
     
     for (var i = 0; i < rows.length; i++) {
-        var row = [], cols = rows[i].querySelectorAll("td, th");
+        var row = [], cols = rows[i].querySelectorAll("td,th");
         
         for (var j = 0; j < cols.length; j++) 
             row.push(cols[j].innerText);
@@ -100,10 +196,37 @@
     downloadCSV(csv.join("\n"), filename);
 }
 
+// function filtername()
+//     {  
+//         var rex = new RegExp($('#filtername').val());
+//         if(rex =="/all/"){clearFilter()}else{
+//             $('.content').hide();
+//             $('.content').filter(function() {
+//             return rex.test($(this).text());
+//             }).show();
+//     }
+//     }
+
+
+// function filteritem()
+//     {  
+//         var rex = new RegExp($('#filteritem').val());
+//         if(rex =="/all/"){clearFilter()}else{
+//             $('.content').hide();
+//             $('.content').filter(function() {
+//             return rex.test($(this).text());
+//             }).show();
+//     }
+//     }
+    
+    
+// function clearFilter()
+//     {
+//         $('.filterText').val('');
+//         $('.content').show();
+//     }
+
 </script>
-
-
-
 <div class="container-fluid">
     <div class="row">
 		<div class="col-md-12">
@@ -113,22 +236,21 @@
 		            <p class="category">Movement of Inventory</p>
 		        </div> -->
 		        <div class="content table-responsive table-full-width" style="margin-top: 20px;">
-                
-		            <table id="table" class="table table-hover">
-		                <thead>
-		                	<th>Name</th>
-		                	<th>Item</th>
+                        <table id="logs" class="table table hovering">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Item</th>
                             <th>Category</th>
-		                	<th>Qty</th>
-		                	<th>In/Out</th>
-		                	<th>Date-Time</th>
+                            <th>Qty</th>
+                            <th>In/Out</th>
+                            <th>Date-Time</th>
                             <th>Location</th>
-
-
-		                </thead>
-		                <tbody>
+                            </tr>
+                        </thead>
+                        <tbody id="myTable">
                         {% for log in logs %}
-		                	<tr>
+                            <tr class="content">
                                 <td>{{log.name}}</td>
                                 <td>{{log.item}}</td>
                                 <td>{{log.category}}</td>
@@ -138,21 +260,13 @@
                                 <td>{{log.location}}</td>
                             </tr>
                         {% endfor %}
-                            
-
-		                </tbody>
-		            </table>
+                        </tbody>
+                    </table>
 		        </div>
 		    </div>
 		</div>
 	</div>
-        <script type="text/javascript" language="javascript" src="TableFilter/tablefilter.js">
-        var tf10 = setFilterGrid("table"); 
-        </script>  
         
-
-
-
 	<div class="row" style="padding-bottom:30px;">
 		<div class="col-xs-12" align="center">
          <ul class="pagination">
