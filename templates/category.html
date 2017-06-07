@@ -165,24 +165,20 @@ setInterval("getthedate()",1000)
                         <thead>
                             <th>Name</th>
                             <th>Unit</th>
-                            <th>Unit Value</th>
                             <th>Initial Quantity</th>
                             <th>In</th>
                             <th>Out</th>
                             <th>Remaining Quantity</th>
-                            <th>Total Value</th>
                         </thead>
                         <tbody>
                         {% for item in itemtype %}
                             <tr>
                                 <td>{{item.name}}</td>
                                 <td>{{item.unit}}</td>
-                                <td>{{item.value}}</td>
                                 <td>{{item.starting}}</td>
                                 <td>{{item.recieved}}</td>
                                 <td>{{item.demand}}</td>
                                 <td>{{item.remaining}}</td>
-                                <td>$60</td>
                             </tr>
                         {% endfor %}
                         </tbody>

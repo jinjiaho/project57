@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 import copy
 from forms import LoginForm, RetrievalForm
+import csv
 # from flask.ext.cache import Cache
 
 app = Flask(__name__)
@@ -31,7 +32,7 @@ def getAllInventory(category):
 	cursor = conn.cursor()
 
 	cursor.execute(
-		"SELECT idItem, item, qtyLeft, unit, picture, value FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+		"SELECT idItem, item, qtyLeft, unit, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 
 	data = cursor.fetchall()
 	print(data)
@@ -56,8 +57,7 @@ def getAllInventory(category):
 			"starting": initial_quantity,
 			"recieved": recieved,
 			"demand": delivered_out,
-			"file": item[4],
-			"value": item[5]})
+			"file": item[4]})
 	
 	return items
 
@@ -78,6 +78,7 @@ def getFromLevels(idNFC):
 			"category": item[1],
 			"idNFC":item[2]})
 	return things
+
 
 
 #methods gives me all the logs that occurred within the current month.
@@ -114,54 +115,62 @@ def getAllLogs():
 	return things
 
 #methods gives me all the unique names in logs that occurred within the current month.
-# def getUniqueNames():
-# 	conn = mysql.connect()
-# 	cursor = conn.cursor()
-# 	cursor.execute(
-# 		"SELECT uid, dateTime, action, qty, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
+def getUniqueNames():
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	cursor.execute(
+		"SELECT uid, dateTime, action, qty, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
 
-# 	data=cursor.fetchall()
-# 	names=[]
+	data=cursor.fetchall()
+	names=[]
 	
-# 	for row in data:
-# 		cursor.execute(
-# 			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
-# 		user_data=cursor.fetchall()
+	for row in data:
+		cursor.execute(
+			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
+		user_data=cursor.fetchall()
 		
 
-# 		cursor.execute(
-# 			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[4]))
-# 		item_data=cursor.fetchall()
+		cursor.execute(
+			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[4]))
+		item_data=cursor.fetchall()
 
-# 		names.append({"name":user_data[0][0].encode('ascii')})
-# 	names = set( val for dic in names for val in dic.values())
-# 	print(names)
-# 	return names
+		names.append({"name":user_data[0][0].encode('ascii')})
+	names = set( val for dic in names for val in dic.values())
+	print(names)
+	return names
 
-# def getUniqueItems():
-# 	conn = mysql.connect()
-# 	cursor = conn.cursor()
-# 	cursor.execute(
-# 		"SELECT uid, dateTime, action, qty, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
+def getUniqueItems():
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	cursor.execute(
+		"SELECT uid, dateTime, action, qty, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
 
-# 	data=cursor.fetchall()
-# 	items=[]
+	data=cursor.fetchall()
+	items=[]
 	
-# 	for row in data:
-# 		cursor.execute(
-# 			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
-# 		user_data=cursor.fetchall()
+	for row in data:
+		cursor.execute(
+			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
+		user_data=cursor.fetchall()
 		
 
-# 		cursor.execute(
-# 			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[4]))
-# 		item_data=cursor.fetchall()
+		cursor.execute(
+			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[4]))
+		item_data=cursor.fetchall()
 
-# 		items.append({"item":item_data[0][0].encode('ascii')})
-# 	items = set( val for dic in items for val in dic.values())
+		items.append({"item":item_data[0][0].encode('ascii')})
+	items = set( val for dic in items for val in dic.values())
 
-# 	return items
+	return items
 		
+
+# TEST: extract dummy inventory qty data for Highcharts
+def extract():
+	with open("inventory.csv", 'rU') as f:  #opens file
+	    reader = csv.reader(f)
+	    data = list(list(rec) for rec in csv.reader(f, delimiter=',')) #reads csv into a list of lists
+	return data
+
 
 #----------------------------ROUTING ------------------------
 
@@ -234,9 +243,9 @@ def hello():
 def inventory():
 
 	# get current list of all items listed in db
-	supplies = getAllInventory('supplies')
-	hampers = getAllInventory('hampers')
-	kitchenware = getAllInventory('kitchenware')
+	supplies = getAllInventory('Guest Supplies')
+	hampers = getAllInventory('Guest Hampers')
+	kitchenware = getAllInventory('Kitchenware')
 	return render_template('inventory.html',
 		supplies = supplies,
 		hampers = hampers,
@@ -245,14 +254,16 @@ def inventory():
 @app.route('/inventory/<category>/<item>')
 def item(item, category):
 	item = item
+	qty = extract()
 	category = category
-	return render_template('item.html', item=item, category=category)
+	return render_template('item.html', item=item, category=category,qty=qty)
 
 @app.route('/inventory/<category>')
 def category(category):
 	category = category
 	itemtype = getAllInventory(category)
 	return render_template('category.html', category=category, itemtype=itemtype)
+
 
 @app.route('/logs')
 def logs():

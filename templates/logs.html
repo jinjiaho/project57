@@ -54,11 +54,6 @@
 {% endblock %}
 
 {% block content %}
-<style>
-	.card .content {
-		padding:0;
-	}
-</style>
 
 
 <script>
@@ -153,8 +148,9 @@
 
 // });
     
+    
+    function downloadCSV(csv, filename) {
 
-	function downloadCSV(csv, filename) {
     var csvFile;
     var downloadLink;
 
@@ -179,7 +175,7 @@
     // Click download link
     downloadLink.click();
 }
-	function exportTableToCSV(filename) {
+    function exportTableToCSV(filename) {
     var csv = [];
     var rows = document.querySelectorAll("table tr");
     
@@ -195,6 +191,37 @@
     // Download CSV file
     downloadCSV(csv.join("\n"), filename);
 }
+
+$(document).ready(function() { 
+    $("#logs").tablesorter({
+        // sortList: [[4,1]],
+        // showProcessing: true,
+        widgets: ["filter"],
+//         widgetOptions : {
+//       // Use the $.tablesorter.storage utility to save the most recent filters
+//       filter_saveFilters : true
+//       filter_formatter : {
+//         function($cell, indx){
+//           return $.tablesorter.filterFormatter.uiDatepicker( $cell, indx, {
+//             // add any of the jQuery UI Datepicker options here (http://api.jqueryui.com/datepicker/)
+//             // from : '8/1/2013', // starting date
+//             // to   : '1/18/2014',  // ending date
+//             textFrom: 'from',   // "from" label text
+//             textTo: 'to',       // "to" label text
+//             changeMonth: true,
+//             changeYear : true
+//             });
+//       }
+//   }
+//   filter_placeholder : {
+//         search : '', // any default search inputs including the datepicker comparison
+//         from   : 'Date from...', // datepicker range "from" placeholder
+//         to     : 'Date to...'  // datepicker range "to" placeholder
+//       }
+// }
+
+    }); 
+});
 
 // function filtername()
 //     {  
@@ -227,6 +254,7 @@
 //     }
 
 </script>
+
 <div class="container-fluid">
     <div class="row">
 		<div class="col-md-12">
@@ -236,15 +264,15 @@
 		            <p class="category">Movement of Inventory</p>
 		        </div> -->
 		        <div class="content table-responsive table-full-width" style="margin-top: 20px;">
-                        <table id="logs" class="table table hovering">
+                        <table id="logs" class="tablesorter">
                         <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Item</th>
+                            <th class="filter-select filter-onlyAvail" data-placeholder="All">Name</th>
+                            <th class="filter-select filter-onlyAvail" data-placeholder="All">Item</th>
                             <th>Category</th>
                             <th>Qty</th>
-                            <th>In/Out</th>
-                            <th>Date-Time</th>
+                            <th class="filter-select filter-onlyAvail">In/Out</th>
+                            <th>Date-Time (two inputs; range)</th>
                             <th>Location</th>
                             </tr>
                         </thead>
@@ -279,6 +307,5 @@
 			<button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
 		</div>
 
-	</div>
-</div>
+
 {% endblock %}

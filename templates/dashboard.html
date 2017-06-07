@@ -31,7 +31,7 @@
 </style>
 <div class="sidebar-wrapper">
     <div class="logo">
-        <a href="http://www.creative-tim.com" class="simple-text" style="text-align:left;">
+        <a href="" class="simple-text" style="text-align:left;">
         <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
             Supervisor
         </a>
@@ -136,8 +136,8 @@
                         <h4 class="title">Recent Activity</h4>
                         <p class="category">Latest inventory movement</p>
                     </div></a>
-                    <div class="content table-responsive table-full-width">
-                        <table class="table table-hover table-striped">
+                    <div class="">
+                        <table id="recent" class="tablesorter">
                             <thead>
                                 <th>Name</th>
                                 <th>Item</th>
@@ -250,4 +250,15 @@
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() { 
+    $("#recent").tablesorter({
+        sortList: [[4,1]],
+        showProcessing: true,
+        widgets: ["filter"]
+    }); 
+});
+</script>
+
 {% endblock %}
