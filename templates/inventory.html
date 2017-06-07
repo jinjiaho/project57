@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block sidebar %}
 <div class="sidebar-wrapper">
+<link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
     <div class="logo">
         <a href="" class="simple-text" style="text-align:left;">
         <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
@@ -16,7 +17,7 @@
             </a>
         </li>
         <li class="active">
-            <a href="#">
+            <a href="/inventory">
                 <i class="pe-7s-rocket"></i>
                 <p>Inventory</p>
             </a>
@@ -94,16 +95,17 @@
                     <div class="content all-icons panel">
                         <div class="row">
                           
+
                           {% for item in supplies %}
-                          <a href="supplies/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="supplies/{{item.name}}"><div class="alert alert-danger">
+                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="inventory/{{item.name}}"><div class="alert alert-danger">
                               <img src="/static/img/items/supplies/{{item.name}}.jpg"/>
                               <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                             </div></a>
                           </div>
                           {% endfor %}
                             <a href="Guest Supplies">
-                            <button class="btn btn-default btn-block" id="btn_getData" >Get Data</button></a>
+                            <button class="btn btn-default btn-block" id="btn_getData" >Month Review</button></a>
 
                           </div>
 
@@ -119,15 +121,15 @@
                           
 
                           {% for item in hampers %}
-                          <a href="hampers/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="hampers/{{item.name}}"><div class="alert alert-warning">
+                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="inventory/{{item.name}}"><div class="alert alert-warning">
                               <img src="/static/img/items/hampers/{{item.file}}.jpg"/>
                               <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                             </div></a>
                           </div>
                           {% endfor %}
                           <a href="Guest Hampers">
-                          <button class="btn btn-default btn-block" id="btn_getData">Get Data</button></a>
+                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
 
 
                           </div>
@@ -142,29 +144,32 @@
                         <div class="row">
                           
 
+
                           {% for item in kitchenware %}
-                          <a href="kitchenware/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="kitchenware/{{item.name}}"><div class="alert alert-warning">
+                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="inventory/{{item.name}}"><div class="alert alert-warning">
                               <img src="/static/img/items/kitchenware/{{item.file}}.jpg"/>
                               <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
+
+
                             </div></a>
                           </div>
                           {% endfor %}
                           <a href="Kitchenware">
-                          <button class="btn btn-default btn-block" id="btn_getData">Get Data</button></a>
+                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
 
                           </div>
                           
                     </div>
                 </div>
-<<<<<<< HEAD
+
                 <!-- </div>
                 </div>
             </div> -->
-=======
+
                 </div>
             </div>
->>>>>>> 6528709354ad88fd67ed15fd48924f2ddd29c821
+
 
         </div>
         <div class="row buttons">

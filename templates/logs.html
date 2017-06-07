@@ -18,7 +18,7 @@
         </li>
         
         <li>
-            <a href="/inventory">
+            <a href="/inventory/">
                 <i class="pe-7s-rocket"></i>
                 <p>Inventory</p>
             </a>
@@ -54,100 +54,155 @@
 {% endblock %}
 
 {% block content %}
+<style type="text/css">
+{
+    font-size: 90%;
+}
 
+.ui-widget {
+    font-family: "Helvetica Neue","Trebuchet MS",Tahoma,Verdana,Arial,sans-serif;
+    background: #fff;
+}
+
+.ui-datepicker {
+    padding: 0;
+    width: 233px;
+    height: auto;
+    margin: 5px auto 0;
+    font: 9pt Arial, sans-serif;
+}
+
+.ui-datepicker-header {
+    border: none;
+    font-size: 80%;
+    -moz-border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0; /* border radius */
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box; /* prevents bg color from leaking outside the border */
+    background-color: #e0e8ec; /* layer fill content */
+    -moz-box-shadow: 0 1px 0 rgba(255,255,255,.53), inset 0 -1px 0 rgba(0,0,0,.12); /* drop shadow and inner shadow */
+    -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.53), inset 0 -1px 0 rgba(0,0,0,.12); /* drop shadow and inner shadow */
+    box-shadow: 0 1px 0 rgba(255,255,255,.53), inset 0 -1px 0 rgba(0,0,0,.12); /* drop shadow and inner shadow */
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxsaW5lYXJHcmFkaWVudCBpZD0iaGF0MCIgZ3JhZGllbnRVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHgxPSI1MCUiIHkxPSIxMDAlIiB4Mj0iNTAlIiB5Mj0iLTEuNDIxMDg1NDcxNTIwMmUtMTQlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMCIgc3RvcC1vcGFjaXR5PSIwLjIxIi8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmZiIgc3RvcC1vcGFjaXR5PSIwLjIxIi8+CiAgIDwvbGluZWFyR3JhZGllbnQ+Cgo8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0idXJsKCNoYXQwKSIgLz4KPC9zdmc+); /* gradient overlay */
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,.21) 0%, rgba(255,255,255,.21) 100%); /* gradient overlay */
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,.21) 0%, rgba(255,255,255,.21) 100%); /* gradient overlay */
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,.21) 0%, rgba(255,255,255,.21) 100%); /* gradient overlay */
+    background-image: linear-gradient(bottom, rgba(0,0,0,.21) 0%, rgba(255,255,255,.21) 100%); /* gradient overlay */
+}
+
+.ui-datepicker-title {
+    text-align: center;
+    color: #515d65; /* text color */
+    font-size: 13px;
+    font-weight: bold;
+    text-shadow: 0 1px 1px rgba(255,255,255,.8); /* drop shadow */
+
+}
+
+.ui-icon-circle-triangle-e {
+    background-image: url(images/ui-icons_454545_256x240.png);
+    background-position: -32px -16px;
+}
+
+.ui-icon-circle-triangle-w {
+    background-image: url(images/ui-icons_454545_256x240.png);
+    background-position: -96px -16px;
+}
+
+.ui-datepicker .ui-datepicker-prev{
+    float: left;
+    cursor:pointer;
+    background-position: center -30px;
+    font-size: 13px;
+}
+.ui-datepicker .ui-datepicker-next {
+    float: right;
+    cursor:pointer;
+    background-position: center 0px;
+    font-size: 13px;
+}
+
+.ui-state-default {
+    background: transparent;
+    border: none;
+    color: #2b2b2b;
+    font-family: "Myriad Pro";
+    font-weight: normal;
+    text-align: center;
+}
+
+.ui-datepicker-header .ui-state-hover {
+    background: #bdc5c9;
+}
+
+.ui-datepicker table {
+    margin: 0;
+    width: 100%;
+}
+
+.ui-datepicker th {
+    color: #9da7af;
+    font-size: 12px;
+    font-weight: normal;
+    -moz-border-radius: 216px 0 0 0 / 0 0 0 0;
+    -webkit-border-radius: 216px 0 0 0 / 0 0 0 0;
+    border-radius: 216px 0 0 0 / 0 0 0 0;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    background-color: rgba(0,0,0,.08);
+
+}
+
+.ui-datepicker td {
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 0;
+    -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxsaW5lYXJHcmFkaWVudCBpZD0iaGF0MCIgZ3JhZGllbnRVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHgxPSI1MCUiIHkxPSIxMDAlIiB4Mj0iNTAlIiB5Mj0iLTEuNDIxMDg1NDcxNTIwMmUtMTQlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMCIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmZiIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CiAgIDwvbGluZWFyR3JhZGllbnQ+Cgo8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0idXJsKCNoYXQwKSIgLz4KPC9zdmc+);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,.06) 0%, rgba(255,255,255,.06) 100%);
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,.06) 0%, rgba(255,255,255,.06) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,.06) 0%, rgba(255,255,255,.06) 100%);
+    background-image: linear-gradient(bottom, rgba(0,0,0,.06) 0%, rgba(255,255,255,.06) 100%);
+
+}
+
+.ui-datepicker td:last-child {
+    border-right: none;
+}
+
+.ui-datepicker td span, 
+.ui-datepicker td a {
+    padding: .7em 0;
+    color: #6a747a;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: Arial;
+}
+
+.ui-datepicker-calendar .ui-state-hover {
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,.12) 0%, rgba(255,255,255,.06) 100%);
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,.12) 0%, rgba(255,255,255,.06) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,.12) 0%, rgba(255,255,255,.06) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,.12) 0%, rgba(255,255,255,.06) 100%);
+}
+
+.ui-state-active,
+.ui-state-active.ui-state-hover {
+    color: #fff;
+    background-color: #8ab8ed;
+    text-shadow: 0 1px 0 rgba(0,0,0,.26);
+    -moz-box-shadow: inset 0 4px 9px rgba(0,0,0,.24);
+    -webkit-box-shadow: inset 0 4px 9px rgba(0,0,0,.24);
+    box-shadow: inset 0 4px 9px rgba(0,0,0,.24);
+}
+</style>
 
 <script>
-
-// $(function() {
-
-//   // call the tablesorter plugin
-//   $("logs").tablesorter({
-//     theme: 'blue',
-
-//     // hidden filter input/selects will resize the columns, so try to minimize the change
-//     widthFixed : true,
-
-//     // initialize zebra striping and filter widgets
-//     widgets: ["zebra", "filter"],
-
-//     // headers: { 5: { sorter: false, filter: false } },
-
-//     widgetOptions : {
-
-//       // extra css class applied to the table row containing the filters & the inputs within that row
-//       filter_cssFilter   : '',
-
-//       // If there are child rows in the table (rows with class name from "cssChildRow" option)
-//       // and this option is true and a match is found anywhere in the child row, then it will make that row
-//       // visible; default is false
-//       filter_childRows   : false,
-
-//       // if true, filters are collapsed initially, but can be revealed by hovering over the grey bar immediately
-//       // below the header row. Additionally, tabbing through the document will open the filter row when an input gets focus
-//       filter_hideFilters : false,
-
-//       // Set this option to false to make the searches case sensitive
-//       filter_ignoreCase  : true,
-
-//       // jQuery selector string of an element used to reset the filters
-//       filter_reset : '.reset',
-
-//       // Use the $.tablesorter.storage utility to save the most recent filters
-//       filter_saveFilters : true,
-
-//       // Delay in milliseconds before the filter widget starts searching; This option prevents searching for
-//       // every character while typing and should make searching large tables faster.
-//       filter_searchDelay : 300,
-
-//       // Set this option to true to use the filter to find text from the start of the column
-//       // So typing in "a" will find "albert" but not "frank", both have a's; default is false
-//       filter_startsWith  : false,
-
-//       // Add select box to 4th column (zero-based index)
-//       // each option has an associated function that returns a boolean
-//       // function variables:
-//       // e = exact text from cell
-//       // n = normalized value returned by the column parser
-//       // f = search filter input value
-//       // i = column index
-//       filter_functions : {
-
-//         // Add select menu to this column
-//         // set the column value to true, and/or add "filter-select" class name to header
-//         // '.Name' : true,
-
-//         // // Exact match only
-//         // 1 : function(e, n, f, i, $r, c, data) {
-//         //   return e === f;
-//         // },
-
-//         // // Add these options to the select dropdown (regex example)
-//         // 2 : {
-//         //   "A - D" : function(e, n, f, i, $r, c, data) { return /^[A-D]/.test(e); },
-//         //   "E - H" : function(e, n, f, i, $r, c, data) { return /^[E-H]/.test(e); },
-//         //   "I - L" : function(e, n, f, i, $r, c, data) { return /^[I-L]/.test(e); },
-//         //   "M - P" : function(e, n, f, i, $r, c, data) { return /^[M-P]/.test(e); },
-//         //   "Q - T" : function(e, n, f, i, $r, c, data) { return /^[Q-T]/.test(e); },
-//         //   "U - X" : function(e, n, f, i, $r, c, data) { return /^[U-X]/.test(e); },
-//         //   "Y - Z" : function(e, n, f, i, $r, c, data) { return /^[Y-Z]/.test(e); }
-//         // },
-
-//         // // Add these options to the select dropdown (numerical comparison example)
-//         // // Note that only the normalized (n) value will contain numerical data
-//         // // If you use the exact text, you'll need to parse it (parseFloat or parseInt)
-//         // 4 : {
-//         //   "< $10"      : function(e, n, f, i, $r, c, data) { return n < 10; },
-//         //   "$10 - $100" : function(e, n, f, i, $r, c, data) { return n >= 10 && n <=100; },
-//         //   "> $100"     : function(e, n, f, i, $r, c, data) { return n > 100; }
-//         // }
-//       }
-
-//     }
-
-//   });
-
-// });
-    
     
     function downloadCSV(csv, filename) {
 
@@ -177,7 +232,8 @@
 }
     function exportTableToCSV(filename) {
     var csv = [];
-    var rows = document.querySelectorAll("table tr");
+    var rows = document.querySelectorAll();
+    print(rows)
     
     for (var i = 0; i < rows.length; i++) {
         var row = [], cols = rows[i].querySelectorAll("td,th");
@@ -192,66 +248,59 @@
     downloadCSV(csv.join("\n"), filename);
 }
 
+
 $(document).ready(function() { 
     $("#logs").tablesorter({
-        // sortList: [[4,1]],
-        // showProcessing: true,
+        sortList: [[4,1]],
+        // theme:'blue',
+        showProcessing: true,
         widgets: ["filter"],
-//         widgetOptions : {
-//       // Use the $.tablesorter.storage utility to save the most recent filters
-//       filter_saveFilters : true
-//       filter_formatter : {
-//         function($cell, indx){
-//           return $.tablesorter.filterFormatter.uiDatepicker( $cell, indx, {
-//             // add any of the jQuery UI Datepicker options here (http://api.jqueryui.com/datepicker/)
-//             // from : '8/1/2013', // starting date
-//             // to   : '1/18/2014',  // ending date
-//             textFrom: 'from',   // "from" label text
-//             textTo: 'to',       // "to" label text
-//             changeMonth: true,
-//             changeYear : true
-//             });
-//       }
-//   }
-//   filter_placeholder : {
-//         search : '', // any default search inputs including the datepicker comparison
-//         from   : 'Date from...', // datepicker range "from" placeholder
-//         to     : 'Date to...'  // datepicker range "to" placeholder
-//       }
-// }
+        widgetOptions : {
+
+      // extra css class applied to the table row containing the filters & the inputs within that row
+      filter_cssFilter   : '',
+
+      // If there are child rows in the table (rows with class name from "cssChildRow" option)
+      // and this option is true and a match is found anywhere in the child row, then it will make that row
+      // visible; default is false
+      filter_childRows   : false,
+
+      // if true, filters are collapsed initially, but can be revealed by hovering over the grey bar immediately
+      // below the header row. Additionally, tabbing through the document will open the filter row when an input gets focus
+      filter_hideFilters : false,
+
+      // Set this option to false to make the searches case sensitive
+      filter_ignoreCase  : true,
+
+      // jQuery selector string of an element used to reset the filters
+      filter_reset : '.reset',
+
+      // Use the $.tablesorter.storage utility to save the most recent filters
+      filter_saveFilters : true,
+
+      // Delay in milliseconds before the filter widget starts searching; This option prevents searching for
+      // every character while typing and should make searching large tables faster.
+      filter_searchDelay : 300,
+
+      // Set this option to true to use the filter to find text from the start of the column
+      // So typing in "a" will find "albert" but not "frank", both have a's; default is false
+      filter_startsWith  : false,
+
+      filter_formatter : {
+        6 : function($cell, indx){
+          return $.tablesorter.filterFormatter.uiDatepicker( $cell, indx, {
+            from : '01/01/1999', // default from date
+            to   : '01/01/2022',  // default to date
+            changeMonth: true,
+            changeYear : true
+          });
+        }
+      }    
+  }
+
 
     }); 
 });
-
-// function filtername()
-//     {  
-//         var rex = new RegExp($('#filtername').val());
-//         if(rex =="/all/"){clearFilter()}else{
-//             $('.content').hide();
-//             $('.content').filter(function() {
-//             return rex.test($(this).text());
-//             }).show();
-//     }
-//     }
-
-
-// function filteritem()
-//     {  
-//         var rex = new RegExp($('#filteritem').val());
-//         if(rex =="/all/"){clearFilter()}else{
-//             $('.content').hide();
-//             $('.content').filter(function() {
-//             return rex.test($(this).text());
-//             }).show();
-//     }
-//     }
-    
-    
-// function clearFilter()
-//     {
-//         $('.filterText').val('');
-//         $('.content').show();
-//     }
 
 </script>
 
@@ -269,11 +318,11 @@ $(document).ready(function() {
                         <tr>
                             <th class="filter-select filter-onlyAvail" data-placeholder="All">Name</th>
                             <th class="filter-select filter-onlyAvail" data-placeholder="All">Item</th>
-                            <th>Category</th>
-                            <th class="filter-select filter-onlyAvail">In/Out</th>
+                            <th class="filter-select filter-onlyAvail" data-placeholder="All">Category</th>
+                            <th class="filter-select" data-placeholder="All">In/Out</th>
                             <th>Quantity change</th>
                             <th>Quantity remaining</th>
-                            <th>Date-Time (two inputs; range)</th>
+                            <th>Date-Time</th>
                             <th>Location</th>
                             </tr>
                         </thead>
@@ -284,7 +333,7 @@ $(document).ready(function() {
                                 <td>{{log.item}}</td>
                                 <td>{{log.category}}</td>
                                 <td>{{log.action}}</td>
-                                <td>{{log.change}}</td>
+                                <td>{{log.move}}</td>
                                 <td>{{log.remaining}}</td>
                                 <td>{{log.dateTime}}</td>
                                 <td>{{log.location}}</td>
@@ -306,7 +355,7 @@ $(document).ready(function() {
             <li><a href="#">4</a></li>
             <li><a href="#">5</a></li>
         </ul> 
-			<button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+			<!-- <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button> -->
 		</div>
 
 

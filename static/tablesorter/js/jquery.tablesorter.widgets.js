@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 /*** This file is dynamically generated ***
 █████▄ ▄████▄   █████▄ ▄████▄ ██████   ███████▄ ▄████▄ █████▄ ██ ██████ ██  ██
 ██  ██ ██  ██   ██  ██ ██  ██   ██     ██ ██ ██ ██  ██ ██  ██ ██ ██▄▄   ██▄▄██
@@ -6,9 +6,9 @@
 █████▀ ▀████▀   ██  ██ ▀████▀   ██     ██ ██ ██ ▀████▀ █████▀ ██ ██     █████▀
 */
 /*! tablesorter (FORK) - updated 05-26-2017 (v2.28.12)*/
-=======
+
 /*! tablesorter (FORK) - updated 06-02-2017 (v2.28.13)*/
->>>>>>> 6528709354ad88fd67ed15fd48924f2ddd29c821
+
 /* Includes widgets ( storage,uitheme,columns,filter,stickyHeaders,resizable,saveSort ) */
 (function(factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -2336,7 +2336,7 @@
 
 })( jQuery );
 
-<<<<<<< HEAD
+
 /*! Widget: stickyHeaders - updated 1/6/2017 (v2.28.4) *//*
 =======
 /*! Widget: stickyHeaders - updated 6/2/2017 (v2.28.13) *//*
@@ -2397,8 +2397,7 @@
 		}, options.timer);
 	};
 
-<<<<<<< HEAD
-=======
+
 	function getStickyOffset(c, wo) {
 		var $el = isNaN(wo.stickyHeaders_offset) ? $(wo.stickyHeaders_offset) : [];
 		return $el.length ?
@@ -2406,7 +2405,7 @@
 			parseInt(wo.stickyHeaders_offset, 10) || 0;
 	}
 
->>>>>>> 6528709354ad88fd67ed15fd48924f2ddd29c821
+
 	// Sticky headers based on this awesome article:
 	// http://css-tricks.com/13465-persistent-headers/
 	// and https://github.com/jmosbech/StickyTableHeaders by Jonas Mosbech
@@ -2443,12 +2442,12 @@
 				$thead = $table.children('thead:first'),
 				$header = $thead.children('tr').not('.sticky-false').children(),
 				$tfoot = $table.children('tfoot'),
-<<<<<<< HEAD
+
 				$stickyOffset = isNaN(wo.stickyHeaders_offset) ? $(wo.stickyHeaders_offset) : '',
 				stickyOffset = $stickyOffset.length ? $stickyOffset.height() || 0 : parseInt(wo.stickyHeaders_offset, 10) || 0,
-=======
+
 				stickyOffset = getStickyOffset(c, wo),
->>>>>>> 6528709354ad88fd67ed15fd48924f2ddd29c821
+
 				// is this table nested? If so, find parent sticky header wrapper (div, not table)
 				$nestedSticky = $table.parent().closest('.' + ts.css.table).hasClass('hasStickyHeaders') ?
 					$table.parent().closest('table.tablesorter')[0].config.widgetOptions.$sticky.parent() : [],
@@ -2470,10 +2469,10 @@
 				$stickyThead = $stickyTable.children('thead:first'),
 				$stickyCells,
 				laststate = '',
-<<<<<<< HEAD
+
 				spacing = 0,
-=======
->>>>>>> 6528709354ad88fd67ed15fd48924f2ddd29c821
+
+
 				setWidth = function($orig, $clone){
 					var index, width, border, $cell, $this,
 						$cells = $orig.filter(':visible'),
@@ -2505,17 +2504,17 @@
 					}
 				},
 				resizeHeader = function() {
-<<<<<<< HEAD
+
 					stickyOffset = $stickyOffset.length ? $stickyOffset.height() || 0 : parseInt(wo.stickyHeaders_offset, 10) || 0;
 					spacing = 0;
 					$stickyWrap.css({
 						left : $attach.length ? parseInt($attach.css('padding-left'), 10) || 0 :
 								$table.offset().left - parseInt($table.css('margin-left'), 10) - $xScroll.scrollLeft() - spacing,
-=======
+
 					$stickyWrap.css({
 						left : $attach.length ? parseInt($attach.css('padding-left'), 10) || 0 :
 								$table.offset().left - parseInt($table.css('margin-left'), 10) - $xScroll.scrollLeft(),
->>>>>>> 6528709354ad88fd67ed15fd48924f2ddd29c821
+
 						width: $table.outerWidth()
 					});
 					setWidth( $table, $stickyTable );
@@ -2526,10 +2525,9 @@
 					// Detect nested tables - fixes #724
 					nestedStickyTop = $nestedSticky.length ? $nestedSticky.offset().top - $yScroll.scrollTop() + $nestedSticky.height() : 0;
 					var offset = $table.offset(),
-<<<<<<< HEAD
-=======
+
 						stickyOffset = getStickyOffset(c, wo),
->>>>>>> 6528709354ad88fd67ed15fd48924f2ddd29c821
+
 						yWindow = $.isWindow( $yScroll[0] ), // $.isWindow needs jQuery 1.4.3
 						xWindow = $.isWindow( $xScroll[0] ),
 						attachTop = $attach.length ?
@@ -2545,17 +2543,17 @@
 					}
 					if (xWindow) {
 						// adjust when scrolling horizontally - fixes issue #143
-<<<<<<< HEAD
+
 						cssSettings.left = $table.offset().left - parseInt($table.css('margin-left'), 10) - $xScroll.scrollLeft() - spacing;
 					}
 					if ($nestedSticky.length) {
 						cssSettings.top = ( cssSettings.top || 0 ) + stickyOffset + nestedStickyTop;
 					}
-=======
+
 						cssSettings.left = $table.offset().left - parseInt($table.css('margin-left'), 10) - $xScroll.scrollLeft();
 					}
 					cssSettings.top = ( cssSettings.top || 0 ) + stickyOffset + nestedStickyTop;
->>>>>>> 6528709354ad88fd67ed15fd48924f2ddd29c821
+
 					$stickyWrap
 						.removeClass( ts.css.stickyVis + ' ' + ts.css.stickyHide )
 						.addClass( isVisible === 'visible' ? ts.css.stickyVis : ts.css.stickyHide )
@@ -2655,11 +2653,10 @@
 				});
 			}
 
-<<<<<<< HEAD
-=======
+
 			// make sure sticky is visible if page is partially scrolled
 			scrollSticky( true );
->>>>>>> 6528709354ad88fd67ed15fd48924f2ddd29c821
+
 			$table.triggerHandler('stickyHeadersInit');
 
 		},

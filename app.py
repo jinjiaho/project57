@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash
+from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -34,21 +34,18 @@ def getAllInventory(category):
 	cursor.execute(
 		"SELECT idItem, item, qtyLeft, unit, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
-	print(data)
 	items = []
 	for item in data:
 		cursor.execute(
-			"SELECT action,'change' FROM ascott_invmgmt.logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now()) AND idItem='{}';".format(item[0]))
+			"SELECT action, move FROM ascott_invmgmt.logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now()) AND idItem='{}';".format(item[0]))
 		in_out_data = cursor.fetchall()
 		delivered_out = 0
 		recieved = 0
 		for i in in_out_data:
-			print(i[1].encode('ascii'))
-			print(i[0].encode('ascii'))
 			if i[0].encode('ascii') == 'out':
-				delivered_out = delivered_out + (int(i[1].encode('ascii')))
-			else:
-				recieved = recieved + int(i[0].encode('ascii'))
+				delivered_out = delivered_out + (-1*int(i[1]))
+			elif i[0].encode('ascii') == "in":
+				recieved = recieved + int(i[1])
 		remaining_quantity = item[2]
 		initial_quantity = remaining_quantity + delivered_out - recieved
 		items.append(
@@ -59,7 +56,7 @@ def getAllInventory(category):
 			"recieved": recieved,
 			"demand": delivered_out,
 			"file": item[4]})
-	
+		
 	return items
 
 
@@ -87,7 +84,7 @@ def getAllLogs():
 	conn = mysql.connect()
 	cursor = conn.cursor()
 	cursor.execute(
-		"SELECT uid, dateTime, action, 'change', qtyAfter, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
+		"SELECT uid, dateTime, action, move, qtyAfter, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
 
 	data=cursor.fetchall()
 	things = []
@@ -106,7 +103,7 @@ def getAllLogs():
 			{"name": user_data[0][0].encode('ascii'),
 			"dateTime": row[1],
 			"action":row[2],
-			"change":row[3],
+			"move":row[3],
 			"remaining":row[4],
 			"item":item_data[0][0].encode('ascii'),
 			"category":item_data[0][1].encode('ascii'),
@@ -114,54 +111,6 @@ def getAllLogs():
 	print(things)
 	return things
 
-#methods gives me all the unique names in logs that occurred within the current month.
-def getUniqueNames():
-	conn = mysql.connect()
-	cursor = conn.cursor()
-	cursor.execute(
-		"SELECT uid, dateTime, action, qty, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
-
-	data=cursor.fetchall()
-	names=[]
-	
-	for row in data:
-		cursor.execute(
-			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
-		user_data=cursor.fetchall()
-		
-
-		cursor.execute(
-			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[4]))
-		item_data=cursor.fetchall()
-
-		names.append({"name":user_data[0][0].encode('ascii')})
-	names = set( val for dic in names for val in dic.values())
-	print(names)
-	return names
-
-def getUniqueItems():
-	conn = mysql.connect()
-	cursor = conn.cursor()
-	cursor.execute(
-		"SELECT uid, dateTime, action, qty, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
-
-	data=cursor.fetchall()
-	items=[]
-	
-	for row in data:
-		cursor.execute(
-			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
-		user_data=cursor.fetchall()
-		
-
-		cursor.execute(
-			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[4]))
-		item_data=cursor.fetchall()
-
-		items.append({"item":item_data[0][0].encode('ascii')})
-	items = set( val for dic in items for val in dic.values())
-
-	return items
 		
 
 # TEST: extract dummy inventory qty data for Highcharts
@@ -170,6 +119,37 @@ def extract():
 	    reader = csv.reader(f)
 	    data = list(list(rec) for rec in csv.reader(f, delimiter=',')) #reads csv into a list of lists
 	return data
+
+# POST for getting chart data
+@app.route('/api/getData/', methods=["POST"])
+def getData():
+
+	print "content_type: ", request.content_type
+	print "request.json: ", request.json
+
+	data = str(request.get_json())
+	# print(data, type(data))
+
+	if not request.json:
+	    print "Bad json format"
+	    abort(400)
+	else:
+		conn = mysql.connect()
+		cursor = conn.cursor()
+
+		query = "SELECT iditem FROM Ascott_Invmgmt.Items WHERE item = '{}';".format(request.json)
+
+		cursor.execute(query)
+		idItem = cursor.fetchone()[0]
+		# print(idItem)
+
+		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {0}".format(idItem)
+		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = 1"
+		# print query
+		cursor.execute(query)
+		responseData = cursor.fetchall()
+
+		return jsonify(responseData)
 
 
 #----------------------------ROUTING ------------------------
@@ -241,7 +221,6 @@ def hello():
 
 @app.route('/inventory/')
 def inventory():
-
 	# get current list of all items listed in db
 	supplies = getAllInventory('Guest Supplies')
 	hampers = getAllInventory('Guest Hampers')
