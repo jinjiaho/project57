@@ -5,74 +5,75 @@
 {% block title %}
     
 <span class="cart-group">
-    <a class="cart-icon" href="cart">
-        <div class="cart-notif">
-            <span class="cart-qty">{{cart_qty}}</span>
-        </div>
+    <a id="cart-icon" class="cart-icon" href="cart">
+        <div id="cart-notif" class="cart-notif hide"><span id="cart-qty" class="cart-qty"></span></div>
         <img src="/static/img/cart.png" />
     </a>
 </span>
+
+<script>
+    $(function show_cart_length() {
+        if (localStorage.length == 0) {
+            $("#cart-notif").remove();
+        } else {
+            $("#cart-notif").removeClass('hide');
+            var qty = localStorage.length;
+            $("#cart-qty").html(qty);
+        }
+    });
+</script>
 
 <a class="navbar-brand" href="#">Store 1 Shelf 1</a>
 {% endblock %}
 
 {% block content%}
 <style>
-    
-    span.cart-group {
-        float: right !important;
-        margin: 15px 25px 15px 0;
-    }
 
-    span.cart-group img {
-        max-width: 40px;
-        max-height: 30px;
-        margin-right: -7px;
-        z-index: 1;
-    }
 
-    .cart-icon .cart-notif {
-        float:right;
-        width: 14px;
-        height: 14px;
-        background-color: red;
-        border: 1px solid red;
-        border-radius: 8px;
-        margin-top: -3px;
-        z-index: 2;
-        position: relative;
-    }
+span.cart-group {
+  float: right !important;
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  /*margin: 15px 25px 15px 0;*/
+}
 
-    .cart-icon .cart-notif .cart-qty {
-        color: white;
-        z-index: 9;
-        position: relative;
-        top: -6px;
-        right: -3px;
-        font-size: x-small;
-    }
+span.cart-group img {
+  max-width: 40px;
+  max-height: 30px;
+  margin-right: -7px;
+  z-index: 1;
+}
 
-    .font-icon-detail img {
-        /*width: 50px;*/
-        height: 50px;
-        margin-bottom: 5px;
-    }
+.cart-icon .cart-notif {
+  float:right;
+  width: 14px;
+  height: 14px;
+  background-color: red;
+  border: 1px solid red;
+  border-radius: 8px;
+  margin-top: -3px;
+  z-index: 2;
+  position: relative;
+}
 
-    .font-icon-detail .name {
-        color: #000;
-        height: 37px;
-    }
+.cart-icon .cart-notif .cart-qty {
+  color: white;
+  z-index: 9;
+  position: relative;
+  top: -7px;
+  right: -3px;
+  font-size: x-small;
+}
 
-    .item-pic {
-        width: 100%;
-        position: fixed;
-        top: 8%;
-    }
+.modal-pic {
+  width: 100%;
+}
 
-    .item-pic img {
-        height: 50px;
-    }
-
+.modal-pic img {
+  max-width: 180px;
+  margin-bottom: 20px;
+}
 
 </style>
 <div class="content">
@@ -82,20 +83,20 @@
                 <div class="card">
                     <div class="content all-icons">
                         <div class="row">
-                            <!-- {% for item in things %}
+                            {% for item in things %}
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_{{item[0]}}">
+                                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_{{item.name}}">
                                     <div class="font-icon-detail">
-                                        <img src="/static/img/items/{{item[2]}}/{{item[4]}}"/><br/>
-                                        <span class="name" data-name="pen" style="text-transform:capitalize;">{{item[1]}}</span>
+                                        <img src="/static/img/items/{{item.category}}/{{item.picture}}"/><br/>
+                                        <div class="name">{{item.name}}</div>
                                     </div>
                                 </a>
                             </div>
-                            {% endfor %} -->
+                            {% endfor %}
                             
         <!-- for all the items in the category-->
 
-                            {% for things in catGoods %}
+                            <!-- {% for things in catGoods %}
                             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
                                 <a href="{{things.name}}" data-rel="popup">
                                     <div class="font-icon-detail">
@@ -106,7 +107,7 @@
                                 </a>
                             </div>
                             
-                            {% endfor %}
+                            {% endfor %} -->
                         </div>
                     </div>
                 </div>
@@ -118,28 +119,77 @@
 <script type="text/javascript">
 $(document).ready(function() {
     $(".openModal").click(function() {
-        var name = $(this).find("span").innerHTML();
+        var name = $(this).find('div.name').html();
         var img = $(this).find("img").attr('src');
-        $("#qtyModal form .item-pic img").attr('src', img);
-        $("#qtyModal form .qty-display input['item']").val(name);
+        $("#qtyForm .modal-pic img").attr('src', img);
+        $("#qtyForm #modal-input-name").val(name);
+        $("#qtyModal h4").text(name);
     });
 })
-    
-    
+
 </script>
 
-<div id="qtyModal" class="modal" data-backdrop="false">
-    <span class="close" data-dismiss="modal">&times;</span>
-    <form method="POST">
-        <div class='item-pic' align="center"><img src=""/></div>
-        <div class="qty-display">
-            <p>Enter quantity:</p>
-            <input id="quantity" type="number" name="qty">
-            <input type="hidden" name="item" value="">
-            <div class="button-wrapper" align="center" style="margin-top: 15px;">
-                <button type="submit" class="btn btn-success" style="">Submit</button>
-            </div>
+<div id="qtyModal" class="modal fade" data-backdrop="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" id="qtyForm">
+                <div class="modal-header">
+                    <span class="close" data-dismiss="modal">&times;</span>
+                    <h4 id="form-header"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class='modal-pic' align="center"><img src=""/></div>
+                    <div class="qty-display form-fields">
+                        <!-- <label>Enter quantity:</label> -->
+                        <input id="modal-input-name" type="hidden" name="item" value="" />
+                        <input id="quantity" type="number" name="qty" value="" placeholder="Enter quantity"/>
+                        <button type="submit" class="btn btn-success" style="">Submit</button>
+                    </div>
+                </div>
+                <div class="modal-footer" align="center" style="margin-top: 15px;">
+                    
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
+
+<style>
+#qtyModal #form-header {
+  margin: 0px;
+}
+
+.qty-display.form-group label, 
+.qty-display.form-group input {
+  float:left;
+}
+
+.qty-display.form-group input {
+  max-width: 60px;
+}
+
+</style>
+<script>
+
+$("#qtyForm").on('submit', function(e) {
+    e.preventDefault();
+    var item = $(this).find($("#modal-input-name")).val();
+    var qty = JSON.stringify($(this).find($("#quantity")).val());
+    if (localStorage[item]) {
+        alert("Adding to existing cart item");
+        qty = JSON.stringify(JSON.parse(localStorage[item]) + $("input:eq(1)"));
+        localStorage[item] = qty;
+    }
+    else {
+        localStorage.setItem(item, qty);
+    }
+    var cart_size = localStorage.length;
+    
+    $("#cart-qty").text(cart_size);
+    
+    $("#qtyModal").hide();
+    location.reload();
+})
+
+</script>
 {% endblock %}

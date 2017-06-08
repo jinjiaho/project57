@@ -23,7 +23,6 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 adminmode = False
 
-role = ""
 #----------------------------METHODS-------------------------
 #methods gives me all the items based on category
 def getAllInventory(category):
@@ -156,39 +155,25 @@ def scanner():
 def shelf(tag_id):
 	if not session['logged_in']:
 		return redirect('/login')
-	if request.method == 'GET':
-		conn = mysql.connect()
-		cursor = conn.cursor()
+	conn = mysql.connect()
+	cursor = conn.cursor()
 
-		cursor.execute("SELECT id, name, category, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(tag_id))
+	cursor.execute("SELECT name, category, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(tag_id))
 
-		data=cursor.fetchall()
-		things = []
-		for item in data:
-			things.append(
-				{"id" : item[0],
-				"name": item[1],
-				"category": item[2],
-				"picture":item[3]})
-		return render_template('storeroom.html', role=role, things=things, cart_qty = len(cart))
-	else: 
-		item = request.form['item']
-		qty = request.form['qty']
-		updated = False
-		for item in cart:
-			if item['name']==item:
-				item['qty'] = item['qty'] + qty
-			updated = True
-		if updated == False:
-			cart.append({'name':item, 'qty': qty})
-		return render_template('storeroom.html', role=role, cart_qty = len(cart))
+	data=cursor.fetchall()
+	things = []
+	for item in data:
+		things.append(
+			{"name": item[0],
+			"category": item[1],
+			"picture":item[2]})
+	return render_template('storeroom.html', things=things)
 
 
 @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
 def checkout(tag_id):
 	if request.method == 'GET':
-
-		return render_template('cart.html', role=role, cart=cart)
+		return render_template('cart.html')
 	else:
 		now = datetime.now()
 		form_data = request.form
