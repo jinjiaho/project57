@@ -25,26 +25,21 @@ DROP TABLE IF EXISTS `Logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Logs` (
-  `idLogs` int(11) NOT NULL,
-  `uid` int(11) NOT NULL,
-  `dateTime` datetime NOT NULL,
-  `action` varchar(45) NOT NULL,
-  `move` int(45) NOT NULL,
-  `qtyAfter` int(45) NOT NULL,
-  `idItem` varchar(45) NOT NULL,
-  `idNFC` varchar(45) NOT NULL,
-  PRIMARY KEY (`idLogs`)
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user` varchar(45) NOT NULL,
+  `date_time` datetime NOT NULL,
+  `action` char(45) NOT NULL, -- 'out', 'in' or 'check' --
+  `qty_moved` int(45) NOT NULL,
+  `qty_left` int(45) NOT NULL,
+  `item` varchar(45) NOT NULL,
+  `location` varchar(45) NOT NULL,
+  FOREIGN KEY (`user`) references User (`username`) on delete cascade on update cascade,
+  FOREIGN KEY (`item`) references Item (`name`) on delete cascade on update cascade,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `Logs`
---
 
-LOCK TABLES `Logs` WRITE;
-/*!40000 ALTER TABLE `Logs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Logs` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

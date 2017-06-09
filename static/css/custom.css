@@ -30,13 +30,56 @@ body {
    vertical-align: middle;
 }
 
-
 .button-wrapper {
   padding: 0px auto 15px auto;
   width: 100%;
 }
 
 .modal {
-   position: relative;
+   position: fixed;
    z-index: 20;
+   display: none;
+   top: 0;
+   left:0;
+   width: 100% !important;
+   height: 100% !important;
+   background: rgba(0,0,0,0.5);
+}
+
+.modal .qty-display {
+    width: 180px;
+    margin: 0 auto;
+    z-index: 99999;
+}
+
+.modal .qty-display input {
+    width: 180px;
+    padding: 5px;
+    border: 1px solid #777;
+    border-radius: 5px;
+}
+
+.font-icon-detail {
+    min-height: 132.41px;
+    line-height: 18px;
+}
+
+.font-icon-detail img {
+  /*width: 50px;*/
+  max-height: 50px;
+  margin-bottom: 5px;
+  position: relative;
+  top: 20%;
+}
+
+.font-icon-detail .name {
+  color: #000;
+  height: 37px;
+  position: relative;
+  bottom: 15%;
+  width: 100%;
+  padding: 0 10% 0 10%;
+  text-transform: capitalize;
+  vertical-align: middle;
+
 }
