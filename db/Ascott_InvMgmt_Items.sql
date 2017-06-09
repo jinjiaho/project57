@@ -4,6 +4,7 @@
 -- ------------------------------------------------------
 -- Server version	5.7.18
 
+
 CREATE DATABASE  IF NOT EXISTS `Ascott_InvMgmt` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `Ascott_InvMgmt`;
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
