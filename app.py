@@ -24,20 +24,22 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 adminmode = False
 
+#----------------------GLOBAL VARIABLES---------------------
+role = None
 
 #----------------------------METHODS-------------------------
-#methods gives me all the items based on category and amount in or out within the last month for each item
+# Returns all the items based on category and amount in or out within the last month for each item
 def getAllInventory(category):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
 	cursor.execute(
-		"SELECT idItem, item, qtyLeft, unit, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+		"SELECT sku, name, qty_left, unit, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
 	items = []
 	for item in data:
 		cursor.execute(
-			"SELECT action, move FROM ascott_invmgmt.logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now()) AND idItem='{}';".format(item[0]))
+			"SELECT action, qty_moved FROM ascott_invmgmt.logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
 		in_out_data = cursor.fetchall()
 		delivered_out = 0
 		recieved = 0
@@ -60,13 +62,12 @@ def getAllInventory(category):
 	return items
 
 
-
-#methods gives me all the items based on NFC id.
-def getFromLevels(idNFC):
+# Returns all the items based on location. KIV for possible supervisor view filtering.
+def getFromLevels(location):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
-	cursor.execute("SELECT item, category, idNFC FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(idNFC))
+	cursor.execute("SELECT name, category, location FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(location))
 
 	data=cursor.fetchall()
 	things = []
@@ -74,43 +75,39 @@ def getFromLevels(idNFC):
 		things.append(
 			{"name": item[0],
 			"category": item[1],
-			"idNFC":item[2]})
+			"location":item[2]})
 	return things
 
 
 
-#methods gives me all the logs that occurred within the current month.
+# Returns the logs that occurred within the current month.
 def getAllLogs():
 	conn = mysql.connect()
 	cursor = conn.cursor()
 	cursor.execute(
-		"SELECT uid, dateTime, action, move, qtyAfter, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
-
+		"SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now());")
 	data=cursor.fetchall()
 	things = []
 	
 	for row in data:
-		cursor.execute(
-			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
-		user_data=cursor.fetchall()
-		
 
-		cursor.execute(
-			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[5]))
-		item_data=cursor.fetchall()
+		cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE name = {};".format(str(row[5])))
+		item_data=cursor.fetchone()
 
-		things.append(
-			{"name": user_data[0][0].encode('ascii'),
-			"dateTime": row[1],
-			"action":row[2],
-			"move":row[3],
-			"remaining":row[4],
-			"item":item_data[0][0].encode('ascii'),
-			"category":item_data[0][1].encode('ascii'),
-			"location":row[6]})
-	print(things)
+		if item_data:
+
+			things.append(
+				{"name": row[0].encode('ascii'),
+				"dateTime": row[1],
+				"action":row[2],
+				"move":row[3],
+				"remaining":row[4],
+				"item":row[5].encode('ascii'),
+				"category":item_data.encode('ascii'),
+				"location":row[6]})
+			print(things)
+
 	return things
-
 		
 
 # TEST: extract dummy inventory qty data for Highcharts
@@ -138,15 +135,16 @@ def getData():
 		cursor = conn.cursor()
 
 		# TODO: string parameterisation
-		query = "SELECT iditem FROM Ascott_Invmgmt.Items WHERE item = '{}';".format(request.json)
+		query = "SELECT sku FROM Ascott_Invmgmt.Items WHERE name = '{}';".format(request.json)
+
 		cursor.execute(query)
 		idItem = cursor.fetchone()[0]
 		# print(idItem)
 
+		query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
+		query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = 1"
 		# TODO: string parameterisation
 		# query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
-		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = 1"
-		# print query
 		cursor.execute(query)
 		responseData = cursor.fetchall()
 
@@ -154,12 +152,21 @@ def getData():
 
 
 #----------------------------ROUTING ------------------------
+@app.route('/')
+def hello():
+	if session.get('logged_in'):
+		if role == 'supervisor':
+			return redirect('/dashboard')
+		else:
+			return redirect('/scan')
+	else:
+		return redirect('/login')
 
-@app.route('/', methods=["GET", "POST"])
+@app.route('/login', methods=["GET", "POST"])
 def login():
 	
 	error = ""
-#create a login form to collect username, pass & role
+	# create a login form to collect username & password
 	form = LoginForm()
 
 	if request.method == "POST":
@@ -168,15 +175,9 @@ def login():
 		else: 
 			username = form.username.data
 			password = form.password.data
-			role = form.role.data
 		
-			# cursor = mysql.connect().cursor()
-			# sql = "SELECT username, password, role FROM Ascott_InvMgmt.User WHERE username="'+username+'";"
-			# cursor.execute(sql)
-			# db = MySQLdb.connect(host="localhost", port = 3306, user = "root", password="classroom",db="Ascott_InvMgmt")
 			cursor=mysql.connect().cursor()
 			cursor.execute("SELECT username, password, role FROM User WHERE username= '" + username + "';")
-
 
 			#check if user and pass data is correct by executing the db
 			#data is stored as a tuple
@@ -186,28 +187,23 @@ def login():
 				# return redirect(url_for('login'))    #('Username does not exist.')
 				# error = 'User does not exist'
 				flash('User does not exist')
-				return redirect(url_for('login'))
+				return redirect('/login')
 
 			elif password != data[1]:
 				flash('Username and Password do not match.')
-				return redirect(url_for('login'))
+				return redirect('/login')
 
-			elif role != data[2]:
-				flash('Wrong position!')
-				return redirect(url_for('login'))
-			
 			else:	
 				if data[2] == "supervisor":
 					session['logged_in'] = True
 					session['username'] = username
-					return redirect(url_for('hello'))
+					role = "supervisor"
+					return redirect('/dashboard')
 				elif data[2] =="attendant":
 					session['logged_in'] = True
 					session['username'] = username
-					return redirect(url_for('scanner'))
-				else:
-					flash('Role is incorrect')
-					return render_template('login.html', error=error)
+					role = "attendant"
+					return redirect('/scan')
 
 	elif request.method =="GET":
 		return render_template('login.html', form=form)
@@ -215,17 +211,36 @@ def login():
 
 
 @app.route('/dashboard')
-def hello():
-
+def dashboard():
+	if not session['logged_in']:
+		return redirect('/login')
 	return render_template('dashboard.html')
 
 
 @app.route('/inventory/')
 def inventory():
+	# conn = mysql.connect()
+	# cursor = conn.cursor()
+
+	# cursor.execute(
+	# 	"SELECT sku, name, qty_left, unit, picture, category FROM Ascott_InvMgmt.Items;")
+	# data = cursor.fetchall()
+	# items = {}
+	# for i in data:
+	# 	if i[5] not in items:
+	# 		items[i[5]] = []
+	# 		print("new category created: "+str(i[5]))
+	# 	items[i[5]].append({'name':i[1],
+	# 		'remaining':i[2],
+	# 		'unit':i[3],
+	# 		'picture':i[4]})
+
+	# print(items)
+			
 	# get current list of all items listed in db
 	supplies = getAllInventory('Guest Supplies')
 	hampers = getAllInventory('Guest Hampers')
-	kitchenware = getAllInventory('Kitchenware')
+	kitchenware = getAllInventory('Kitche	nware')
 	return render_template('inventory.html',
 		supplies = supplies,
 		hampers = hampers,
@@ -236,7 +251,10 @@ def item(item, category):
 	item = item
 	qty = extract()
 	category = category
-	return render_template('item.html', item=item, category=category,qty=qty)
+	return render_template('item.html', 
+		item=item, 
+		category=category,
+		qty=qty)
 
 @app.route('/inventory/<category>')
 def category(category):
@@ -253,7 +271,7 @@ def logs():
 	return render_template('logs.html',logs=logs)
 	# names=names, items=items)
 
-@app.route('/scanner')
+@app.route('/scan')
 def scanner():
 	return render_template('scanner.html')
 
@@ -262,60 +280,48 @@ def scanner():
 # @cache.cached(timeout=50)
 def shelf(tag_id):
 	if not session.get('logged_in'):
-		return redirect(url_for('login'))
-	else:
-		if request.method == 'GET':
-			conn = mysql.connect()
-			cursor = conn.cursor()
+		return redirect('/login')
 
-			cursor.execute("SELECT idItem, item, category, idNFC, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(tag_id))
+	conn = mysql.connect()
+	cursor = conn.cursor()
 
-			data=cursor.fetchall()
-			things = []
-			for item in data:
-				things.append(
-					{"item_id": item[0],
-					"name": item[1],
-					"category": item[2],
-					"idNFC":item[3],
-					"picture":item[4]})
-			return render_template('storeroom.html', things=things) #removed role=role and cart_qty=len(cart) for now, since undefined
-		else: 
-			item = request.form['item']
-			qty = request.form['qty']
-			updated = False
-			for item in cart:
-				if item['name']==item:
-					item['qty'] = item['qty'] + qty
-				updated = True
-			if updated == False:
-				cart.append({'name':item, 'qty': qty})
-			return render_template('storeroom.html', role=role, cart_qty = len(cart))
+	cursor.execute("SELECT name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
+
+	data=cursor.fetchall()
+	things = []
+	for item in data:
+		things.append(
+			{"name": item[0],
+			"category": item[1],
+			"picture":item[2]})
+	return render_template('storeroom.html', things=things)
+
 
 
 @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
 def checkout(tag_id):
 	if request.method == 'GET':
-		return render_template('cart.html', role=role, cart=cart)
+		return render_template('cart.html')
 	else:
 		now = datetime.now()
-		form = request.form
-		items = d.getlist['item']
-		qtys = d.getlist['qty']
-		#  for i in range(0, d.size()):
-			# HARDCODED: Username
-			# query = "INSERT INTO Logs (datetime, user, item, qty, type, tag_id) VALUES ('"+now+"', 'ra', "+items[i]+"', '"+qtys[i]+"', 'withdrawal', '"+tag_id"');"
-			# TODO: Execute query to create log
-		cache = []
+		form_data = request.form
+		user = session['username']
+		
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		for item, qty in form_data.iteritems():
+			cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
+
+		cart = []
 		flash("Success!")
 		return redirect('scanner.html')
 
-@app.route('/storeroom/')
-def storeroom():
-#get data input from idNFC from mobilephone. data output from db is in tuple
-#this userinput is hard coded
-	catItems = getFromLevels("Level4C2")
-	return render_template("storeroom.html", catGoods=catItems)
+# @app.route('/storeroom/')
+# def storeroom():
+# #get data input from location from mobilephone. data output from db is in tuple
+# #this userinput is hard coded
+# 	catItems = getFromLevels("Level4C2")
+# 	return render_template("storeroom.html", catGoods=catItems)
 
 @app.route('/storeroom/<things>', methods=["GET","POST"])	
 def retrieval(things):
@@ -342,25 +348,18 @@ def retrieval(things):
 
 	return render_template("retrieval.html", things=things)
 
-@app.route('/tasks')
-def tasks():
-	return render_template('tasks.html')
-
-@app.route('/template')
-def template():
-	return render_template('template.html')
-
-@app.route('/logout') #added this to test logging in, no logout buttons in the html files at the moment
+@app.route('/logout')
 def logout():
 	session.pop('logged_in', None)
 	session.pop('username', None)
-	return redirect(url_for('login'))
+	role = None
+	return redirect('/login')
+
 
 @app.errorhandler(404)
 def page_not_found(e):
 	"""Return a custom 404 error."""
 	return 'Sorry, nothing at this URL.', 404
-
 
 
 ## testing

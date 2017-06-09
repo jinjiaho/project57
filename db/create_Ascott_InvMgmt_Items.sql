@@ -25,29 +25,21 @@ DROP TABLE IF EXISTS `Items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Items` (
-  `idItem` int(11) NOT NULL,
-  `item` varchar(45) NOT NULL,
-  `idNFC` varchar(45) NOT NULL,
-  `qtyLeft` int(11) NOT NULL,
-  `reorderPt` int(11) NOT NULL,
-  `batchSize` int(11) NOT NULL,
-  `category` char(25) NOT NULL,
-  `picture` char(100) NOT NULL,
-  `unitSize` char(100) NOT NULL,
-  PRIMARY KEY (`idItem`,`idNFC`)
+  `sku` int(11) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  `location` char(45) NOT NULL,
+  `qty_left` int(11) NOT NULL,
+  `reorder_pt` int(11) NOT NULL,
+  `batch_qty` int(11) NOT NULL,
+  `category` char(25) NOT NULL CHECK (`category` = 'Guest Supplies' or `category` = 'Guest Hampers' or `category` = 'Kitchenware'),
+  `picture` char(50) NOT NULL,
+  `unit` char(10) NOT NULL,
+  PRIMARY KEY (`sku`,`location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `Items`
---
 
-LOCK TABLES `Items` WRITE;
-/*!40000 ALTER TABLE `Items` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Items` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

@@ -11,7 +11,7 @@
 
     <ul class="nav">
         <li>
-            <a href="/">
+            <a href="/dashboard">
                 <i class="pe-7s-graph"></i>
                 <p>Dashboard</p>
             </a>
@@ -23,11 +23,17 @@
                 <p>Inventory</p>
             </a>
         </li>
+        <li class="active">
+            <a href="/logs">
+                <i class="pe-7s-news-paper"></i>
+                <p>Logs</p>
+            </a>
+        </li>
 
-        <li>
-            <a href="/tasks">
+        <li class="active">
+            <a href="/logs">
                 <i class="pe-7s-note2"></i>
-                <p>Tasks</p>
+                <p>Logs</p>
             </a>
         </li>
         <li>
@@ -357,6 +363,8 @@ $(document).ready(function() {
         </ul> 
 			<!-- <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button> -->
 		</div>
+    </div>
+</div>
 
 
 {% endblock %}

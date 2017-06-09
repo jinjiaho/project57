@@ -26,6 +26,9 @@
         max-width: 76px;
     }
 
+    #cart-table tbody td span {
+        text-transform: capitalize;
+    }
 
 
 </style>
@@ -34,9 +37,9 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <form>
+                        <form id="cart-form">
                             <div class="content table-responsive table-full-width">
-                                <table class="table table-hover">
+                                <table id="cart-table" class="table table-hover">
                                     <thead>
                                         <th></th>
                                         <th>Item</th>
@@ -44,14 +47,7 @@
                                         <th></th>
                                     </thead>
                                     <tbody>
-                                        {% for item in cart %}
-                                        <tr>
-                                            <td><img src="/static/img/items/Guest supplies/Ascott pen.jpg"/></td>
-                                            <td style="text-transform:capitalize;">{{item.name}}</td>
-                                            <td><a href="" data-toggle="modal" data-target="#qtyModal" id="openModal">{{item.qty}}</a></td>
-                                            <td>&times;</td>
-                                        </tr>
-                                        {% endfor %}
+                                        
                                         <tr>
                                             <td></td>
                                             <td></td>
@@ -72,28 +68,42 @@
             </div>
         </div>
 </div>
-<div id="qtyModal" class="modal" data-backdrop="false">
-    <span class="close" data-dismiss="modal">&times;</span>
-    <div class="qty-display">
-    <p>Enter quantity:</p>
-    <input id="quantity" type="number" name="qty">
-    </div>
-  <div class="numpad">
-    <ul id="keypad">   
-        <li class="letter">1</li>  
-        <li class="letter">2</li>  
-        <li class="letter">3</li>  
-        <li class="letter clearl">4</li>  
-        <li class="letter">5</li>  
-        <li class="letter">6</li> 
-      
-        <li class="letter clearl">7</li>  
-        <li class="letter">8</li>  
-        <li class="letter">9</li> 
-        <li class="delete clearl"><</li> 
-        <li class="letter">0</li>
-        <li class="enter">Enter</li> 
-    </ul>  
-  </div>
-</div>
+
+<script>
+$(function() {
+    alert(localStorage.length);
+    for (var key in localStorage) {
+        var item_name = key;
+        alert(item_name + " "+localStorage[key])
+        var new_row = $('<tr/>');
+        $('<td/><img/>').appendTo(new_row);
+        $('<td/><span/>').text(item_name).appendTo(new_row);
+        var input = $('<td/>').append($('<input/>', {
+            'type':'number',
+            'name':key,
+            'value':localStorage[key],
+            'style':'max-width: 15px;'
+        }));
+        input.appendTo(new_row);
+        $('<span/>', {
+            'class':'x'
+        }).text('&times;').appendTo($('<td/>')).appendTo(new_row);
+        $('#cart-table tbody').prepend(new_row);
+    }
+
+})
+
+$("td .x").click(function() {
+    $(this).parent().remove();
+})
+
+$("#cart-form").on('submit', function(event) {
+    event.preventDefault();
+    localStorage.clear();
+    $(this).submit();  
+})
+
+</script>
+
+
 {% endblock %}
