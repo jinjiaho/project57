@@ -26,22 +26,40 @@ adminmode = False
 
 
 #----------------------------METHODS-------------------------
-#methods gives me all the items based on category
+#methods gives me all the items based on category and amount in or out within the last month for each item
 def getAllInventory(category):
-    conn = mysql.connect()
-    cursor = conn.cursor()
+	conn = mysql.connect()
+	cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT item, qtyLeft, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
-    data = cursor.fetchall()
-    items = []
-    for item in data:
-    	items.append(
-    		{"name": item[0],
-			"qty": item[1],
-			"file": item[2]})
-    
-    return items
+	cursor.execute(
+		"SELECT idItem, item, qtyLeft, unit, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+	data = cursor.fetchall()
+	items = []
+	for item in data:
+		cursor.execute(
+			"SELECT action, move FROM ascott_invmgmt.logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now()) AND idItem='{}';".format(item[0]))
+		in_out_data = cursor.fetchall()
+		delivered_out = 0
+		recieved = 0
+		for i in in_out_data:
+			if i[0].encode('ascii') == 'out':
+				delivered_out = delivered_out + (-1*int(i[1]))
+			elif i[0].encode('ascii') == "in":
+				recieved = recieved + int(i[1])
+		remaining_quantity = item[2]
+		initial_quantity = remaining_quantity + delivered_out - recieved
+		items.append(
+			{"name": item[1],
+			"remaining": item[2],
+			"unit": item[3],
+			"starting": initial_quantity,
+			"recieved": recieved,
+			"demand": delivered_out,
+			"file": item[4]})
+		
+	return items
+
+
 
 #methods gives me all the items based on NFC id.
 def getFromLevels(idNFC):
@@ -58,6 +76,42 @@ def getFromLevels(idNFC):
 			"category": item[1],
 			"idNFC":item[2]})
 	return things
+
+
+
+#methods gives me all the logs that occurred within the current month.
+def getAllLogs():
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	cursor.execute(
+		"SELECT uid, dateTime, action, move, qtyAfter, idItem,idNFC FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
+
+	data=cursor.fetchall()
+	things = []
+	
+	for row in data:
+		cursor.execute(
+			"SELECT name FROM Ascott_InvMgmt.User WHERE uid = '{}';".format(row[0]))
+		user_data=cursor.fetchall()
+		
+
+		cursor.execute(
+			"SELECT item, category FROM Ascott_InvMgmt.Items WHERE idItem = '{}';".format(row[5]))
+		item_data=cursor.fetchall()
+
+		things.append(
+			{"name": user_data[0][0].encode('ascii'),
+			"dateTime": row[1],
+			"action":row[2],
+			"move":row[3],
+			"remaining":row[4],
+			"item":item_data[0][0].encode('ascii'),
+			"category":item_data[0][1].encode('ascii'),
+			"location":row[6]})
+	print(things)
+	return things
+
+		
 
 # TEST: extract dummy inventory qty data for Highcharts
 def extract():
@@ -162,31 +216,41 @@ def login():
 @app.route('/dashboard')
 def hello():
 
-    return render_template('dashboard.html')
+	return render_template('dashboard.html')
 
 
-@app.route('/inventory')
+@app.route('/inventory/')
 def inventory():
+	# get current list of all items listed in db
+	supplies = getAllInventory('Guest Supplies')
+	hampers = getAllInventory('Guest Hampers')
+	kitchenware = getAllInventory('Kitchenware')
+	return render_template('inventory.html',
+		supplies = supplies,
+		hampers = hampers,
+		kitchenware = kitchenware)
 
-    # get current list of all items listed in db
-    supplies = getAllInventory('supplies')
-    hampers = getAllInventory('hampers')
-    kitchenware = getAllInventory('kitchenware')
-
-    return render_template('inventory.html',
-        all_guest_supplies = supplies,
-        all_guest_hampers = hampers,
-        all_kitchenware = kitchenware)
-
-@app.route('/inventory/<item>')
-def item(item):
+@app.route('/inventory/<category>/<item>')
+def item(item, category):
 	item = item
 	qty = extract()
-	return render_template('item.html', item=item, qty=qty)
+	category = category
+	return render_template('item.html', item=item, category=category,qty=qty)
+
+@app.route('/inventory/<category>')
+def category(category):
+	category = category
+	itemtype = getAllInventory(category)
+	return render_template('category.html', category=category, itemtype=itemtype)
+
 
 @app.route('/logs')
 def logs():
-	return render_template('logs.html')
+	logs=getAllLogs()
+	# names=getUniqueNames()
+	# items=getUniqueItems()
+	return render_template('logs.html',logs=logs)
+	# names=names, items=items)
 
 @app.route('/scanner')
 def scanner():
@@ -196,33 +260,36 @@ def scanner():
 @app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
 # @cache.cached(timeout=50)
 def shelf(tag_id):
-	if request.method == 'GET':
-		conn = mysql.connect()
-		cursor = conn.cursor()
+	if not session.get('logged_in'):
+		return redirect(url_for('login'))
+	else:
+		if request.method == 'GET':
+			conn = mysql.connect()
+			cursor = conn.cursor()
 
-		cursor.execute("SELECT idItem, item, category, idNFC, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(idNFC))
+			cursor.execute("SELECT idItem, item, category, idNFC, picture FROM Ascott_InvMgmt.Items WHERE idNFC = '{}';".format(tag_id))
 
-		data=cursor.fetchall()
-		things = []
-		for item in data:
-			things.append(
-				{"item_id": item[0],
-				"name": item[1],
-				"category": item[2],
-				"idNFC":item[3],
-				"picture":item[4]})
-		return render_template('storeroom.html', role=role, things=things, cart_qty = len(cart))
-	else: 
-		item = request.form['item']
-		qty = request.form['qty']
-		updated = False
-		for item in cart:
-			if item['name']==item:
-				item['qty'] = item['qty'] + qty
-			updated = True
-		if updated == False:
-			cart.append({'name':item, 'qty': qty})
-		return render_template('storeroom.html', role=role, cart_qty = len(cart))
+			data=cursor.fetchall()
+			things = []
+			for item in data:
+				things.append(
+					{"item_id": item[0],
+					"name": item[1],
+					"category": item[2],
+					"idNFC":item[3],
+					"picture":item[4]})
+			return render_template('storeroom.html', things=things) #removed role=role and cart_qty=len(cart) for now, since undefined
+		else: 
+			item = request.form['item']
+			qty = request.form['qty']
+			updated = False
+			for item in cart:
+				if item['name']==item:
+					item['qty'] = item['qty'] + qty
+				updated = True
+			if updated == False:
+				cart.append({'name':item, 'qty': qty})
+			return render_template('storeroom.html', role=role, cart_qty = len(cart))
 
 
 @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
@@ -282,10 +349,16 @@ def tasks():
 def template():
 	return render_template('template.html')
 
+@app.route('/logout') #added this to test logging in, no logout buttons in the html files at the moment
+def logout():
+	session.pop('logged_in', None)
+	session.pop('username', None)
+	return redirect(url_for('login'))
+
 @app.errorhandler(404)
 def page_not_found(e):
-    """Return a custom 404 error."""
-    return 'Sorry, nothing at this URL.', 404
+	"""Return a custom 404 error."""
+	return 'Sorry, nothing at this URL.', 404
 
 
 

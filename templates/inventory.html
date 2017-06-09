@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block sidebar %}
 <div class="sidebar-wrapper">
+<link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
     <div class="logo">
         <a href="" class="simple-text" style="text-align:left;">
         <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
@@ -10,13 +11,13 @@
 
     <ul class="nav">
         <li>
-            <a href="/dashboard">
+            
                 <i class="pe-7s-graph"></i>
                 <p>Dashboard</p>
             </a>
         </li>
         <li class="active">
-            <a href="#">
+            <a href="/inventory">
                 <i class="pe-7s-rocket"></i>
                 <p>Inventory</p>
             </a>
@@ -87,7 +88,6 @@
 <div class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
                 <div class="card">
                     <button class="header accordion">
                         <h4 class="title">Guest Supplies</h4>
@@ -95,21 +95,23 @@
                     <div class="content all-icons panel">
                         <div class="row">
                           
-                          {% for item in all_guest_supplies %}
-                          <a href="./{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="./{{item.name}}"><div class="alert alert-danger">
+
+                          {% for item in supplies %}
+                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="inventory/{{item.name}}"><div class="alert alert-danger">
                               <img src="/static/img/items/supplies/{{item.name}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
+                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                             </div></a>
                           </div>
                           {% endfor %}
+                            <a href="Guest Supplies">
+                            <button class="btn btn-default btn-block" id="btn_getData" >Month Review</button></a>
 
                           </div>
 
-                        </div>
-                        </div>
                     </div>
-                </div>
+                  </div>
+                
                 <div class="card">
                     <button class="header accordion">
                         <h4 class="title">Guest Hampers</h4>
@@ -118,14 +120,16 @@
                         <div class="row">
                           
 
-                          {% for item in all_guest_hampers %}
-                          <a href="./{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="./{{item.name}}"><div class="alert alert-warning">
+                          {% for item in hampers %}
+                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="inventory/{{item.name}}"><div class="alert alert-warning">
                               <img src="/static/img/items/hampers/{{item.file}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
+                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                             </div></a>
                           </div>
                           {% endfor %}
+                          <a href="Guest Hampers">
+                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
 
 
                           </div>
@@ -140,28 +144,36 @@
                         <div class="row">
                           
 
-                          {% for item in all_kitchenware %}
+
+                          {% for item in kitchenware %}
                           <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
                             <a href="inventory/{{item.name}}"><div class="alert alert-warning">
-                              <img src="/static/img/items/kitchenware/{{item.name}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.qty}}</span></div>
+                              <img src="/static/img/items/kitchenware/{{item.file}}.jpg"/>
+                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
+
+
                             </div></a>
                           </div>
                           {% endfor %}
+                          <a href="Kitchenware">
+                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
 
-
-                          
                           </div>
                           
-                        </div>
                     </div>
                 </div>
+
+                <!-- </div>
+                </div>
+            </div> -->
+
                 </div>
             </div>
 
+
         </div>
         <div class="row buttons">
-          <button class="btn btn-default btn-block" id="btn_getData">Get Data</button>
+          
           <button class="btn btn-primary btn-block" id="btn_newItem">New Item</button>
         </div>
     </div>
@@ -182,5 +194,7 @@ for (i = 0; i < acc.length; i++) {
         }
     }
 }
+
 </script>
+
 {% endblock %}

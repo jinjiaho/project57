@@ -1,0 +1,125 @@
+idItem,item,idNFC,qtyLeft,reorderPt,batchSize,category,picture,unit,value
+1,"Snapple Juice",test,48,0,1,hampers,fff,Bottle,$6.21
+2,"Butternut Squash",lalala,20,0,1,hampers,hoola,Packet,$1.58
+3,Cereals(small),afas,336,0,1,hampers,ret,Packet,$0.61
+4,"Raw Honey",gfjgf,24,0,1,hampers,fgdg,Bottle,$4.62
+5,"Honey Mustard Onion Chips",jhgfm,48,0,1,hampers,s,Packet,$1.16
+6,"Sea Salt Small Chips",xcb,48,0,1,hampers,grgh,Packet,$1.65
+7,"Farm Crackers",rte,0,0,1,hampers,sr,Packet,$4.41
+8,"Instant Oatmeal",szg,42,0,1,hampers,hrshs,Packet,$5.90
+9,"Ascott Teddy Grocery Bag",rey,10,0,1,hampers,ghr,Pieces,$4.80
+10,"Coffee Creamer",djgf,7,0,1,hampers,gr,Box,$20.00
+11,"Coke Zero(330ml)",ete,2,0,1,hampers,gre,Carton,$15.50
+12,Sprite(330ml),rey,15,0,1,hampers,gr,Carton,$13.40
+13,"Coke Zero(1.5L)",kghj,8,0,1,hampers,tre,Carton,$22.92
+14,Sprite(1.5L),uoy,7,0,1,hampers,g,Carton,$24.00
+15,"Dr Who Water",uip,0,0,1,hampers,sreh,Carton,$4.50
+16,"Fiji Water",qrew,12,0,1,hampers,rh,Carton,$28.80
+17,"Golden Crystal Sugar",sdg,19,0,1,hampers,y,Packet,$8.63
+18,"RIPE Sachet Sugar",hy,25,0,1,hampers,uy,Packet,$6.38
+19,"Toblerone Milk",trye,134,0,1,hampers,jyuj,Bar,$2.25
+20,"Nespresso Livanto",dfg,600,0,1,hampers,yuk,Pieces,$0.85
+21,"Nespresso Ristretto",sr,600,0,1,hampers,yut,Pieces,$0.85
+22,"TWG Earl Grey",yrt,14,0,1,hampers,uj,Carton,$26.92
+23,"TWG English Breakfast Tea",etw,6,0,1,hampers,yh,Carton,$26.92
+24,"TWG Jasmine Tea",ytu,7,0,1,hampers,g,Carton,$26.92
+25,"Milk 1L",igh,7,0,1,hampers,sew,Carton,$15.40
+26,Wine,nvc,18,0,1,hampers,er,Bottle,$15.00
+27,"Nascafe Gold Blend Decaf",st,0,0,1,hampers,etrrwet,Carton,$56.00
+28,"Ascott Cookies",few,150,0,1,hampers,ryt,Pieces,$3.70
+29,"Fish Noodle",sdfs,4,0,1,hampers,ytr,Carton,$32.00
+30,"Laksa Noodle",htyr,9,0,1,hampers,uiyurt,Carton,$32.00
+31,"Strawberry Jam",nvc,24,0,1,hampers,jy,Bottle,$5.50
+32,"Ascott Pen",taet,750,0,1,supplies,h,Pieces,$0.65
+33,Umbrella,dsger,253,0,1,supplies,d,Pieces,$8.10
+34,"Laundry Bag",t,0,0,1,supplies,hrt,Pieces,$0.45
+35,"Laundry Bag (Plastic)",tre,5000,0,1,supplies,hst,Pieces,$0.27
+36,Somat,tre,2,0,1,supplies,hts,Carton,$13.84
+37,"Laundry Detergent 50g",y,2000,0,1,supplies,jsd,Box,$0.25
+38,"Hand Soap",y54,150,0,1,supplies,h,Pieces,$1.00
+39,"Dish Washing ",try,384,0,1,supplies,rh,Pieces,$1.56
+40,Toothbrush,y,2500,0,1,supplies,trj,Pieces,$0.53
+41,"Shaving Kit",5utr,4000,0,1,supplies,dfh,Pieces,$0.35
+42,"Shower Cap",gre,5000,0,1,supplies,fd,Pieces,$0.13
+43,Comb,re,2000,0,1,supplies,htr,Pieces,$0.15
+44,"Cotton Buds",yr,2000,0,1,supplies,jg,Pieces,$0.10
+45,"Sewing Kit",yr,11000,0,1,supplies,j,Pieces,$0.13
+46,Shampoo,tryuu,576,0,1,supplies,ytku,Bottle,$1.00
+47,Conditioner,ytk,0,0,1,supplies,k,Bottle,$1.00
+48,"Shower Gell",u,576,0,1,supplies,u,Bottle,$1.00
+49,"Body Lotion ",rg,768,0,1,supplies,rt,Bottle,$1.00
+50,"Soap 50g",erw5,0,0,1,supplies,ret,Pieces,$1.00
+51,"Soap 25g",rty,250,0,1,supplies,re,Pieces,$0.89
+52,"Tissue Box",rtu,2,0,1,supplies,d,Carton,$17.30
+53,"Toilet Roll",776i,0,0,1,supplies,hr,Bundle,$33.50
+54,"Sanitary Bag",ey,500,0,1,supplies,y,Pieces,$0.44
+55,L'occitane,ryw5,35,0,1,supplies,rtu,Box,$67.70
+56,Slippers,54,200,0,1,supplies,th,Pieces,$1.06
+57,"TEFAL VIESSE Electric Kettle","er t",1,0,1,kitchenware,trh,Pieces,$72.82
+58,"BRAUN HT 400 Multitoast",trg,0,0,1,kitchenware,s,Pieces,$49.00
+59,"PADERNO Ice Bucket with Tong",rsry,9,0,1,kitchenware,h,Pieces,$27.03
+60,"PADERNO Sauce Pot with two handles and cover",ryw,5,0,1,kitchenware,reg,Pieces,$51.52
+61,"PADERNO Sauce Pot with one handle and cover",5r,5,0,1,kitchenware,sg,Pieces,$49.29
+62,"PADERNO Frying Pan",yytre,2,0,1,kitchenware,rs,Pieces,$31.95
+63,"PADERNO Soup Ladle",y5,3,0,1,kitchenware,rrh,Pieces,$7.39
+64,"PADERNO Utility Knife",yrt,25,0,1,kitchenware,sr,Pieces,$16.27
+65,"PADERNO Parking/Fruit Knife",yr,6,0,1,kitchenware,ghsr,Pieces,$4.60
+66,"PADERNO Potato Peeler",y5,23,0,1,kitchenware,gr,Pieces,$2.86
+67,"PADERNO Kitchen Scissors",ytr,15,0,1,kitchenware,ge,Pieces,$3.43
+68,"PADERNO Can Opener",ty,9,0,1,kitchenware,rsg,Pieces,$7.90
+69,"PADERNO Double Level Corkscrew",kuyt,7,0,1,kitchenware,yrty,Pieces,$9.17
+70,"PADERNO Kitchen Food Tong",hre,1,0,1,kitchenware,hs,Pieces,$4.34
+71,"Wooden Pan Tuner/Spatula",re,18,0,1,kitchenware,g,Pieces,$1.50
+72,"Kitchen Sponge Holder",tertr5,26,0,1,kitchenware,sr,Pieces,$2.90
+73,"Kitchen Sponge-3m",yy5,0,0,1,kitchenware,gre,Pieces,$2.00
+74,"Kitchen Waste Bin with Lid",ywr,4,0,1,kitchenware,gse,Pieces,$21.00
+75,"Plastic Cutlery Tray",yhtts,18,0,1,kitchenware,g,Pieces,$1.50
+76,"Plastic Chopping Board",u,24,0,1,kitchenware,dg,Pieces,$7.36
+77,"Hot Pot Mat",sut,87,0,1,kitchenware,rsg,Pieces,$2.17
+78,"Pot Holder/Oven Mitt",thsr,43,0,1,kitchenware,rs,Pieces,$9.20
+79,"RONA GLASS Scena-Crystalling Wine Glass",6u,18,0,1,kitchenware,g,Pieces,$5.10
+80,"RONA GLASS Globo 12 High Ball Tumbler",rtutu,12,0,1,kitchenware,ry,Pieces,$2.70
+81,"RONA GLASS Globo 15 Cocktail Tumbler",ytu,6,0,1,kitchenware,tr,Pieces,$2.50
+82,"RONA GLASS Globo 16 Old-Fashioned Tumbler",ut,30,0,1,kitchenware,t,Pieces,$2.50
+83,"SAMBONET Table/Dinner Knife",7,48,0,1,kitchenware,u6,Pieces,$4.39
+84,"SAMBONET Dessert Knife",it,70,0,1,kitchenware,u,Pieces,$3.54
+85,"SAMBONET Table/Dinner Fork",urt,48,0,1,kitchenware,6ey,Pieces,$2.99
+86,"SAMBONET Dessert Fork",htrw,51,0,1,kitchenware,r,Pieces,$2.63
+87,"SAMBONET Serving Spoon",tw46,3,0,1,kitchenware,ae,Pieces,$6.23
+88,"SAMBONET Table/Dinner Spoon",6,88,0,1,kitchenware,te,Pieces,$2.99
+89,"SAMBONET Dessert Spoon",778,72,0,1,kitchenware,t,Pieces,$2.63
+90,"SAMBONET Tea Spoon",o78oo7,12,0,1,kitchenware,ert,Pieces,$1.82
+91,"PANASONIC 1500W Hair Dryer",5e,113,0,1,kitchenware,re,Pieces,$31.70
+92,"NARUMI Ashtray",ry,99,0,1,kitchenware,re,Pieces,$4.80
+93,"NARUMI 32cm Cosmo Oval Fish Platter",5yw4y5,10,0,1,kitchenware,y,Pieces,$35.40
+94,"NARUMI 27cm (Esprit) Dinner Plate",6u,17,0,1,kitchenware,r,Pieces,$9.60
+95,"NARUMI 21cm (Esprit) Side/Dessert/Salad Plate",65u,11,0,1,kitchenware,gs,Pieces,$7.40
+96,"NARUMI 23cm (Esprit) Coupe Soup/Cereal Plate",6,20,0,1,kitchenware,ry,Pieces,$9.60
+97,"NARUMI 19cm Service Bowl",u6ui76,3,0,1,kitchenware,ry,Pieces,$13.60
+98,"NARUMI 10cm Chinese Rice Bowl",i,18,0,1,kitchenware,tsu,Pieces,$6.20
+99,"NARUMI Soup Spoon",i65,5,0,1,kitchenware,tr,Pieces,$4.50
+100,"NARUMI Coffee/Tea Pot",u,0,0,1,kitchenware,u,Pieces,$34.40
+101,"NARUMI Milk/Creamer Jug",i,7,0,1,kitchenware,tr,Pieces,$12.00
+102,"NARUMI Sugar Pot with Cover",76i,6,0,1,kitchenware,u,Pieces,$17.90
+103,"NARUMI Salt Shaker",6r,15,0,1,kitchenware,srtu,Pieces,$5.00
+104,"NARUMI Pepper Shaker",i7,15,0,1,kitchenware,tf,Pieces,$5.00
+105,"NARUMI Coffee Mug (Esprit)",i76i77,42,0,1,kitchenware,hs,Pieces,$9.20
+106,"NARUMI Coffee/Tea Cup (Esprit)",6u,36,0,1,kitchenware,t,Pieces,$6.60
+107,"NARUMI Coffee/Tea Cup Saucer",45,4,0,1,kitchenware,yy,Pieces,$4.50
+108,"NARUMI Toothpick Holder",54,15,0,1,kitchenware,srt,Pieces,$5.00
+109,Chopsticks,45y5,70,0,1,kitchenware,ytr,Pieces,$0.32
+110,"ILLUMINATOR Torch",i7i8,0,0,1,kitchenware,u,Pieces,$13.50
+111,"Ironing Board",9p,2,0,1,kitchenware,stu,Pieces,$33.50
+112,"Ironing Board Cover",6y8,0,0,1,kitchenware,rus,Pieces,$13.50
+113,"Ivory Satin Hanger with Chrome Plated",y,48,0,1,kitchenware,u,Pieces,$1.45
+114,"Regular Wooden Hanger with anti slip bar",yp9,50,0,1,kitchenware,uu,Pieces,$1.60
+115,"Trouser Hanger with notches and skirt clips",p8yp9,90,0,1,kitchenware,r,Pieces,$1.80
+116,"Broad Coat Hanger",80,50,0,1,kitchenware,urt,Pieces,$2.50
+117,Iron-Tefal,76,3,0,1,kitchenware,u,Pieces,$46.00
+118,"IMPULSE USA Resin Tissue Box Cover",r6,11,0,1,kitchenware,s,Pieces,$17.00
+119,"TANITA Precision Weighing Scale",457,6,0,1,kitchenware,uty,Pieces,$29.30
+120,"PADERNO Meat Fork",8,4,0,1,kitchenware,5r,Pieces,$5.80
+121,"TEFAL/PHILLIPS Rice and Slow Cooker",tri,0,0,1,kitchenware,ys,Pieces,$74.69
+122,"PADERNO Frying Pan with Cover",l78t,1,0,1,kitchenware,y,Pieces,$76.17
+123,"Food Strainer",ttp,1,0,1,kitchenware,tr5yu,Pieces,$14.90
+124,"Nespresso Coffee Machine",r7o,0,0,1,kitchenware,rturt,Pieces,$371.96
