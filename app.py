@@ -121,7 +121,7 @@ def extract():
 	return data
 
 # POST for getting chart data
-@app.route('/api/getData/', methods=["POST"])
+@app.route('/api/getData', methods=["POST"])
 def getData():
 
 	print "content_type: ", request.content_type
@@ -143,8 +143,8 @@ def getData():
 		idItem = cursor.fetchone()[0]
 		# print(idItem)
 
-		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {0}".format(idItem)
-		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = 1"
+		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
+		# query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = 1"
 		# print query
 		cursor.execute(query)
 		responseData = cursor.fetchall()
