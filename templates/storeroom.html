@@ -13,11 +13,11 @@
 
 <script>
     $(function show_cart_length() {
-        if (localStorage.length == 0) {
+        if (localStorage[cart] == null) {
             $("#cart-notif").remove();
         } else {
             $("#cart-notif").removeClass('hide');
-            var qty = localStorage.length;
+            var qty = localStorage[cart_qty];
             $("#cart-qty").html(qty);
         }
     });
@@ -175,13 +175,51 @@ $(document).ready(function() {
 
 </style>
 <script>
+$(function () {
+  function($addTocartBtn){
+    var $cartIcon = $(".my-cart-icon");
+    var $image = $('<img width="30px" height="30px" src="' + $addTocartBtn.data("image") + '"/>').css({"position": "fixed", "z-index": "999"});
+    $addTocartBtn.prepend($image);
+    var position = $cartIcon.position();
+    $image.animate({
+      top: position.top,
+      left: position.left
+    }, 500 , "linear", function() {
+      $image.remove();
+    });
+  }
+
+  $('.my-cart-btn').myCart({
+    classCartIcon: 'my-cart-icon',
+    classCartBadge: 'my-cart-badge',
+    affixCartIcon: true,
+    checkoutCart: function(products) {
+      $.each(products, function(){
+        console.log(this);
+      });
+    },
+    clickOnAddToCart: function($addTocart){
+      goToCartIcon($addTocart);
+    },
+    getDiscountPrice: function(products) {
+      var total = 0;
+      $.each(products, function(){
+        total += this.quantity * this.price;
+      });
+      return total * 0.5;
+    }
+  });
+
+})
 
 $("#qtyForm").on('submit', function(e) {
     e.preventDefault();
+    var picture = $(this).find($(".modal-pic img")).attr('src');
     var item = $(this).find($("#modal-input-name")).val();
-    var qty = JSON.stringify($(this).find($("#quantity")).val());
-    if (localStorage[item]) {
-        alert("Adding to existing cart item");
+    var qty = $(this).find($("#quantity")).val();
+    var string = JSON.stringify([picture, item, qty])
+    if (localStorage[cart]) {
+        localStorage[cart_qty] = JSON.stringify
         qty = JSON.stringify(JSON.parse(localStorage[item]) + $("input:eq(1)"));
         localStorage[item] = qty;
     }

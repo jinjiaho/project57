@@ -67,7 +67,7 @@ def getFromLevels(location):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
-	cursor.execute("SELECT item, category, location FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(location))
+	cursor.execute("SELECT name, category, location FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(location))
 
 	data=cursor.fetchall()
 	things = []
@@ -85,29 +85,29 @@ def getAllLogs():
 	conn = mysql.connect()
 	cursor = conn.cursor()
 	cursor.execute(
-		"SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE month(dateTime) = month(now()) AND year(dateTime) = year(now());")
-
+		"SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now());")
 	data=cursor.fetchall()
 	things = []
 	
 	for row in data:
 
-		cursor.execute(
-			"SELECT name, category FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(row[5]))
-		item_data=cursor.fetchall()
+		cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE name = {};".format(str(row[5])))
+		item_data=cursor.fetchone()
 
-		things.append(
-			{"name": user_data[0][0].encode('ascii'),
-			"dateTime": row[1],
-			"action":row[2],
-			"move":row[3],
-			"remaining":row[4],
-			"item":item_data[0][0].encode('ascii'),
-			"category":item_data[0][1].encode('ascii'),
-			"location":row[6]})
-	print(things)
+		if item_data:
+
+			things.append(
+				{"name": row[0].encode('ascii'),
+				"dateTime": row[1],
+				"action":row[2],
+				"move":row[3],
+				"remaining":row[4],
+				"item":row[5].encode('ascii'),
+				"category":item_data.encode('ascii'),
+				"location":row[6]})
+			print(things)
+
 	return things
-
 		
 
 # TEST: extract dummy inventory qty data for Highcharts
@@ -134,14 +134,14 @@ def getData():
 		conn = mysql.connect()
 		cursor = conn.cursor()
 
-		query = "SELECT iditem FROM Ascott_Invmgmt.Items WHERE item = '{}';".format(request.json)
+		query = "SELECT sku FROM Ascott_Invmgmt.Items WHERE name = '{}';".format(request.json)
 
 		cursor.execute(query)
 		idItem = cursor.fetchone()[0]
 		# print(idItem)
 
-		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {0}".format(idItem)
-		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = 1"
+		query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
+		query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = 1"
 		# print query
 		cursor.execute(query)
 		responseData = cursor.fetchall()
@@ -308,7 +308,7 @@ def checkout(tag_id):
 		conn = mysql.connect()
 		cursor = conn.cursor()
 		for item, qty in form_data.iteritems():
-			cursor.execute("INSERT INTO Logs (user, dateTime, action, qty, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
+			cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
 
 		cart = []
 		flash("Success!")
