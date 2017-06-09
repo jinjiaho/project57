@@ -137,14 +137,15 @@ def getData():
 		conn = mysql.connect()
 		cursor = conn.cursor()
 
+		# TODO: string parameterisation
 		query = "SELECT iditem FROM Ascott_Invmgmt.Items WHERE item = '{}';".format(request.json)
-
 		cursor.execute(query)
 		idItem = cursor.fetchone()[0]
 		# print(idItem)
 
-		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
-		# query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = 1"
+		# TODO: string parameterisation
+		# query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
+		query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = 1"
 		# print query
 		cursor.execute(query)
 		responseData = cursor.fetchall()
