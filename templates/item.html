@@ -60,11 +60,11 @@
 			<div class="col-md-9">
 			    <div class="card">
 			        <div class="content">
-                        <div id="chart" style="margin: 0 auto"></div>
+                        <div id="chart" style="height: 400px; margin: 0 auto"></div>
 			            <div class="footer" id="update" style="display:none">
                             <hr>
 			                <div class="stats">
-			                    <i class="fa fa-history"></i> Updated 3 minutes ago
+			                    <i class="fa fa-history"></i> Latest stock movement &mdash; 3 minutes ago
 			                </div>
 			            </div>
 			        </div>
@@ -84,60 +84,42 @@
 </div>
 
 <script>
-$.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=new-intraday.json&callback=?', function (data) {
+Highcharts.stockChart('chart', {
+    rangeSelector: {
+        selected: 1
+    },
+    chart: {
+        type: 'area'
+    },
+    title: {
+        text: '{{item}}'
+    },
+    subtitle: {
+        text: 'Quantity remaining'
+    },
+    // xAxis: {
+    //     type: 'datetime',
+    //     dateTimeLabelFormats: { // don't display the dummy year
+    //         month: '%e. %b',
+    //         year: '%b'
+    //     },
+    //     title: {
+    //         text: 'Date'
+    //     }
+    // },
+    tooltip: {
+        // headerFormat: '<b>Quantity</b><br>',
+        pointFormat: '<b>Quantity:</b> {point.y:.2f}'
+    },
+    credits: {
+        enabled: false
+    },
+    scrollbar: {
+        enabled: false
+    },
 
-    // create the chart
-    Highcharts.stockChart('chart', {
-
-        chart: {
-            events: {
-                load: function () {
-                    console.log("chart loaded");
-                    $("#update").css("display", "inline");
-                }
-            }
-        },
-
-        title: {
-            text: '{{item}}'
-        },
-
-        subtitle: {
-            text: 'Quantity remaining'
-        },
-
-        xAxis: {
-            gapGridLineWidth: 0
-        },
-
-        rangeSelector: {
-            buttons: [{
-                type: 'hour',
-                count: 1,
-                text: '1h'
-            }, {
-                type: 'day',
-                count: 1,
-                text: '1D'
-            }, {
-                type: 'all',
-                count: 1,
-                text: 'All'
-            }],
-            selected: 1,
-            inputEnabled: false
-        },
-        credits: {
-            enabled: false
-        },
-        series: [{
-            name: 'Quantity',
-            type: 'area',
-            data: data,
-            gapSize: 5,
-            tooltip: {
-                valueDecimals: 2
-            },
+    plotOptions: {
+        area: {
             fillColor: {
                 linearGradient: {
                     x1: 0,
@@ -150,22 +132,45 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=new-intrad
                     [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
                 ]
             },
-            threshold: null
-        }],
-        plotOptions: {
-            series: {
-                events: {
-                  afterAnimate: function (ev) {
-                    // console.log(data)
-                    // console.log(ev)
-                    // console.log('fired only once for each series');
-                    $("#update").css("display", "inline");
-                  }
+            marker: {
+                enabled: false
+            },
+            lineWidth: 1,
+            states: {
+                hover: {
+                    lineWidth: 1
                 }
+            },
+            threshold: null
+        },
+        series: {
+            events: {
+              afterAnimate: function (ev) {
+                // console.log(data)
+                // console.log(ev)
+                // console.log('fired only once for each series');
+                // $("#update").css("display", "inline");
+                $("#update").fadeIn();
+              }
             }
         }
-    });
+    },
+
+    series: [{
+        name: '{{item}}',
+        // Define the data points. All series have a dummy year
+        // of 1970/71 in order to be compared on the same x axis. Note
+        // that in JavaScript, months start at 0 for January, 1 for February etc.
+        data: [
+            /* AAPL historical OHLC data from the Google Finance API */
+            {% for point in qty %}
+            [{{point[0]}}, {{point[1]}}],
+            {% endfor %}
+            [{{item[-1][0]}}, {{item[-1][1]}}]
+        ]
+    }]
 });
+
 
 $(document).ready(function(){
     // insert any required code here

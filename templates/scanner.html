@@ -44,13 +44,11 @@
 			right: 0;
 		}
 
-		.content .scanTag {
-			position: relative;
-			top: calc(50% - 108px);
-			left: calc(50% - 120px);
+		.content .text-container .scanTag {
 			text-align: center;
 			color: #000;
 			font-size: 48pt;
+			font-size: 10vh;
 			line-height: 1.14;
 		}
 
@@ -59,13 +57,25 @@
 			font-size: 24pt;
 			padding-top: 8px;
 		}
+
+		.text-container {
+			width: 100%;
+			text-align: center;
+			position: relative;
+			top: 27%;
+		}
+		
 	</style>
 	<body class="login-layout">
 		<div id="container">
 			<div id="body">
-				<a href="/shelves/Level4C2/"><div class="content">
-					<span class="scanTag">PLACE PHONE ON TAG</span>
-				</div></a>
+				<a href="/shelves/Level4C2/">  <!-- hardcoded with an idNFC for now-->
+					<div class="content">
+						<div class="text-container">
+							<span class="scanTag">PLACE PHONE ON TAG</span>
+						</div>
+					</div>
+				</a>
 			</div>
 			
 			<a href=""><div id="footer">

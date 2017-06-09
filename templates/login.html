@@ -116,24 +116,6 @@
 
 														{{ form.password }}
 													</div>
-				<!-- label for role  -->
-													{{ form.role.label }} <br>
-													{% for subfield in form.role %} 
-													<tr>
-
-														<td>{{ subfield }}</td>
-														<td>{{ subfield.label }}</td>
-														<br>
-													</tr> 
-														{% if form.role.errors %}
-															<!-- {% for error in form.role.errors %}  -->
-															
-															<p class="error-message"> {{ error }}</p>
-															
-														<!-- 	{% endfor %} -->
-														{% endif %}
-														
-													{% endfor %}
 
 
 													{{ form.submit(class="width-35 pull-right btn btn-sm btn-primary") }}

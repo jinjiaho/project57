@@ -75,6 +75,11 @@ span.cart-group img {
   margin-bottom: 20px;
 }
 
+.btn-success {
+  border-color: #4a960a;
+  color: #204c00;
+}
+
 </style>
 <div class="content">
     <div class="container-fluid">
@@ -105,7 +110,7 @@ span.cart-group img {
                                     <span class="name">{{things.name}}</span>
                                     </div>
                                 </a>
-                            </div>
+                            </div> -->
                             
                             {% endfor %} -->
                         </div>
@@ -143,11 +148,11 @@ $(document).ready(function() {
                         <!-- <label>Enter quantity:</label> -->
                         <input id="modal-input-name" type="hidden" name="item" value="" />
                         <input id="quantity" type="number" name="qty" value="" placeholder="Enter quantity"/>
-                        <button type="submit" class="btn btn-success" style="">Submit</button>
+                        
                     </div>
                 </div>
                 <div class="modal-footer" align="center" style="margin-top: 15px;">
-                    
+                    <button type="submit" class="btn btn-success" style="">Submit</button>
                 </div>
             </form>
         </div>
@@ -188,7 +193,7 @@ $("#qtyForm").on('submit', function(e) {
     $("#cart-qty").text(cart_size);
     
     $("#qtyModal").hide();
-    location.reload();
+    // location.reload();
 })
 
 </script>

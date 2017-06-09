@@ -1,0 +1,6 @@
+uid,username,password,role,name
+1,mabeltan,nuggets,attendant,"Mabel Tan"
+2,henrylai,henry,supervisor,"Henry Lai"
+3,supervisor,supervisor,supervisor,supervisor
+4,room,attendant,attendant,"room attendant"
+5,angussaw,beef,attendant,"Angus Saw"

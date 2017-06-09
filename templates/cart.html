@@ -71,19 +71,20 @@
 
 <script>
 $(function() {
-    var entries = {};
+    alert(localStorage.length);
     for (var key in localStorage) {
         var item_name = key;
         alert(item_name + " "+localStorage[key])
         var new_row = $('<tr/>');
         $('<td/><img/>').appendTo(new_row);
         $('<td/><span/>').text(item_name).appendTo(new_row);
-        $('<input/>', {
+        var input = $('<td/>').append($('<input/>', {
             'type':'number',
             'name':key,
             'value':localStorage[key],
             'style':'max-width: 15px;'
-        }).appendTo($('<td/>').appendTo(new_row);
+        }));
+        input.appendTo(new_row);
         $('<span/>', {
             'class':'x'
         }).text('&times;').appendTo($('<td/>')).appendTo(new_row);

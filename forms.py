@@ -5,10 +5,7 @@ from wtforms.validators import DataRequired, Email, Length
 class LoginForm(Form):
 	username = StringField('Username', validators=[DataRequired("Please enter your usename")])
 	password = PasswordField('Password', validators=[DataRequired('Please enter a password')])
-	role = RadioField("Are you a: ",choices=[('attendant','Room Attendant'),('supervisor','Supervisor')],validators=[validators.input_required('choose either one')])
-	
 	submit = SubmitField("Sign in")
-
 
 
 class RetrievalForm(Form):

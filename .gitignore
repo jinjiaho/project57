@@ -3,3 +3,4 @@ flask/
 
 # python compiled files
 *.pyc
+inventory.csv

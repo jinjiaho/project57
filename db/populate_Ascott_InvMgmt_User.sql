@@ -19,7 +19,7 @@
 -- Dumping data for table `User`
 --
 
-USE `Ascott_invMgmt`;
+USE `Ascott_InvMgmt`;
 LOCK TABLES `User` WRITE;
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;
 INSERT INTO `User` VALUES ('mabeltan','nuggets','attendant','Mabel Tan'),
