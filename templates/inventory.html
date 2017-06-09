@@ -117,7 +117,6 @@
                     <div class="content all-icons panel">
                         <div class="row">
                           {% for item in supplies %}
-<<<<<<< HEAD
                           <a href="{{item.name}}">
                             <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
                               <div class="alert alert-danger">
@@ -126,14 +125,6 @@
                               </div>
                             </div>
                           </a>
-=======
-                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="inventory/{{item.name}}"><div class="alert alert-danger">
-                              <img src="/static/img/items/Guest Supplies/{{item.file}}"/>
-                              <div class="alert-label">{{item.name}}<br></div>
-                            </div></a>
-                          </div>
->>>>>>> 7d7b9f922893a29c44e9acc15de9f9e9eeae12b4
                           {% endfor %}
                             <a href="Guest Supplies">
                             <button class="btn btn-default btn-block" id="btn_getData" >Month Review</button></a>
