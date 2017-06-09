@@ -1,11 +1,11 @@
-CREATE DATABASE  IF NOT EXISTS `Ascott_InvMgmt` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `Ascott_InvMgmt`;
 -- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
 -- Host: localhost    Database: Ascott_InvMgmt
 -- ------------------------------------------------------
 -- Server version	5.7.18
 
+CREATE DATABASE  IF NOT EXISTS `Ascott_InvMgmt` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `Ascott_InvMgmt`;
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -18,28 +18,33 @@ USE `Ascott_InvMgmt`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `Logs`
+-- Table structure for table `User`
 --
 
-DROP TABLE IF EXISTS `Logs`;
+DROP TABLE IF EXISTS `User`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Logs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user` varchar(45) NOT NULL,
-  `date_time` datetime NOT NULL,
-  `action` char(45) NOT NULL, -- 'out', 'in' or 'check' --
-  `qty_moved` int(45) NOT NULL,
-  `qty_left` int(45) NOT NULL,
-  `item` varchar(45) NOT NULL,
-  `location` varchar(45) NOT NULL,
-  FOREIGN KEY (`user`) references User (`username`) on delete cascade on update cascade,
-  FOREIGN KEY (`item`) references Item (`name`) on delete cascade on update cascade,
-  PRIMARY KEY (`id`)
+CREATE TABLE `User` (
+  `username` varchar(45) NOT NULL UNIQUE,
+  `password` varchar(45) NOT NULL,
+  `role` varchar(15) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Dumping data for table `User`
+--
 
+LOCK TABLES `User` WRITE;
+/*!40000 ALTER TABLE `User` DISABLE KEYS */;
+INSERT INTO `User` VALUES ('mabeltan','nuggets','attendant','Mabel Tan'),
+('henrylai','henry','supervisor','Henry Lai'),
+('suroot','password','supervisor','Supervisor (root)'),
+('raroot','password','attendant','Room Attendant (root)');
+/*!40000 ALTER TABLE `User` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
