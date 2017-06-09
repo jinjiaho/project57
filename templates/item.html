@@ -84,93 +84,111 @@
 </div>
 
 <script>
-Highcharts.stockChart('chart', {
-    rangeSelector: {
-        selected: 1
-    },
-    chart: {
-        type: 'area'
-    },
-    title: {
-        text: '{{item}}'
-    },
-    subtitle: {
-        text: 'Quantity remaining'
-    },
-    // xAxis: {
-    //     type: 'datetime',
-    //     dateTimeLabelFormats: { // don't display the dummy year
-    //         month: '%e. %b',
-    //         year: '%b'
-    //     },
-    //     title: {
-    //         text: 'Date'
-    //     }
-    // },
-    tooltip: {
-        // headerFormat: '<b>Quantity</b><br>',
-        pointFormat: '<b>Quantity:</b> {point.y:.2f}'
-    },
-    credits: {
-        enabled: false
-    },
-    scrollbar: {
-        enabled: false
-    },
-
-    plotOptions: {
-        area: {
-            fillColor: {
-                linearGradient: {
-                    x1: 0,
-                    y1: 0,
-                    x2: 0,
-                    y2: 1
-                },
-                stops: [
-                    [0, Highcharts.getOptions().colors[0]],
-                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                ]
-            },
-            marker: {
-                enabled: false
-            },
-            lineWidth: 1,
-            states: {
-                hover: {
-                    lineWidth: 1
-                }
-            },
-            threshold: null
-        },
-        series: {
-            events: {
-              afterAnimate: function (ev) {
-                // console.log(data)
-                // console.log(ev)
-                // console.log('fired only once for each series');
-                // $("#update").css("display", "inline");
-                $("#update").fadeIn();
-              }
+var chartData;
+function getData(callback) {
+    $.ajax({
+        type: "POST",
+        url: "/api/getData",
+        data: JSON.stringify("{{item}}"),
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response, status, jqXHR) {
+            var filtered = [];
+            for (var c = 0; c < response.length; ++c) {
+                filtered.push([new Date(response[c][0]).getTime(), response[c][1]])
             }
+            chartData = filtered;
+            callback(filtered)
         }
-    },
+    });
+}
 
-    series: [{
-        name: '{{item}}',
-        // Define the data points. All series have a dummy year
-        // of 1970/71 in order to be compared on the same x axis. Note
-        // that in JavaScript, months start at 0 for January, 1 for February etc.
-        data: [
-            /* AAPL historical OHLC data from the Google Finance API */
-            {% for point in qty %}
-            [{{point[0]}}, {{point[1]}}],
-            {% endfor %}
-            [{{item[-1][0]}}, {{item[-1][1]}}]
-        ]
-    }]
-});
+function initChart(dataSources) {
 
+
+    Highcharts.stockChart('chart', {
+        rangeSelector: {
+            selected: 1
+        },
+        chart: {
+            type: 'area'
+        },
+        title: {
+            text: '{{item}}'
+        },
+        subtitle: {
+            text: 'Quantity remaining'
+        },
+        // xAxis: {
+        //     type: 'datetime',
+        //     dateTimeLabelFormats: { // don't display the dummy year
+        //         month: '%e. %b',
+        //         year: '%b'
+        //     },
+        //     title: {
+        //         text: 'Date'
+        //     }
+        // },
+        tooltip: {
+            // headerFormat: '<b>Quantity</b><br>',
+            pointFormat: '<b>Quantity:</b> {point.y:.2f}'
+        },
+        credits: {
+            enabled: false
+        },
+        scrollbar: {
+            enabled: false
+        },
+
+        plotOptions: {
+            area: {
+                fillColor: {
+                    linearGradient: {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                    },
+                    stops: [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                    ]
+                },
+                marker: {
+                    enabled: false
+                },
+                lineWidth: 1,
+                states: {
+                    hover: {
+                        lineWidth: 1
+                    }
+                },
+                threshold: null
+            },
+            series: {
+                events: {
+                  afterAnimate: function (ev) {
+                    // console.log(data)
+                    // console.log(ev)
+                    // console.log('fired only once for each series');
+                    // $("#update").css("display", "inline");
+                    $("#update").fadeIn();
+                  }
+                }
+            }
+        },
+
+        series: [{
+            name: '{{item}}',
+            // Define the data points. All series have a dummy year
+            // of 1970/71 in order to be compared on the same x axis. Note
+            // that in JavaScript, months start at 0 for January, 1 for February etc.
+            data: dataSources
+        }]
+    });
+}
+
+getData(initChart);
 
 $(document).ready(function(){
     // insert any required code here

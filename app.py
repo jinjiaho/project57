@@ -118,7 +118,7 @@ def extract():
 	return data
 
 # POST for getting chart data
-@app.route('/api/getData/', methods=["POST"])
+@app.route('/api/getData', methods=["POST"])
 def getData():
 
 	print "content_type: ", request.content_type
@@ -134,6 +134,7 @@ def getData():
 		conn = mysql.connect()
 		cursor = conn.cursor()
 
+		# TODO: string parameterisation
 		query = "SELECT sku FROM Ascott_Invmgmt.Items WHERE name = '{}';".format(request.json)
 
 		cursor.execute(query)
@@ -142,7 +143,8 @@ def getData():
 
 		query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
 		query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = 1"
-		# print query
+		# TODO: string parameterisation
+		# query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
 		cursor.execute(query)
 		responseData = cursor.fetchall()
 
