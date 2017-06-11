@@ -1,56 +1,18 @@
 {% extends "base.html" %}
-{% block sidebar %}
-<div class="sidebar-wrapper">
-    <div class="logo">
-        <a href="" class="simple-text" style="text-align:left;">
-        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
-            Supervisor
-        </a>
-    </div>
 
-    <ul class="nav">
-        <li>
-            <a href="/">
-                <i class="pe-7s-graph"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
-        <li class="active">
-            <a href="/inventory">
-                <i class="pe-7s-rocket"></i>
-                <p>Inventory</p>
-            </a>
-        </li>
-        <li>
-            <a href="/logs">
-                <i class="pe-7s-news-paper"></i>
-                <p>Logs</p>
-            </a>
-        </li>
-        <li>
-            <a href="/">
-                <i class="pe-7s-power"></i>
-                <p>Log Out</p>
-            </a>
-        </li>
-        
-    </ul>
-</div>
-{% endblock %}
-
-{% block title %}Inventory{% endblock %}
+{% block title %}{{item}}{% endblock %}
 
 {% block content %}
 <style>
     
-  .buttons {
+.buttons {
     padding: 15px;
-  }
+}
 
-  .btn-success {
+.btn-success {
     color: #81eb50;
     border-color: #81eb50;
-  }
+}
 </style>
 <link rel="stylesheet" type="text/css" href="../static/css/loading.css"/>
 
@@ -70,6 +32,13 @@
 			        </div>
 			    </div>
 			</div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="content">
+                        <img src="/static/css/item/{{category}}/{{picture}}"/>
+                    </div>
+                </div>
+            </div>
 		</div>
 
         <div class="row">

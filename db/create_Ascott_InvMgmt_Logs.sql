@@ -28,7 +28,7 @@ CREATE TABLE `Logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user` varchar(45) NOT NULL,
   `date_time` datetime NOT NULL,
-  `action` char(45) NOT NULL, -- 'out', 'in' or 'check' --
+  `action` char(45) NOT NULL,
   `qty_moved` int(45) NOT NULL,
   `qty_left` int(45) NOT NULL,
   `item` varchar(45) NOT NULL,

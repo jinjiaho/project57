@@ -1,6 +1,5 @@
 {% extends "base.html" %}
-{% block sidebar %}
-{% endblock %}
+
 {% block title %}
 <a class="navbar-brand" href="javascript:history.back()"><img src="/static/img/back.png"/></a>
 <a class="navbar-brand" href="#" style="padding-left:0;">Cart</a>
@@ -82,12 +81,12 @@ $(function() {
             'type':'number',
             'name':key,
             'value':localStorage[key],
-            'style':'max-width: 15px;'
+            'style':'max-width: 60px;'
         }));
         input.appendTo(new_row);
         $('<span/>', {
             'class':'x'
-        }).text('&times;').appendTo($('<td/>')).appendTo(new_row);
+        }).text("x").appendTo($('<td/>')).appendTo(new_row);
         $('#cart-table tbody').prepend(new_row);
     }
 
@@ -95,6 +94,7 @@ $(function() {
 
 $("td .x").click(function() {
     $(this).parent().remove();
+    location.reload();
 })
 
 $("#cart-form").on('submit', function(event) {

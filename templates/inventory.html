@@ -1,76 +1,9 @@
 {% extends "base.html" %}
-{% block sidebar %}
-<div class="sidebar-wrapper">
-    <div class="logo">
-        <a href="" class="simple-text" style="text-align:left;">
-        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
-            Supervisor
-        </a>
-    </div>
-
-    <ul class="nav">
-        <li>
-            <a href="/dashboard">
-                <i class="pe-7s-graph"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
-        <li class="active">
-            <a href="/inventory">
-                <i class="pe-7s-rocket"></i>
-                <p>Inventory</p>
-            </a>
-        </li>
-        <li>
-            <a href="/logs">
-                <i class="pe-7s-news-paper"></i>
-                <p>Logs</p>
-            </a>
-        </li>
-                <li>
-            <a href="/tasks">
-                <i class="pe-7s-note2"></i>
-                <p>Tasks</p>
-            </a>
-        </li>
-        <li>
-            <a href="/">
-                <i class="pe-7s-power"></i>
-                <p>Log Out</p>
-            </a>
-        </li>
-        
-    </ul>
-</div>
-{% endblock %}
 
 {% block title %}Inventory{% endblock %}
 
 {% block content %}
 <style>
-  .alert {
-    min-height: 110px;
-  }
-  .alert img {
-    float: left;
-    height: 90px;
-    max-width: 90px;
-  }
-
-  .alert .alert-label {
-    /*font-size: 24pt;*/
-    padding: 10px 10px;
-    float: left;
-    height: inherit;
-    width: calc(100% - 100px);
-    text-align:center;
-  }
-
-  .alert .alert-label span {
-    font-size: 24pt;
-  }
-
-
 
   .buttons {
     padding: 15px;
@@ -93,6 +26,114 @@
 <div class="content">
     <div class="container-fluid">
         <div class="row">
+        
+          <div class="card sup-view">
+              <button class="header accordion">
+                  <h4 class="title">Guest Supplies</h4>
+              </button>
+              <div class="content all-icons panel">
+                  <div class="row">
+                    {% for item in supplies %}
+                    <a href="{{item.name}}">
+                      <div class="font-icon-list col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="alert alert-danger">
+                          <div class="img-wrapper" align='center'>
+                            <img src="/static/img/items/Guest Supplies/{{item.file}}"/>
+                          </div>
+                          <div class="alert-group pull-right">
+                            <div class="alert-label">{{item.name}}</div>
+                            <div class="alert-number">{{item.remaining}}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                    {% endfor %}
+                  </div>
+                  <div class="row">
+                      <a href="Guest Supplies">
+                        <div class="btn-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12" align="center">
+                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button>
+                        </div>
+                      </a>
+
+                  </div>
+
+              </div>
+          </div>
+          
+          <div class="card sup-view">
+              <button class="header accordion">
+                  <h4 class="title">Guest Hamper</h4>
+              </button>
+              <div class="content all-icons panel">
+                  <div class="row">
+                    {% for item in hampers %}
+                    <a href="{{item.name}}">
+                      <div class="font-icon-list col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="alert alert-warning">
+                          <div class="img-wrapper" align='center'>
+                            <img src="/static/img/items/Guest Hampers/{{item.file}}"/>
+                          </div>
+                          <div class="alert-group pull-right">
+                            <div class="alert-label">{{item.name}}</div>
+                            <div class="alert-number">{{item.remaining}}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                    {% endfor %}
+                  </div>
+                  <div class="row">
+                    <a href="Guest Hampers">
+                      <div class="btn-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12" align="center">
+                        <button class="btn btn-default btn-block" id="btn_getData">Month Review</button>
+                      </div>
+                    </a>
+
+                  </div>
+                    
+              </div>
+          </div>
+
+          <div class="card sup-view">
+              <button class="header accordion">
+                  <h4 class="title">Kitchenware</h4>
+              </button>
+              <div class="content all-icons panel">
+                  <div class="row">
+                    {% for item in kitchenware %}
+                    <a href="{{item.name}}">
+                      <div class="font-icon-list col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="alert alert-warning">
+                          <div class="img-wrapper" align='center'>
+                            <img src="/static/img/items/Kitchenware/{{item.file}}"/>
+                          </div>
+                          <div class="alert-group pull-right">
+                            <div class="alert-label">{{item.name}}</div>
+                            <div class="alert-number">{{item.remaining}}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                    {% endfor %}
+                  </div>
+                  <div class="row">
+                    <a href="Kitchenware">
+                    <div class="btn-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12" align="center">
+                      <button class="btn btn-default btn-block" id="btn_getData">Month Review</button>
+                    </div></a>
+                  </div>
+                    
+              </div>
+          </div>
+
+        </div>
+        <!-- <div class="row buttons">
+          
+          <button class="btn btn-primary btn-block" id="btn_newItem">New Item</button>
+        </div> -->
+
+        <!-- DO NOT DELETE: FURTHER AUTOMATION IN PROGRESS -->
         <!-- {% for category in all_items %}
           <div class="card">
             <button class="header accordion">
@@ -116,91 +157,6 @@
             </div>
           </div>
           {% endfor %} -->
-                <div class="card">
-                    <button class="header accordion">
-                        <h4 class="title">Guest Supplies</h4>
-                    </button>
-                    <div class="content all-icons panel">
-                        <div class="row">
-                          {% for item in supplies %}
-                          <a href="{{item.name}}">
-                            <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                              <div class="alert alert-danger">
-                                <img src="/static/img/items/Guest Supplies/{{item.file}}"/>
-                                <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
-                              </div>
-                            </div>
-                          </a>
-                          {% endfor %}
-                            <a href="Guest Supplies">
-                            <button class="btn btn-default btn-block" id="btn_getData" >Month Review</button></a>
-
-                          </div>
-
-                    </div>
-                  </div>
-                
-                <div class="card">
-                    <button class="header accordion">
-                        <h4 class="title">Guest Hamper</h4>
-                    </button>
-                    <div class="content all-icons panel">
-                        <div class="row">
-                          {% for item in hampers %}
-                          <a href="{{item.name}}">
-                            <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                              <div class="alert alert-warning">
-                                <img src="/static/img/items/Guest Hampers/{{item.file}}"/>
-                                <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
-                              </div>
-                            </div>
-                          </a>
-                          {% endfor %}
-                          <a href="Guest Hampers">
-                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
-
-
-                          </div>
-                          
-                        </div>
-                    </div>
-                <div class="card">
-                    <button class="header accordion">
-                        <h4 class="title">Kitchenware</h4>
-                    </button>
-                    <div class="content all-icons panel">
-                        <div class="row">
-                          {% for item in kitchenware %}
-                          <a href="{{item.name}}">
-                            <div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                              <div class="alert alert-warning">
-                                <img src="/static/img/items/Kitchenware/{{item.file}}"/>
-                                <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
-                              </div>
-                            </div>
-                          </a>
-                          {% endfor %}
-                          <a href="Kitchenware">
-                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
-
-                          </div>
-                          
-                    </div>
-                </div>
-
-                <!-- </div>
-                </div>
-            </div> -->
-
-                </div>
-            </div>
-
-
-        </div>
-        <div class="row buttons">
-          
-          <button class="btn btn-primary btn-block" id="btn_newItem">New Item</button>
-        </div>
     </div>
 </div>
 

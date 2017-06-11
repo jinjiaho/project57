@@ -25,17 +25,7 @@
     border: 0;
 }
 
-.all-icons .font-icon-list {
-    padding: 3%;
-}
 
-.all-icons .font-icon-detail{
-    text-align: center;
-    padding: 20% 0px 15%;
-    border: 1px solid #e5e5e5;
-    border-radius: 6px;
-    /*margin: 15px 0;*/
-}
 .all-icons .font-icon-detail input{
     margin: 5% auto 0;
     width: 100%;

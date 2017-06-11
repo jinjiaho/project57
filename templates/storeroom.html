@@ -1,26 +1,27 @@
 {% extends "base.html" %}
-{% block sidebar %}
-{% endblock %}
+
 
 {% block title %}
     
 <span class="cart-group">
     <a id="cart-icon" class="cart-icon" href="cart">
-        <div id="cart-notif" class="cart-notif hide"><span id="cart-qty" class="cart-qty"></span></div>
-        <img src="/static/img/cart.png" />
+        <div id="cart-notif" class="cart-notif hide"></span>
+        <span id="cart-qty" class="cart-qty"></span></div>
+        <img class="my-cart-icon" src="/static/img/cart.png" />
     </a>
 </span>
 
 <script>
-    $(function show_cart_length() {
-        if (localStorage[cart] == null) {
-            $("#cart-notif").remove();
-        } else {
-            $("#cart-notif").removeClass('hide');
-            var qty = localStorage[cart_qty];
-            $("#cart-qty").html(qty);
-        }
-    });
+$(function show_cart_length() {
+    if (localStorage.length == 0) {
+        $("#cart-notif").remove();
+    } else {
+        $("#cart-notif").removeClass('hide');
+        var qty = localStorage.length;
+        $("#cart-qty").html(qty);
+    }
+});
+
 </script>
 
 <a class="navbar-brand" href="#">Store 1 Shelf 1</a>
@@ -98,21 +99,6 @@ span.cart-group img {
                                 </a>
                             </div>
                             {% endfor %}
-                            
-        <!-- for all the items in the category-->
-
-                            <!-- {% for things in catGoods %}
-                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a href="{{things.name}}" data-rel="popup">
-                                    <div class="font-icon-detail">
-                                    <img src="/static/img/items/{{things.category}}/{{things.name}}.jpg"/>
-
-                                    <span class="name">{{things.name}}</span>
-                                    </div>
-                                </a>
-                            </div> -->
-                            
-                            {% endfor %} -->
                         </div>
                     </div>
                 </div>
@@ -143,7 +129,7 @@ $(document).ready(function() {
                     <h4 id="form-header"></h4>
                 </div>
                 <div class="modal-body">
-                    <div class='modal-pic' align="center"><img src=""/></div>
+                    <div id="modal-picture" class='modal-pic' align="center"><img src=""/></div>
                     <div class="qty-display form-fields">
                         <!-- <label>Enter quantity:</label> -->
                         <input id="modal-input-name" type="hidden" name="item" value="" />
@@ -152,7 +138,7 @@ $(document).ready(function() {
                     </div>
                 </div>
                 <div class="modal-footer" align="center" style="margin-top: 15px;">
-                    <button type="submit" class="btn btn-success" style="">Submit</button>
+                    <button type="submit" class="btn btn-success my-cart-btn" style="">Submit</button>
                 </div>
             </form>
         </div>
@@ -175,64 +161,39 @@ $(document).ready(function() {
 
 </style>
 <script>
-$(function () {
-  function($addTocartBtn){
-    var $cartIcon = $(".my-cart-icon");
-    var $image = $('<img width="30px" height="30px" src="' + $addTocartBtn.data("image") + '"/>').css({"position": "fixed", "z-index": "999"});
-    $addTocartBtn.prepend($image);
-    var position = $cartIcon.position();
-    $image.animate({
-      top: position.top,
-      left: position.left
-    }, 500 , "linear", function() {
-      $image.remove();
-    });
-  }
-
-  $('.my-cart-btn').myCart({
-    classCartIcon: 'my-cart-icon',
-    classCartBadge: 'my-cart-badge',
-    affixCartIcon: true,
-    checkoutCart: function(products) {
-      $.each(products, function(){
-        console.log(this);
-      });
-    },
-    clickOnAddToCart: function($addTocart){
-      goToCartIcon($addTocart);
-    },
-    getDiscountPrice: function(products) {
-      var total = 0;
-      $.each(products, function(){
-        total += this.quantity * this.price;
-      });
-      return total * 0.5;
-    }
-  });
-
-})
 
 $("#qtyForm").on('submit', function(e) {
     e.preventDefault();
-    var picture = $(this).find($(".modal-pic img")).attr('src');
-    var item = $(this).find($("#modal-input-name")).val();
-    var qty = $(this).find($("#quantity")).val();
-    var string = JSON.stringify([picture, item, qty])
-    if (localStorage[cart]) {
-        localStorage[cart_qty] = JSON.stringify
-        qty = JSON.stringify(JSON.parse(localStorage[item]) + $("input:eq(1)"));
-        localStorage[item] = qty;
+    localStorage.clear();
+    var item_name = $(this).find($("#modal-input-name")).val();
+    var qty = $(this).find($("#quantity")).val()
+    var picture = $(this).find($('#modal-picture')).attr('src');
+    // var item_row = {item_name: [qty, picture]};
+    if (localStorage.getItem('cart') == null) {
+      localStorage.setItem('cart', JSON.stringify({}));
+    }
+    var cart_dict = JSON.parse(localStorage.getItem('cart'));
+    if (item_name in cart_dict) {
+        alert("Adding to existing cart item");
+        var prev_qty = cart_dict[item_name][0];
+        var new_qty = prev_qty + qty;
+        cart_dict[item_name] = [new_qty, picture];
+        localStorage.setItem('cart',JSON.stringify(cart_dict));
     }
     else {
-        localStorage.setItem(item, qty);
+        alert("Adding new item");
+        cart_dict[item_name] = [qty, picture];
+        localStorage.setItem('cart',JSON.stringify(cart_dict))
     }
-    var cart_size = localStorage.length;
+
+    alert(localStorage.getItem('cart'));
+    var cart_size = cart_dict.length;
     
     $("#cart-qty").text(cart_size);
     
     $("#qtyModal").hide();
-    // location.reload();
 })
+
 
 </script>
 {% endblock %}
