@@ -1,9 +1,12 @@
--- MySQL dump 10.13  strib 5.7.17, for macos10.12 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
 -- Host: localhost    Database: Ascott_InvMgmt
 -- ------------------------------------------------------
 -- Server version	5.7.18
 
+
+CREATE DATABASE  IF NOT EXISTS `Ascott_InvMgmt` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `Ascott_InvMgmt`;
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -16,10 +19,27 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping data for table `Logs`
+-- Table structure for table `Logs`
 --
 
-USE `Ascott_InvMgmt`;
+DROP TABLE IF EXISTS `Logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user` varchar(45) NOT NULL,
+  `date_time` datetime NOT NULL,
+  `action` char(45) NOT NULL, -- 'out', 'in' or 'check' --
+  `qty_moved` int(45) NOT NULL,
+  `qty_left` int(45) NOT NULL,
+  `item` varchar(45) NOT NULL,
+  `location` varchar(45) NOT NULL,
+  FOREIGN KEY (`user`) references User (`username`) on delete cascade on update cascade,
+  FOREIGN KEY (`item`) references Item (`name`) on delete cascade on update cascade,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 LOCK TABLES `Logs` WRITE;
 /*!40000 ALTER TABLE `Logs` DISABLE KEYS */;
 INSERT INTO `ascott_invmgmt`.`logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('1', '1', '2016-12-19 09:04:00', 'out', '-12', '246', '9', '639');
@@ -217,7 +237,6 @@ INSERT INTO `ascott_invmgmt`.`logs` (`id`, `user`, `date_time`, `action`, `qty_m
 INSERT INTO `ascott_invmgmt`.`logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('193', '4', '2017-06-03 16:10:00', 'out', '-12', '104', '9', '749');
 INSERT INTO `ascott_invmgmt`.`logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('194', '4', '2017-06-07 12:27:00', 'out', '-11', '116', '9', '50');
 INSERT INTO `ascott_invmgmt`.`logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('195', '2', '2017-06-08 06:53:00', 'out', '-13', '91', '9', '64');
-
 /*!40000 ALTER TABLE `Logs` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -230,4 +249,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-05-31 14:27:31
+-- Dump completed on 2017-05-21  2:32:05

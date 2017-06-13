@@ -289,7 +289,7 @@ def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
-@app.route('/shelves/<tag_id>/', methods=['GET'])
+@app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
 # @cache.cached(timeout=50)
 def shelf(tag_id):
 	if not session.get('logged_in'):
@@ -309,25 +309,26 @@ def shelf(tag_id):
 			"picture":item[2]})
 	return render_template('storeroom.html', things=things, 
 		role = role,
-		user = session['username'])
+		user = session['username'], 
+		location = tag_id)
 
 
-@app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
-def checkout(tag_id):
-	if request.method == 'GET':
-		return render_template('cart.html')
-	else:
-		now = datetime.now()
-		form_data = request.form
-		user = session['username']
+# @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
+# def checkout(tag_id):
+# 	if request.method == 'GET':
+# 		return render_template('cart.html')
+# 	else:
+# 		now = datetime.now()
+# 		form_data = request.form
+# 		user = session['username']
 		
-		conn = mysql.connect()
-		cursor = conn.cursor()
-		for item, qty in form_data.iteritems():
-			cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
+# 		conn = mysql.connect()
+# 		cursor = conn.cursor()
+# 		for item, qty in form_data.iteritems():
+# 			cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
 
-		flash("Success!")
-		return redirect('scanner.html')
+# 		flash("Success!")
+# 		return redirect('scanner.html')
 
 # @app.route('/storeroom/')
 # def storeroom():
