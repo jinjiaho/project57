@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block sidebar %}
+<div class="sidebar-wrapper">
+    <div class="logo">
+        <a href="" class="simple-text" style="text-align:left;">
+        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
+            Supervisor
+        </a>
+    </div>
+
+    <ul class="nav">
+        <li>
+            <a href="/dashboard">
+                <i class="pe-7s-graph"></i>
+                <p>Dashboard</p>
+            </a>
+        </li>
+        <li>
+            <a href="/inventory">
+                <i class="pe-7s-rocket"></i>
+                <p>Inventory</p>
+            </a>
+        </li>
+        <li>
+            <a href="/logs">
+                <i class="pe-7s-news-paper"></i>
+                <p>Logs</p>
+            </a>
+        </li>
+        <li class="active">
+            <a href="">
+                <i class="pe-7s-note2"></i>
+                <p>Tasks</p>
+            </a>
+        </li>
+        <li>
+            <a href="/">
+                <i class="pe-7s-power"></i>
+                <p>Log Out</p>
+            </a>
+        </li>
+        
+    </ul>
+</div>
+{% endblock %}
+
+{% block title %}Tasks{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <style>
+                .all-icons .font-icon-detail input{
+                    color: #f30615;
+                }
+            </style>
+
+            <div class="col-md-12">
+                <div class="card ">
+                    <div class="header">
+                        <h4 class="title">Tasks</h4>
+                        <p class="category">Backend development</p>
+                    </div>
+                    <div class="content">
+                        <div class="table-full-width">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <label class="checkbox">
+                                                <input type="checkbox" value="" data-toggle="checkbox">
+                                            </label>
+                                        </td>
+                                        <td>Stock check (guest supplices)</td>
+                                        <td class="td-actions text-right">
+                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="checkbox">
+                                                <input type="checkbox" value="" data-toggle="checkbox" checked="">
+                                            </label>
+                                        </td>
+                                        <td>Receive L'Occitane arriving today</td>
+                                        <td class="td-actions text-right">
+                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="footer">
+                            <hr>
+                            <div class="stats">
+                                <i class="fa fa-history"></i> Updated 3 minutes ago
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

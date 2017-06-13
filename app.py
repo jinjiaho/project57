@@ -91,21 +91,21 @@ def getAllLogs():
 	
 	for row in data:
 
-		cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE name = {};".format(str(row[5])))
-		item_data=cursor.fetchone()
+		cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE sku = {};".format(str(row[5])))
+		item_data=cursor.fetchall()
+		# print(item_data)
+		# print(item_data[0])
+		# print(item_data[1])
 
-		if item_data:
-
-			things.append(
+		things.append(
 				{"name": row[0].encode('ascii'),
 				"dateTime": row[1],
 				"action":row[2],
 				"move":row[3],
 				"remaining":row[4],
-				"item":row[5].encode('ascii'),
-				"category":item_data.encode('ascii'),
+				"item":item_data[0][0].encode('ascii'),
+				"category":item_data[0][1].encode('ascii'),
 				"location":row[6]})
-			print(things)
 
 	return things
 		
