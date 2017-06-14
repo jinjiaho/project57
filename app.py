@@ -162,13 +162,16 @@ def auth():
 
 @app.route('/')
 def hello():
-	if session.get('logged_in'):
-		if role == 'supervisor':
-			return redirect('/dashboard')
-		else:
-			return redirect('/dashboard')
-	else:
+	# user authentication
+	logged_in = auth()
+	if not logged_in:
 		return redirect('/login')
+	else:
+		# user already logged in previously
+		if session['role'] == "supervisor":
+			return redirect('/dashboard')
+		elif session['role'] == "attendant":
+			return redirect('/scan')
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -219,12 +222,12 @@ def login():
 		logged_in = auth()
 		if not logged_in:
 			return render_template('login.html', form=form)
-
-		# user already logged in previously
-		if session['role'] == "supervisor":
-			return redirect('/dashboard')
-		elif session['role'] =="attendant":
-			return redirect('/scan')
+		else:
+			# user already logged in previously
+			if session['role'] == "supervisor":
+				return redirect('/dashboard')
+			elif session['role'] == "attendant":
+				return redirect('/scan')
 
 
 @app.route('/admin',methods=["GET","POST"])
