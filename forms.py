@@ -3,9 +3,9 @@ from wtforms import StringField, PasswordField, SubmitField, RadioField, validat
 from wtforms.validators import DataRequired, Email, Length
 
 class LoginForm(Form):
-	username = StringField('Username', validators=[DataRequired("Please enter your usename")])
-	password = PasswordField('Password', validators=[DataRequired('Please enter a password')])
-	submit = SubmitField("Sign in")
+	username = StringField('Username', validators=[DataRequired("Please enter a usename")])
+	password = PasswordField('Password', validators=[DataRequired('Password cannot be empty')])
+	submit = SubmitField("Login")
 
 
 class RetrievalForm(Form):

@@ -138,7 +138,7 @@ def getData():
 		idItem = cursor.fetchone()[0]
 		# print(idItem)
 
-		query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
+		# query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
 		query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = 1"
 		# TODO: string parameterisation
 		# query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
@@ -148,7 +148,18 @@ def getData():
 		return jsonify(responseData)
 
 
+# true if user is authenticated, else false
+def auth():
+	# print session.keys()[0], type(session.keys()[0])
+	if u'logged_in' in session:
+		# print session['logged_in'], type(session['logged_in'])
+		return session['logged_in']
+	# else:
+		# print "You're not logged in"
+	return False
+
 #----------------------------ROUTING ------------------------
+
 @app.route('/')
 def hello():
 	if session.get('logged_in'):
@@ -176,39 +187,54 @@ def login():
 			cursor=mysql.connect().cursor()
 			cursor.execute("SELECT username, password, role FROM User WHERE username= '" + username + "';")
 
-			#check if user and pass data is correct by executing the db
-			#data is stored as a tuple
+			# check if user and pass data is correct by executing the db
+			# data is stored as a tuple
 			data = cursor.fetchone()
 	
 			if data is None: 
-				# return redirect(url_for('login'))    #('Username does not exist.')
-				# error = 'User does not exist'
+				# username does not match records
 				flash('User does not exist')
 				return redirect('/login')
 
 			elif password != data[1]:
-				flash('Username and Password do not match.')
+				# password does not match records
+				flash('Incorrect password')
 				return redirect('/login')
 
-			else:	
-				role = data[2]
+			else:
+				# username & password match
+				session['username'] = data[0]
+				session['role'] = data[2]
+				session['logged_in'] = True
+
+				# check role
 				if data[2] == "supervisor":
-					session['logged_in'] = True
-					session['username'] = username
 					return redirect('/dashboard')
 				elif data[2] =="attendant":
-					session['logged_in'] = True
-					session['username'] = username
 					return redirect('/scan')
 
 	elif request.method =="GET":
-		return render_template('login.html', form=form)
+
+		# user authentication
+		logged_in = auth()
+		if not logged_in:
+			return render_template('login.html', form=form)
+
+		# user already logged in previously
+		if session['role'] == "supervisor":
+			return redirect('/dashboard')
+		elif session['role'] =="attendant":
+			return redirect('/scan')
 
 
 @app.route('/dashboard')
 def dashboard():
-	if not session['logged_in']:
+
+	# user authentication
+	logged_in = auth()
+	if not logged_in:
 		return redirect('/login')
+
 	return render_template('dashboard.html', user=session['username'])
 
 
@@ -231,6 +257,11 @@ def inventory():
 	# 		'picture':i[4]})
 
 	# print(items)
+
+	# user authentication
+	logged_in = auth()
+	if not logged_in:
+		return redirect('/login')
 			
 	# get current list of all items listed in db
 	supplies = getAllInventory('Guest Supplies')
@@ -243,6 +274,12 @@ def inventory():
 
 @app.route('/inventory/<item>')
 def item(item):
+
+	# user authentication
+	logged_in = auth()
+	if not logged_in:
+		return redirect('/login')
+
 	name = item
 	conn = mysql.connect()
 	cursor = conn.cursor()
@@ -275,6 +312,12 @@ def item(item):
 
 @app.route('/logs')
 def logs():
+
+	# user authentication
+	logged_in = auth()
+	if not logged_in:
+		return redirect('/login')
+
 	logs=getAllLogs()
 	# names=getUniqueNames()
 	# items=getUniqueItems()
@@ -292,7 +335,10 @@ def scanner():
 @app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
 # @cache.cached(timeout=50)
 def shelf(tag_id):
-	if not session.get('logged_in'):
+
+	# user authentication
+	logged_in = auth()
+	if not logged_in:
 		return redirect('/login')
 
 	conn = mysql.connect()
