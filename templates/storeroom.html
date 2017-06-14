@@ -4,81 +4,21 @@
 {% block title %}
     
 <span class="cart-group">
-    <a id="cart-icon" class="cart-icon" href="cart">
+    <a id="cart-icon" data-toggle="modal" data-target="#cartModal" class="cart-icon">
         <div id="cart-notif" class="cart-notif hide"></span>
         <span id="cart-qty" class="cart-qty"></span></div>
         <img class="my-cart-icon" src="/static/img/cart.png" />
     </a>
 </span>
 
-<script>
-$(function show_cart_length() {
-    if (localStorage.length == 0) {
-        $("#cart-notif").remove();
-    } else {
-        $("#cart-notif").removeClass('hide');
-        var qty = localStorage.length;
-        $("#cart-qty").html(qty);
-    }
-});
 
-</script>
-
-<a class="navbar-brand" href="#">Store 1 Shelf 1</a>
+<a class="navbar-brand" href="#">{{location}}</a>
 {% endblock %}
 
 {% block content%}
 <style>
-
-
-span.cart-group {
-  float: right !important;
-  position: absolute;
-  top: 15px;
-  right: 25px;
-  /*margin: 15px 25px 15px 0;*/
-}
-
-span.cart-group img {
-  max-width: 40px;
-  max-height: 30px;
-  margin-right: -7px;
-  z-index: 1;
-}
-
-.cart-icon .cart-notif {
-  float:right;
-  width: 14px;
-  height: 14px;
-  background-color: red;
-  border: 1px solid red;
-  border-radius: 8px;
-  margin-top: -3px;
-  z-index: 2;
-  position: relative;
-}
-
-.cart-icon .cart-notif .cart-qty {
-  color: white;
-  z-index: 9;
-  position: relative;
-  top: -7px;
-  right: -3px;
-  font-size: x-small;
-}
-
-.modal-pic {
-  width: 100%;
-}
-
-.modal-pic img {
-  max-width: 180px;
-  margin-bottom: 20px;
-}
-
-.btn-success {
-  border-color: #4a960a;
-  color: #204c00;
+.navbar-header {
+  margin: 0;
 }
 
 </style>
@@ -90,9 +30,9 @@ span.cart-group img {
                     <div class="content all-icons">
                         <div class="row">
                             {% for item in things %}
-                            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="openModal_{{item.name}}">
-                                    <div class="font-icon-detail">
+                            <div class="mobile-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6" align='center'>
+                                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}">
+                                    <div class="mobile-icon-detail">
                                         <img src="/static/img/items/{{item.category}}/{{item.picture}}"/><br/>
                                         <div class="name">{{item.name}}</div>
                                     </div>
@@ -107,23 +47,11 @@ span.cart-group img {
     </div>
 </div>
 
-<script type="text/javascript">
-$(document).ready(function() {
-    $(".openModal").click(function() {
-        var name = $(this).find('div.name').html();
-        var img = $(this).find("img").attr('src');
-        $("#qtyForm .modal-pic img").attr('src', img);
-        $("#qtyForm #modal-input-name").val(name);
-        $("#qtyModal h4").text(name);
-    });
-})
-
-</script>
 
 <div id="qtyModal" class="modal fade" data-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" id="qtyForm">
+            <form id="qtyForm">
                 <div class="modal-header">
                     <span class="close" data-dismiss="modal">&times;</span>
                     <h4 id="form-header"></h4>
@@ -131,10 +59,9 @@ $(document).ready(function() {
                 <div class="modal-body">
                     <div id="modal-picture" class='modal-pic' align="center"><img src=""/></div>
                     <div class="qty-display form-fields">
-                        <!-- <label>Enter quantity:</label> -->
                         <input id="modal-input-name" type="hidden" name="item" value="" />
-                        <input id="quantity" type="number" name="qty" value="" placeholder="Enter quantity"/>
-                        
+                        <input id="modal-input-qty" type="number" name="qty" value="" placeholder="Enter quantity"/>
+                        <input id="modal-input-sku" type="hidden" name="sku" value="" />
                     </div>
                 </div>
                 <div class="modal-footer" align="center" style="margin-top: 15px;">
@@ -145,55 +72,34 @@ $(document).ready(function() {
     </div>
 </div>
 
-<style>
-#qtyModal #form-header {
-  margin: 0px;
-}
 
-.qty-display.form-group label, 
-.qty-display.form-group input {
-  float:left;
-}
+<div id="cartModal" class="modal fade" data-backdrop="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <form>
+          <div class="modal-header">
+            <span class="close" data-dismiss="modal">&times;</span>
+            <h4 id="form-header">Cart</h4>
+          </div>
+          <div class="modal-body">
+            <table id="cart-table" class="table table-hover">
+              <thead>
+                <th>Item</th>
+                <th>Qty</th>
+                <th></th>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss='modal' value="close">Close</button>
+            <button type="submit" class="btn btn-success" value="submit">Confirm</button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
 
-.qty-display.form-group input {
-  max-width: 60px;
-}
-
-</style>
-<script>
-
-$("#qtyForm").on('submit', function(e) {
-    e.preventDefault();
-    localStorage.clear();
-    var item_name = $(this).find($("#modal-input-name")).val();
-    var qty = $(this).find($("#quantity")).val()
-    var picture = $(this).find($('#modal-picture')).attr('src');
-    // var item_row = {item_name: [qty, picture]};
-    if (localStorage.getItem('cart') == null) {
-      localStorage.setItem('cart', JSON.stringify({}));
-    }
-    var cart_dict = JSON.parse(localStorage.getItem('cart'));
-    if (item_name in cart_dict) {
-        alert("Adding to existing cart item");
-        var prev_qty = cart_dict[item_name][0];
-        var new_qty = prev_qty + qty;
-        cart_dict[item_name] = [new_qty, picture];
-        localStorage.setItem('cart',JSON.stringify(cart_dict));
-    }
-    else {
-        alert("Adding new item");
-        cart_dict[item_name] = [qty, picture];
-        localStorage.setItem('cart',JSON.stringify(cart_dict))
-    }
-
-    alert(localStorage.getItem('cart'));
-    var cart_size = cart_dict.length;
-    
-    $("#cart-qty").text(cart_size);
-    
-    $("#qtyModal").hide();
-})
-
-
-</script>
+<script src="/static/js/shelves.js" type="text/javascript"></script>
 {% endblock %}

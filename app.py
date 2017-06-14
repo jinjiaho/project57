@@ -298,15 +298,16 @@ def shelf(tag_id):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
-	cursor.execute("SELECT name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
+	cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
 
 	data=cursor.fetchall()
 	things = []
 	for item in data:
 		things.append(
-			{"name": item[0],
-			"category": item[1],
-			"picture":item[2]})
+			{"sku":item[0],
+			"name": item[1],
+			"category": item[2],
+			"picture":item[3]})
 	return render_template('storeroom.html', things=things, 
 		role = role,
 		user = session['username'], 

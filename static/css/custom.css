@@ -219,9 +219,13 @@ span.cart-group img {
   color: white;
   z-index: 9;
   position: relative;
-  top: -7px;
+  top: -9px;
   right: -3px;
   font-size: x-small;
+}
+
+.cart-item td input {
+  max-width: 60px !important;
 }
 
 .modal-pic {
@@ -249,4 +253,9 @@ div.modal .modal-header h4 {
 
 .qty-display.form-group input {
   max-width: 60px;
+}
+
+#cartModal table tbody tr img,
+#cartModal table tbody tr input {
+  max-width: 50px;
 }
