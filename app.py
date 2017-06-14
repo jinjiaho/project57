@@ -227,6 +227,42 @@ def login():
 			return redirect('/scan')
 
 
+@app.route('/admin',methods=["GET","POST"])
+def admin():
+
+	form = AddUserForm()
+	if request.method=="POST":
+		if form.validate == False:
+			return render_template('admin.html', form=form)
+		else:
+			username=form.username.data
+			password=form.password.data
+			role=form.role.data
+			name=form.name.data
+
+			newuser=[username,password,role,name]
+			
+
+			conn = mysql.connect()
+			cursor = conn.cursor()
+
+			# TODO: string parameterisation
+			query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
+
+			# query = "INSERT INTO User (username,password,role,name) VALUES ();"
+
+			cursor.execute(query)
+			# cursor.execute("COMMIT")
+			return "congrats"
+
+			
+
+
+	elif request.method =="GET":
+		return render_template('admin.html', form=form)
+
+
+
 @app.route('/dashboard')
 def dashboard():
 
