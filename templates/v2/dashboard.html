@@ -1,255 +1,59 @@
-{% extends "base.html" %}
-{% block sidebar %}
-<style>
-  .alert {
-    min-height: 120px;
-  }
-  .alert img {
-    float: left;
-    height: 100px;
-    margin-bottom: 5px;
-    max-width: 100px;
-  }
-
-  .alert .alert-label {
-    /*font-size: 24pt;*/
-    padding: 10px 10px;
-    float: left;
-    height: inherit;
-    width: calc(100% - 110px);
-    text-align:center;
-  }
-
-  .alert .alert-label span {
-    font-size: 24pt;
-  }
-
-  .alert-danger {
-    background-color: #ff000f;
-  }
-
-</style>
-<div class="sidebar-wrapper">
-    <div class="logo">
-        <a href="" class="simple-text" style="text-align:left;">
-        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
-            Supervisor
-        </a>
-    </div>
-
-    <ul class="nav">
-        <li class="active">
-            <a href="/">
-                <i class="pe-7s-graph"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
-        <li>
-            <a href="/inventory">
-                <i class="pe-7s-rocket"></i>
-                <p>Inventory</p>
-            </a>
-        </li>
-        <li>
-            <a href="/logs">
-                <i class="pe-7s-news-paper"></i>
-                <p>Logs</p>
-            </a>
-        </li>
-        <li>
-            <a href="/">
-                <i class="pe-7s-power"></i>
-                <p>Log Out</p>
-            </a>
-        </li>
-        
-    </ul>
-</div>
-{% endblock %}
-
-{% block title %}Dashboard{% endblock %}
+{% extends "v2/base.html" %}
 
 {% block content %}
-<div class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <style>
-                .all-icons .font-icon-detail input{
-                    color: #f30615;
-                }
-            </style>
+<style>
 
-            <div class="col-md-12">
-                <div class="card ">
-                    <a href="{{url_for('inventory')}}"><div class="header">
-                        <h4 class="title">Running Low</h4>
-                        <p class="category"></p>
-                    </div></a>
-                    <div class="content all-icons">
-                        <div class="row">
-                            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                                <a href="/inventory/pen">
-                                    <div class="alert alert-danger">
-                                        <img src="/static/img/items/Guest supplies/Ascott pen.jpg"/>
-                                        <div class="alert-label">Pen<br/>
-                                            <span>47</span>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xs-12">
-                                <div class="alert alert-danger">
-                                    <img src="/static/img/items/Guest supplies/Shaving kit.jpg"/>
-                                    <div class="alert-label">Shaving Kit<br>
-                                        <span>50</span>
-                                    </div>
-                                </div>
+a.thumbnail > img {
+    max-width: 120px;
+}
 
-                            </div>
-                            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xs-12">
-                                <div class="alert alert-danger">
-                                    <img src="/static/img/items/Guest hamper/Milk.jpg"/>
-                                    <div class="alert-label">Milk<br>
-                                        <span>26</span>
-                                    </div>
-                                </div>
+</style>
 
-                            </div>
-                        </div>
-                        <div class="footer">
-                            <hr>
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Updated 3 minutes ago
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="container">
 
+<!-- Items below reorder point -->
+<h3>Items running out<span class="pull-right">Refresh</span></h3><hr>
 
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card ">
-                    <a href="/logs"><div class="header">
-                        <h4 class="title">Recent Activity</h4>
-                        <p class="category">Latest inventory movement</p>
-                    </div></a>
-                    <div class="">
-                        <table id="recent" class="tablesorter">
-                            <thead>
-                                <th>Name</th>
-                                <th>Item</th>
-                                <th>Qty</th>
-                                <th>In/Out</th>
-                                <th>Date-Time</th>
-                                <th>Qty Left</th>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Ah Moi</td>
-                                    <td>Conditioner</td>
-                                    <td>3</td>
-                                    <td>Out</td>
-                                    <td>3 minutes ago</td>
-                                    <td>98</td>
-                                </tr>
-                                <tr>
-                                    <td>Nisha</td>
-                                    <td>Shampoo</td>
-                                    <td>5</td>
-                                    <td>Out</td>
-                                    <td>2 hours ago</td>
-                                    <td>134</td>
-                                </tr>
-                                <tr>
-                                    <td>Sok Ting</td>
-                                    <td>Toothbrush</td>
-                                    <td>10</td>
-                                    <td>Out</td>
-                                    <td>At 4pm yesterday</td>
-                                    <td>253</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <div class="footer">
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Updated 3 minutes ago
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <style>
-                table {
-                    margin-bottom: 0 !important;
-                }
-
-                td:first-child {
-                    padding-left: 5px !important;
-                }
-            </style>
-
-            <!-- <div class="col-md-12">
-                <div class="card ">
-                    <a href="/tasks"><div class="header">
-                        <h4 class="title">Tasks</h4>
-                    </div></a>
-                    <div class="content">
-                        <div class="table-full-width">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <label class="checkbox">
-                                                <input type="checkbox" value="" data-toggle="checkbox">
-                                            </label>
-                                        </td>
-                                        <td>Stock check (guest supplies)</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label class="checkbox">
-                                                <input type="checkbox" value="" data-toggle="checkbox" checked="">
-                                            </label>
-                                        </td>
-                                        <td>Receive L'Occitane</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="footer">
-                            <hr>
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Updated 3 minutes ago
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-        </div>
+<div class="col-xs-4 col-sm-3 col-md-2"><a href="" class="thumbnail right-caption">
+    <img class="" src="/static/img/items/Guest Hampers/Butternut Squash.jpg" alt="">
+    <div class="caption">
+        <p>Butternut Squash</p>
+        <p>163</p>
     </div>
-</div>
+</a></div>
+
+<div class="col-xs-4 col-sm-3 col-md-2"><a href="" class="thumbnail right-caption">
+    <img class="" src="/static/img/items/Guest Hampers/Butternut Squash.jpg" alt="">
+    <div class="caption">
+        <p>Butternut Squash</p>
+        <p>163</p>
+    </div>
+</a></div>
+
+<div class="col-xs-4 col-sm-3 col-md-2"><a href="" class="thumbnail right-caption">
+    <img class="" src="/static/img/items/Guest Hampers/Butternut Squash.jpg" alt="">
+    <div class="caption">
+        <p>Butternut Squash</p>
+        <p>163</p>
+    </div>
+</a></div>
+
+<div class="col-xs-4 col-sm-3 col-md-2"><a href="" class="thumbnail right-caption">
+    <img class="" src="/static/img/items/Guest Hampers/Butternut Squash.jpg" alt="">
+    <div class="caption">
+        <p>Butternut Squash</p>
+        <p>163</p>
+    </div>
+</a></div>
+
+
+
+
+
+
+</div><!-- /.container -->
+
+
 
 <script>
 $(document).ready(function() { 

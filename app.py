@@ -4,6 +4,7 @@ from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
 import copy
+import re
 from forms import LoginForm, RetrievalForm, AddUserForm
 import csv
 # from flask.ext.cache import Cache
@@ -158,7 +159,20 @@ def auth():
 		# print "You're not logged in"
 	return False
 
+# wrapper function for route redirection
+def filter_role(roles_routes):
+	for k,v in roles.items():
+		if session['role'] == k:
+			return redirect(v)
+
 #----------------------------ROUTING ------------------------
+
+@app.template_filter('quoted')
+def quoted(s):
+    l = re.findall('\'([^\']*)\'', str(s))
+    if l:
+        return l[0]
+    return None
 
 @app.route('/')
 def hello():
@@ -186,9 +200,10 @@ def login():
 		else: 
 			username = form.username.data
 			password = form.password.data
+			remember = form.remember.data
 		
-			cursor=mysql.connect().cursor()
-			cursor.execute("SELECT username, password, role FROM User WHERE username= '" + username + "';")
+			cursor = mysql.connect().cursor()
+			cursor.execute("SELECT username, password, role, name FROM User WHERE username= '" + username + "';")
 
 			# check if user and pass data is correct by executing the db
 			# data is stored as a tuple
@@ -208,7 +223,10 @@ def login():
 				# username & password match
 				session['username'] = data[0]
 				session['role'] = data[2]
+				session['name'] = data[3]
 				session['logged_in'] = True
+				if remember:
+					session.permanent = True
 
 				# check role
 				if data[2] == "supervisor":
@@ -230,7 +248,7 @@ def login():
 				return redirect('/scan')
 
 
-@app.route('/admin',methods=["GET","POST"])
+@app.route('/admin', methods=["GET","POST"])
 def admin():
 
 	form = AddUserForm()
@@ -274,7 +292,7 @@ def dashboard():
 	if not logged_in:
 		return redirect('/login')
 
-	return render_template('dashboard.html', user=session['username'])
+	return render_template('v2/dashboard.html', user=session['username'])
 
 
 @app.route('/inventory/')
@@ -450,8 +468,7 @@ def shelf(tag_id):
 
 @app.route('/logout')
 def logout():
-	session.clear();
-	role = None
+	session.clear()
 	return redirect('/login')
 
 
