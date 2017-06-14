@@ -103,21 +103,33 @@ def getAllLogs():
 			"location":row[6]})
 		print(things)
 
-			
-
 	return things
 		
 
-# TEST: extract dummy inventory qty data for Highcharts
-def extract():
-	with open("inventory.csv", 'rU') as f:  #opens file
-	    reader = csv.reader(f)
-	    data = list(list(rec) for rec in csv.reader(f, delimiter=',')) #reads csv into a list of lists
-	return data
+# Returns inventory items that are below threshold levels
+def getInventoryLow():
+
+	THRESHOLD = 1.2
+	cursor = mysql.connect().cursor()
+	cursor.execute("""SELECT sku, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.Items
+		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt
+		ORDER BY name ASC;""")
+	data = cursor.fetchall()
+
+	r = []
+	for i in data:
+		r.append({"sku": i[0],
+			"name": i[1].encode('ascii'),
+			"qty_left": i[2],
+			"reorder_pt": i[3],
+			"picture": i[4].encode('ascii'),
+			"category": i[5].encode('ascii')})
+		
+	return r
 
 # POST for getting chart data
-@app.route('/api/getData', methods=["POST"])
-def getData():
+@app.route('/api/getChartData', methods=["POST"])
+def getChartData():
 
 	print "content_type: ", request.content_type
 	print "request.json: ", request.json
@@ -292,7 +304,12 @@ def dashboard():
 	if not logged_in:
 		return redirect('/login')
 
-	return render_template('v2/dashboard.html', user=session['username'])
+	i = getInventoryLow()
+	l=0
+	# l = getLogs()
+
+
+	return render_template('v2/dashboard.html', items = i, logs = l)
 
 
 @app.route('/inventory/')
@@ -329,8 +346,8 @@ def inventory():
 		hampers = hampers,
 		kitchenware = kitchenware)
 
-@app.route('/inventory/<item>')
-def item(item):
+@app.route('/inventory/<int:sku>')
+def item(sku):
 
 	# user authentication
 	logged_in = auth()
@@ -338,25 +355,18 @@ def item(item):
 		return redirect('/login')
 
 	name = item
-	conn = mysql.connect()
-	cursor = conn.cursor()
+	cursor = mysql.connect().cursor()
 
-	query = "SELECT sku, name, picture, category FROM Ascott_Invmgmt.Items WHERE name = '{0}';".format(name)
-
+	query = "SELECT name FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
 	cursor.execute(query)
 	data = cursor.fetchall()
+
+	print data
 	try:
-		sku = data[0][0]
-		picture = data[0][2]
-		category = data[0][3]
-		return render_template('item.html', 
-			item=item, 
-			sku = sku,
-			picture = picture,
-			category = category,
-			user = session['username'])
+		name = data[0][0]
+		return render_template('item.html', name = name)
 	except:
-		return render_template('item.html', item=item, sku=None, picture=None, category=None, user=session['username'])
+		return render_template('item.html', name = None)
 
 # @app.route('/inventory/<category>')
 # def category(category):

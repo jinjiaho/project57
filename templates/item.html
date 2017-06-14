@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{item}}{% endblock %}
+{% block title %}{{name}}{% endblock %}
 
 {% block content %}
 <style>
@@ -59,8 +59,8 @@ var chartData;
 function getData(callback) {
     $.ajax({
         type: "POST",
-        url: "/api/getData",
-        data: JSON.stringify("{{item}}"),
+        url: "/api/getChartData",
+        data: JSON.stringify("{{name}}"),
         dataType: "json",
         contentType: "application/json",
         success: function(response, status, jqXHR) {
@@ -85,7 +85,7 @@ function initChart(dataSources) {
             type: 'area'
         },
         title: {
-            text: '{{item}}'
+            text: '{{name}}'
         },
         subtitle: {
             text: 'Quantity remaining'
