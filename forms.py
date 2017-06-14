@@ -10,7 +10,7 @@ class AddUserForm(Form):
 	submit = SubmitField('Add User')
 
 class LoginForm(Form):
-	username = StringField('Username', validators=[DataRequired("Please enter your usename")])
+	username = StringField('Username', validators=[DataRequired("Please enter a usename")])
 	password = PasswordField('Password', validators=[DataRequired('Please enter a password')])
 	submit = SubmitField("Sign in")
 

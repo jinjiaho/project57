@@ -4,7 +4,7 @@ from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
 import copy
-from forms import LoginForm, RetrievalForm
+from forms import LoginForm, RetrievalForm, AddUserForm
 import csv
 # from flask.ext.cache import Cache
 
