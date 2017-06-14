@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Review{% endblock %}
+
+{% block content %}
+<style>
+
+  .buttons {
+    padding: 15px;
+  }
+
+  .btn-block {
+    width: 49%;
+    float:left;
+  }
+
+  #btn_newItem {
+    margin-top: 0;
+  }
+
+  #btn_getData {
+    margin-right: 1% !important;
+  }
+
+</style>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+
+          <a href="/review/Guest Supplies">
+          <div class="card sup-view">
+              <button class="header accordion">
+                  <h4 class="title">Guest Supplies</h4>
+              </button>
+
+          </div>
+          </a>
+
+          <a href="/review/Guest Hampers">
+          <div class="card sup-view">
+              <button class="header accordion">
+                  <h4 class="title">Guest Hampers</h4>
+              </button>
+
+          </div>
+          </a>
+
+          <a href="/review/Kitchenware">
+          <div class="card sup-view">
+              <button class="header accordion">
+                  <h4 class="title">Kitchenware</h4>
+              </button>
+
+          </div>
+          </a>
+
+        </div>
+        <!-- <div class="row buttons">
+          
+          <button class="btn btn-primary btn-block" id="btn_newItem">New Item</button>
+        </div> -->
+
+        <!-- DO NOT DELETE: FURTHER AUTOMATION IN PROGRESS -->
+        <!-- {% for category in all_items %}
+          <div class="card">
+            <button class="header accordion">
+                <h4 class="title">{{category}}</h4>
+            </button>
+            <div class="content all-icons panel">
+                <div class="row">
+                  {% for item in category %}
+                  <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                    <a href="inventory/{{item.name}}"><div class="alert alert-danger">
+                      <img src="/static/img/items/{{category}}/{{item.picture}}"/>
+                      <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
+                    </div></a>
+                  </div>
+                  {% endfor %}
+                    <a href="{{category}}">
+                    <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
+
+                  </div>
+
+            </div>
+          </div>
+          {% endfor %} -->
+    </div>
+</div>
+
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+    acc[i].onclick = function(){
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.display === "block") {
+            panel.style.display = "none";
+        } else {
+            panel.style.display = "block";
+        }
+    }
+}
+
+</script>
+
+{% endblock %}

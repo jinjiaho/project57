@@ -2,11 +2,6 @@
 <html lang="en">
 <head>
 
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <link rel="icon" type="image/png" href="/static/img/favicon.png">
-    <title>Inventory Management | Ascott</title>
-
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -79,48 +74,88 @@
 
 </head>
 <body>
-<div class="container">
-    <div class="wrapper">
-        <div class="sidebar" data-color="purple" data-image="/static/img/sidebar-5.jpg">
+    <div id="container" class="body-container">
+        <div id="body" class="body">
+            <div class="sidebar" data-color="purple" data-image="/static/img/sidebar-5.jpg">
 
-        <!--
-            Tip 1: you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple"
-            Tip 2: you can also add an image using data-image tag
-        -->
-            {% block sidebar %}
-            {% endblock %}
+            <!--
+                Tip 1: you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple"
+                Tip 2: you can also add an image using data-image tag
+            -->
+                
+                <div class="sidebar-wrapper">
+                    <div class="logo" style="text-transform: capitalize;">
+                        <a href="/" class="simple-text" style="text-align:left;text-transform:capitalize;">
+                        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
+                            {{user}}
+                        </a>
+                    </div>
+                    <ul class="nav">
+                        <li>
+                            <a href="/">
+                                <i class="pe-7s-graph"></i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/inventory">
+                                <i class="pe-7s-rocket"></i>
+                                <p>Inventory</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/review">
+                                <i class="pe-7s-rocket"></i>
+                                <p>Review</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/logs">
+                                <i class="pe-7s-news-paper"></i>
+                                <p>Logs</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/logout">
+                                <i class="pe-7s-power"></i>
+                                <p>Log Out</p>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
 
+            </div>
 
+            <div class="main-panel">
+                <nav class="navbar navbar-default navbar-fixed">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            {% block title %}{% endblock %}
+                        </div>
+                        <div class="collapse navbar-collapse">
+                            <ul class="nav navbar-nav navbar-right">
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+
+                {% block content %}
+                
+                {% endblock %}
+
+                
+
+            </div>
         </div>
-
-        <div class="main-panel">
-            <nav class="navbar navbar-default navbar-fixed">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        {% block title %}{% endblock %}
-                    </div>
-                    <div class="collapse navbar-collapse">
-                        <ul class="nav navbar-nav navbar-right">
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-
-            {% block content %}
-            
-            {% endblock %}
-
-            <footer class="footer">
-                <div class="container-fluid">
-                    <p class="copyright pull-right">
-                        &copy; The Ascott Limited | SUTD
-                    </p>
-                </div>
-            </footer>
-
+        <div id="footer" class="footer">
+            <div class="container-fluid">
+                <p class="copyright pull-right">
+                    &copy; The Ascott Limited | SUTD
+                </p>
+            </div>
         </div>
     </div>
-</div>
 
 
 </body>

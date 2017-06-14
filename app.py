@@ -24,8 +24,7 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 adminmode = False
 
-#----------------------GLOBAL VARIABLES---------------------
-role = None
+role = ""
 
 #----------------------------METHODS-------------------------
 # Returns all the items based on category and amount in or out within the last month for each item
@@ -91,21 +90,37 @@ def getAllLogs():
 	
 	for row in data:
 
-		cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE sku = {};".format(str(row[5])))
-		item_data=cursor.fetchall()
-		# print(item_data)
+# # <<<<<<< HEAD
+# 		cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE sku = {};".format(str(row[5])))
+# 		item_data=cursor.fetchall()
+# 		# print(item_data)
 		# print(item_data[0])
 		# print(item_data[1])
 
-		things.append(
-				{"name": row[0].encode('ascii'),
-				"dateTime": row[1],
-				"action":row[2],
-				"move":row[3],
-				"remaining":row[4],
-				"item":item_data[0][0].encode('ascii'),
-				"category":item_data[0][1].encode('ascii'),
-				"location":row[6]})
+# 		things.append(
+# 				{"name": row[0].encode('ascii'),
+# 				"dateTime": row[1],
+# 				"action":row[2],
+# 				"move":row[3],
+# 				"remaining":row[4],
+# 				"item":item_data[0][0].encode('ascii'),
+# 				"category":item_data[0][1].encode('ascii'),
+# 				"location":row[6]})
+# # =======
+		# cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE name = {};".format(str(row[5])))
+		# item_data=cursor.fetchone()
+
+		things.append({"name": row[0].encode('ascii'),
+			"dateTime": row[1],
+			"action":row[2],
+			"move":row[3],
+			"remaining":row[4],
+			"item":row[5].encode('ascii'),
+			"location":row[6]})
+		print(things)
+
+			
+# >>>>>>> 3684797bc005be1436e23565ece904543746d7b6
 
 	return things
 		
@@ -158,7 +173,7 @@ def hello():
 		if role == 'supervisor':
 			return redirect('/dashboard')
 		else:
-			return redirect('/scan')
+			return redirect('/dashboard')
 	else:
 		return redirect('/login')
 
@@ -194,27 +209,25 @@ def login():
 				return redirect('/login')
 
 			else:	
+				role = data[2]
 				if data[2] == "supervisor":
 					session['logged_in'] = True
 					session['username'] = username
-					role = "supervisor"
 					return redirect('/dashboard')
 				elif data[2] =="attendant":
 					session['logged_in'] = True
 					session['username'] = username
-					role = "attendant"
 					return redirect('/scan')
 
 	elif request.method =="GET":
 		return render_template('login.html', form=form)
 
 
-
 @app.route('/dashboard')
 def dashboard():
 	if not session['logged_in']:
 		return redirect('/login')
-	return render_template('dashboard.html')
+	return render_template('dashboard.html', user=session['username'])
 
 
 @app.route('/inventory/')
@@ -240,27 +253,51 @@ def inventory():
 	# get current list of all items listed in db
 	supplies = getAllInventory('Guest Supplies')
 	hampers = getAllInventory('Guest Hampers')
-	kitchenware = getAllInventory('Kitche	nware')
+	kitchenware = getAllInventory('Kitchenware')
 	return render_template('inventory.html',
 		supplies = supplies,
 		hampers = hampers,
 		kitchenware = kitchenware)
 
-@app.route('/inventory/<category>/<item>')
-def item(item, category):
-	item = item
-	qty = extract()
-	category = category
-	return render_template('item.html', 
-		item=item, 
-		category=category,
-		qty=qty)
+@app.route('/inventory/<item>')
+def item(item):
+	name = item
+	conn = mysql.connect()
+	cursor = conn.cursor()
 
-@app.route('/inventory/<category>')
+	query = "SELECT sku, name, picture, category FROM Ascott_Invmgmt.Items WHERE name = '{0}';".format(name)
+
+	cursor.execute(query)
+	data = cursor.fetchall()
+	try:
+		sku = data[0][0]
+		picture = data[0][2]
+		category = data[0][3]
+		return render_template('item.html', 
+			item=item, 
+			sku = sku,
+			picture = picture,
+			category = category,
+			user = session['username'])
+	except:
+		return render_template('item.html', item=item, sku=None, picture=None, category=None, user=session['username'])
+
+@app.route('/review/<category>')
 def category(category):
 	category = category
 	itemtype = getAllInventory(category)
-	return render_template('category.html', category=category, itemtype=itemtype)
+	return render_template('category.html', category=category, itemtype=itemtype, 
+		role = role,
+		user = session['username'])
+
+@app.route('/review')
+def review():
+	supplies = getAllInventory('Guest Supplies')
+	hampers = getAllInventory('Guest Hampers')
+	kitchenware = getAllInventory('Kitchenware')
+	return render_template('review.html', supplies = supplies,
+		hampers = hampers,
+		kitchenware = kitchenware, user=session['username'])
 
 
 @app.route('/logs')
@@ -268,7 +305,10 @@ def logs():
 	logs=getAllLogs()
 	# names=getUniqueNames()
 	# items=getUniqueItems()
-	return render_template('logs.html',logs=logs)
+	return render_template('logs.html',
+		logs=logs, 
+		role = role,
+		user = session['username'])
 	# names=names, items=items)
 
 @app.route('/scan')
@@ -294,27 +334,28 @@ def shelf(tag_id):
 			{"name": item[0],
 			"category": item[1],
 			"picture":item[2]})
-	return render_template('storeroom.html', things=things)
+	return render_template('storeroom.html', things=things, 
+		role = role,
+		user = session['username'], 
+		location = tag_id)
 
 
-
-@app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
-def checkout(tag_id):
-	if request.method == 'GET':
-		return render_template('cart.html')
-	else:
-		now = datetime.now()
-		form_data = request.form
-		user = session['username']
+# @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
+# def checkout(tag_id):
+# 	if request.method == 'GET':
+# 		return render_template('cart.html')
+# 	else:
+# 		now = datetime.now()
+# 		form_data = request.form
+# 		user = session['username']
 		
-		conn = mysql.connect()
-		cursor = conn.cursor()
-		for item, qty in form_data.iteritems():
-			cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
+# 		conn = mysql.connect()
+# 		cursor = conn.cursor()
+# 		for item, qty in form_data.iteritems():
+# 			cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
 
-		cart = []
-		flash("Success!")
-		return redirect('scanner.html')
+# 		flash("Success!")
+# 		return redirect('scanner.html')
 
 # @app.route('/storeroom/')
 # def storeroom():
@@ -323,35 +364,34 @@ def checkout(tag_id):
 # 	catItems = getFromLevels("Level4C2")
 # 	return render_template("storeroom.html", catGoods=catItems)
 
-@app.route('/storeroom/<things>', methods=["GET","POST"])	
-def retrieval(things):
-	things=things
-	form = RetrievalForm()
+# @app.route('/storeroom/<things>', methods=["GET","POST"])	
+# def retrieval(things):
+# 	things=things
+# 	form = RetrievalForm()
 
 
-	if request.method == "POST":
-		if form.validate() == False:
-			return render_template("retrieval.html",things=things,form=form)
-		elif type(form.amount.data)!=int:
-			return render_template("retrieval.html",things=things,form=form)
+# 	if request.method == "POST":
+# 		if form.validate() == False:
+# 			return render_template("retrieval.html",things=things,form=form)
+# 		elif type(form.amount.data)!=int:
+# 			return render_template("retrieval.html",things=things,form=form)
 
-		else:	
-			input = form.amount.data
+# 		else:	
+# 			input = form.amount.data
 			
-			# flash('this has been added to the cart')
-			# return redirect(url_for('storeroom/'))
-			return ('you did it!!!!!')
+# 			# flash('this has been added to the cart')
+# 			# return redirect(url_for('storeroom/'))
+# 			return ('you did it!!!!!')
 
 
-	elif request.method=="GET":
-		return render_template('retrieval.html',things=things, form=form)
+# 	elif request.method=="GET":
+# 		return render_template('retrieval.html',things=things, form=form)
 
-	return render_template("retrieval.html", things=things)
+# 	return render_template("retrieval.html", things=things)
 
 @app.route('/logout')
 def logout():
-	session.pop('logged_in', None)
-	session.pop('username', None)
+	session.clear();
 	role = None
 	return redirect('/login')
 

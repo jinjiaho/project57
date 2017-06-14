@@ -1,51 +1,4 @@
 {% extends "base.html" %}
-{% block sidebar %}
-<div class="sidebar-wrapper">
-<link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
-    <div class="logo">
-        <a href="http://www.creative-tim.com" class="simple-text" style="text-align:left;">
-        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
-            Supervisor
-        </a>
-    </div>
-
-    <ul class="nav">
-        <li>
-            <a href="/dashboard">
-                <i class="pe-7s-graph"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
-        
-        <li>
-            <a href="/inventory/">
-                <i class="pe-7s-rocket"></i>
-                <p>Inventory</p>
-            </a>
-        </li>
-        <li class="active">
-            <a href="/logs">
-                <i class="pe-7s-news-paper"></i>
-                <p>Logs</p>
-            </a>
-        </li>
-
-        <li class="active">
-            <a href="/logs">
-                <i class="pe-7s-note2"></i>
-                <p>Logs</p>
-            </a>
-        </li>
-        <li>
-            <a href="/">
-                <i class="pe-7s-power"></i>
-                <p>Log Out</p>
-            </a>
-        </li>
-        
-    </ul>
-</div>
-{% endblock %}
 
 {% block title %}
 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
@@ -206,9 +159,56 @@
     -webkit-box-shadow: inset 0 4px 9px rgba(0,0,0,.24);
     box-shadow: inset 0 4px 9px rgba(0,0,0,.24);
 }
+
+.container-fluid .date { float:right }
 </style>
 
 <script>
+
+var dayarray=new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+var montharray=new Array("January","February","March","April","May","June","July","August","September","October","November","December")
+
+function getthedate(){
+var mydate=new Date()
+var year=mydate.getYear()
+if (year < 1000)
+year+=1900
+var day=mydate.getDay()
+var month=mydate.getMonth()
+var daym=mydate.getDate()
+if (daym<10)
+daym="0"+daym
+var hours=mydate.getHours()
+var minutes=mydate.getMinutes()
+var seconds=mydate.getSeconds()
+var dn="AM"
+if (hours>=12)
+dn="PM"
+if (hours>12){
+hours=hours-12
+}
+if (hours==0)
+hours=12
+if (minutes<=9)
+minutes="0"+minutes
+if (seconds<=9)
+seconds="0"+seconds
+//change font size here
+var cdate="<small><font color='000000' face='Arial'><b>"+dayarray[day]+", "+montharray[month]+" "+daym+", "+year+" "+hours+":"+minutes+":"+seconds+" "+dn
++"</b></font></small>"
+if (document.all)
+document.all.clock.innerHTML=cdate
+else if (document.getElementById)
+document.getElementById("clock").innerHTML=cdate
+else
+document.write(cdate)
+}
+if (!document.all&&!document.getElementById)
+getthedate()
+function goforit(){
+if (document.all||document.getElementById)
+setInterval("getthedate()",1000)
+}
     
     function downloadCSV(csv, filename) {
 
@@ -237,10 +237,20 @@
     downloadLink.click();
 }
     function exportTableToCSV(filename) {
+    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var d = new Date();
+    var month = monthNames[d.getMonth()];
+    var year = d.getFullYear();
+    var header1 = ["Logs in current month","","","","","","Month: "+month,"Year:"+year];
+    var header2 = ["Property: Ascott Raffles Place Singapore"];//Property is hard coded for now
+    var header3 = ["","","","","",""];
+    var header4 = ["Name","Item","Category","In/Out","Quantity change","Quantity remaining","Date-Time","Location"];
     var csv = [];
-    var rows = document.querySelectorAll();
-    print(rows)
-    
+    var rows = $('#logs').find("tbody tr:visible");
+    csv.push(header1)
+    csv.push(header2)
+    csv.push(header3.join(","));
+    csv.push(header4.join(","));
     for (var i = 0; i < rows.length; i++) {
         var row = [], cols = rows[i].querySelectorAll("td,th");
         
@@ -261,6 +271,12 @@ $(document).ready(function() {
         // theme:'blue',
         showProcessing: true,
         widgets: ["filter"],
+        // headers:{
+        //     '.Quantity change','.Quantity remaining','.Location':{
+        //         sorter: false
+        //     }
+
+        // },
         widgetOptions : {
 
       // extra css class applied to the table row containing the filters & the inputs within that row
@@ -311,6 +327,9 @@ $(document).ready(function() {
 </script>
 
 <div class="container-fluid">
+<span>Property: Ascott Raffles Place Singapore</span>
+<span align="right" id="clock" class="date"></span>
+
     <div class="row">
 		<div class="col-md-12">
 		    <div class="card card-plain">
@@ -326,10 +345,10 @@ $(document).ready(function() {
                             <th class="filter-select filter-onlyAvail" data-placeholder="All">Item</th>
                             <th class="filter-select filter-onlyAvail" data-placeholder="All">Category</th>
                             <th class="filter-select" data-placeholder="All">In/Out</th>
-                            <th>Quantity change</th>
-                            <th>Quantity remaining</th>
+                            <th class="filter-false sorter-false">Quantity change</th>
+                            <th class="filter-false sorter-false">Quantity remaining</th>
                             <th>Date-Time</th>
-                            <th>Location</th>
+                            <th class="filter-false sorter-false">Location</th>
                             </tr>
                         </thead>
                         <tbody id="myTable">
@@ -361,10 +380,12 @@ $(document).ready(function() {
             <li><a href="#">4</a></li>
             <li><a href="#">5</a></li>
         </ul> 
-			<!-- <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button> -->
+			<button onclick= "exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+            <body onLoad="goforit()">
 		</div>
     </div>
 </div>
+
 
 
 {% endblock %}

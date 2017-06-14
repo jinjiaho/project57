@@ -1,77 +1,4 @@
 {% extends "base.html" %}
-{% block sidebar %}
-<style>
-  .alert {
-    min-height: 120px;
-  }
-  .alert img {
-    float: left;
-    height: 100px;
-    margin-bottom: 5px;
-    max-width: 100px;
-  }
-
-  .alert .alert-label {
-    /*font-size: 24pt;*/
-    padding: 10px 10px;
-    float: left;
-    height: inherit;
-    width: calc(100% - 110px);
-    text-align:center;
-  }
-
-  .alert .alert-label span {
-    font-size: 24pt;
-  }
-
-  .alert-danger {
-    background-color: #ff000f;
-  }
-
-</style>
-<div class="sidebar-wrapper">
-    <div class="logo">
-        <a href="" class="simple-text" style="text-align:left;">
-        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
-            Supervisor
-        </a>
-    </div>
-
-    <ul class="nav">
-        <li class="active">
-            <a href="/">
-                <i class="pe-7s-graph"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
-        <li>
-            <a href="/inventory">
-                <i class="pe-7s-rocket"></i>
-                <p>Inventory</p>
-            </a>
-        </li>
-        <li>
-            <a href="/logs">
-                <i class="pe-7s-news-paper"></i>
-                <p>Logs</p>
-            </a>
-        </li>
-                <li>
-            <a href="/tasks">
-                <i class="pe-7s-note2"></i>
-                <p>Tasks</p>
-            </a>
-        </li>
-        <li>
-            <a href="/">
-                <i class="pe-7s-power"></i>
-                <p>Log Out</p>
-            </a>
-        </li>
-        
-    </ul>
-</div>
-{% endblock %}
 
 {% block title %}Dashboard{% endblock %}
 
@@ -80,47 +7,58 @@
     <div class="container-fluid">
         <div class="row">
             <style>
-                .all-icons .font-icon-detail input{
+                .all-icons .sup-detail input{
                     color: #f30615;
                 }
             </style>
 
             <div class="col-md-12">
-                <div class="card ">
+                <div class="card">
                     <a href="{{url_for('inventory')}}"><div class="header">
                         <h4 class="title">Running Low</h4>
                         <p class="category"></p>
                     </div></a>
                     <div class="content all-icons">
                         <div class="row">
-                            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                                <a href="/inventory/pen">
-                                    <div class="alert alert-danger">
-                                        <img src="/static/img/items/Guest Supplies/Ascott Pen.jpg"/>
-                                        <div class="alert-label">Pen<br/>
-                                            <span>47</span>
+                            <div class="sup-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                                <a href="/inventory/Ascott%20Pen">
+                                    <div class="sup-detail alert alert-danger">
+                                        <div class="img-wrapper">
+                                            <img src="/static/img/items/Guest Supplies/Ascott Pen.jpg"/>
+                                        </div>
+                                        <div class="alert-group">
+                                            <div class="alert-label">Pen</div>
+                                            <div class="alert-number">47</div>
                                         </div>
                                     </div>
                                 </a>
                             </div>
-                            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xs-12">
-                                <div class="alert alert-danger">
-                                    <img src="/static/img/items/Guest Supplies/Shaving Kit.jpg"/>
-                                    <div class="alert-label">Shaving Kit<br>
-                                        <span>50</span>
+                            <div class="sup-list col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xs-12">
+                                <a href="/inventory/Shaving%20Kit">
+                                    <div class="sup-detail alert alert-danger">
+                                        <div class="img-wrapper">
+                                            <img src="/static/img/items/Guest Supplies/Shaving Kit.jpg"/>
+                                        </div>
+                                        <div class="alert-group">
+                                            <div class="alert-label">Shaving Kit</div>
+                                            <div class="alert-number">50</div>
+                                        </div>
                                     </div>
-                                </div>
+                                </a>
 
                             </div>
-                            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xs-12">
-                                <div class="alert alert-danger">
-
-                                    <img src="/static/img/items/Guest Hampers/Milk (1L).jpg"/>
-
-                                    <div class="alert-label">Milk<br>
-                                        <span>26</span>
+                            <div class="sup-list col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xs-12">
+                                <a href="/inventory/Milk">
+                                    <div class="sup-detail alert alert-danger">
+                                        <div class="img-wrapper">
+                                            <img src="/static/img/items/Guest Hampers/Milk (1L).jpg"/>
+                                        </div>
+                                        <div class="alert-group">
+                                            <div class="alert-label">Milk</div>
+                                            <div class="alert-number">26</div>
+                                        </div>
                                     </div>
-                                </div>
+                                </a>
 
                             </div>
                         </div>
@@ -200,61 +138,6 @@
                     padding-left: 5px !important;
                 }
             </style>
-
-            <!-- <div class="col-md-12">
-                <div class="card ">
-                    <a href="/tasks"><div class="header">
-                        <h4 class="title">Tasks</h4>
-                    </div></a>
-                    <div class="content">
-                        <div class="table-full-width">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <label class="checkbox">
-                                                <input type="checkbox" value="" data-toggle="checkbox">
-                                            </label>
-                                        </td>
-                                        <td>Stock check (guest supplies)</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label class="checkbox">
-                                                <input type="checkbox" value="" data-toggle="checkbox" checked="">
-                                            </label>
-                                        </td>
-                                        <td>Receive L'Occitane</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="footer">
-                            <hr>
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Updated 3 minutes ago
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
     </div>
 </div>
