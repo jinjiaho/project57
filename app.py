@@ -295,23 +295,27 @@ def shelf(tag_id):
 	if not session.get('logged_in'):
 		return redirect('/login')
 
-	conn = mysql.connect()
-	cursor = conn.cursor()
+	if request.method == 'GET':
 
-	cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
+		conn = mysql.connect()
+		cursor = conn.cursor()
 
-	data=cursor.fetchall()
-	things = []
-	for item in data:
-		things.append(
-			{"sku":item[0],
-			"name": item[1],
-			"category": item[2],
-			"picture":item[3]})
-	return render_template('storeroom.html', things=things, 
-		role = role,
-		user = session['username'], 
-		location = tag_id)
+		cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
+
+		data=cursor.fetchall()
+		things = []
+		for item in data:
+			things.append(
+				{"sku":item[0],
+				"name": item[1],
+				"category": item[2],
+				"picture":item[3]})
+		return render_template('storeroom.html', things=things, 
+			role = role,
+			user = session['username'], 
+			location = tag_id)
+	else:
+		return redirect('/scan')
 
 
 # @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
