@@ -4,6 +4,7 @@ from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
 import copy
+import re
 from forms import LoginForm, RetrievalForm, AddUserForm
 import csv
 # from flask.ext.cache import Cache
@@ -118,23 +119,36 @@ def getAllLogs():
 			"item":row[5].encode('ascii'),
 			"location":row[6]})
 		print(things)
-
 			
 # >>>>>>> 3684797bc005be1436e23565ece904543746d7b6
 
 	return things
 		
 
-# TEST: extract dummy inventory qty data for Highcharts
-def extract():
-	with open("inventory.csv", 'rU') as f:  #opens file
-	    reader = csv.reader(f)
-	    data = list(list(rec) for rec in csv.reader(f, delimiter=',')) #reads csv into a list of lists
-	return data
+# Returns inventory items that are below threshold levels
+def getInventoryLow():
+
+	THRESHOLD = 1.2
+	cursor = mysql.connect().cursor()
+	cursor.execute("""SELECT sku, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.Items
+		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt
+		ORDER BY name ASC;""")
+	data = cursor.fetchall()
+
+	r = []
+	for i in data:
+		r.append({"sku": i[0],
+			"name": i[1].encode('ascii'),
+			"qty_left": i[2],
+			"reorder_pt": i[3],
+			"picture": i[4].encode('ascii'),
+			"category": i[5].encode('ascii')})
+		
+	return r
 
 # POST for getting chart data
-@app.route('/api/getData', methods=["POST"])
-def getData():
+@app.route('/api/getChartData', methods=["POST"])
+def getChartData():
 
 	print "content_type: ", request.content_type
 	print "request.json: ", request.json
@@ -176,7 +190,20 @@ def auth():
 		# print "You're not logged in"
 	return False
 
+# wrapper function for route redirection
+def filter_role(roles_routes):
+	for k,v in roles.items():
+		if session['role'] == k:
+			return redirect(v)
+
 #----------------------------ROUTING ------------------------
+
+@app.template_filter('quoted')
+def quoted(s):
+    l = re.findall('\'([^\']*)\'', str(s))
+    if l:
+        return l[0]
+    return None
 
 @app.route('/')
 def hello():
@@ -204,9 +231,10 @@ def login():
 		else: 
 			username = form.username.data
 			password = form.password.data
+			remember = form.remember.data
 		
-			cursor=mysql.connect().cursor()
-			cursor.execute("SELECT username, password, role FROM User WHERE username= '" + username + "';")
+			cursor = mysql.connect().cursor()
+			cursor.execute("SELECT username, password, role, name FROM User WHERE username= '" + username + "';")
 
 			# check if user and pass data is correct by executing the db
 			# data is stored as a tuple
@@ -226,7 +254,10 @@ def login():
 				# username & password match
 				session['username'] = data[0]
 				session['role'] = data[2]
+				session['name'] = data[3]
 				session['logged_in'] = True
+				if remember:
+					session.permanent = True
 
 				# check role
 				if data[2] == "supervisor":
@@ -248,7 +279,7 @@ def login():
 				return redirect('/scan')
 
 
-@app.route('/admin',methods=["GET","POST"])
+@app.route('/admin', methods=["GET","POST"])
 def admin():
 
 	form = AddUserForm()
@@ -292,7 +323,12 @@ def dashboard():
 	if not logged_in:
 		return redirect('/login')
 
-	return render_template('dashboard.html', user=session['username'])
+	i = getInventoryLow()
+	l=0
+	# l = getLogs()
+
+
+	return render_template('v2/dashboard.html', items = i, logs = l)
 
 
 @app.route('/inventory/')
@@ -329,8 +365,8 @@ def inventory():
 		hampers = hampers,
 		kitchenware = kitchenware)
 
-@app.route('/inventory/<item>')
-def item(item):
+@app.route('/inventory/<int:sku>')
+def item(sku):
 
 	# user authentication
 	logged_in = auth()
@@ -338,25 +374,18 @@ def item(item):
 		return redirect('/login')
 
 	name = item
-	conn = mysql.connect()
-	cursor = conn.cursor()
+	cursor = mysql.connect().cursor()
 
-	query = "SELECT sku, name, picture, category FROM Ascott_Invmgmt.Items WHERE name = '{0}';".format(name)
-
+	query = "SELECT name FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
 	cursor.execute(query)
 	data = cursor.fetchall()
+
+	print data
 	try:
-		sku = data[0][0]
-		picture = data[0][2]
-		category = data[0][3]
-		return render_template('item.html', 
-			item=item, 
-			sku = sku,
-			picture = picture,
-			category = category,
-			user = session['username'])
+		name = data[0][0]
+		return render_template('item.html', name = name)
 	except:
-		return render_template('item.html', item=item, sku=None, picture=None, category=None, user=session['username'])
+		return render_template('item.html', name = None)
 
 @app.route('/review/<category>')
 def category(category):
@@ -407,23 +436,27 @@ def shelf(tag_id):
 	if not logged_in:
 		return redirect('/login')
 
-	conn = mysql.connect()
-	cursor = conn.cursor()
+	if request.method == 'GET':
 
-	cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
+		conn = mysql.connect()
+		cursor = conn.cursor()
 
-	data=cursor.fetchall()
-	things = []
-	for item in data:
-		things.append(
-			{"sku":item[0],
-			"name": item[1],
-			"category": item[2],
-			"picture":item[3]})
-	return render_template('storeroom.html', things=things, 
-		role = role,
-		user = session['username'], 
-		location = tag_id)
+		cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
+
+		data=cursor.fetchall()
+		things = []
+		for item in data:
+			things.append(
+				{"sku":item[0],
+				"name": item[1],
+				"category": item[2],
+				"picture":item[3]})
+		return render_template('storeroom.html', things=things, 
+			role = role,
+			user = session['username'], 
+			location = tag_id)
+	else:
+		return redirect('/scan')
 
 
 # @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
@@ -477,8 +510,7 @@ def shelf(tag_id):
 
 @app.route('/logout')
 def logout():
-	session.clear();
-	role = None
+	session.clear()
 	return redirect('/login')
 
 

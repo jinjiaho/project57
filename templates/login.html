@@ -30,7 +30,8 @@ body {
 }
 </style>
 
-<div class="container-fluid text-center"><div class="col-sm-6 col-sm-offset-3" style="margin-top:30px;">
+<div class="container-fluid text-center">
+<div class="col-sm-6 col-sm-offset-3" style="margin-top:30px;">
 
 
     	<!-- Branding -->
@@ -70,20 +71,20 @@ body {
                 </div>
                 <!-- checkbox for storing userdata -->
                 <div class="checkbox">
-			        <label><input type="checkbox"> Remember me</label>
+			        <label>{{ form.remember(checked="checked") }} Remember me for one month</label>
 			    </div>
 			    {{ form.submit(class="btn btn-primary", style="width:100%;") }}
             </form>
             <p class="checkbox">
-            	<a href="javascript:;" class="forget" data-toggle="modal" data-target=".forget-modal">Forgot your password?</a>
+            	<a href="javascript:;" id="forget">Forgot your password?</a>
             </p>
         	<hr>
         	<p class="text-muted">&copy; The Ascott Limited | SUTD</p>
 	    </div>
 	    <!-- END Form -->
 
-
-</div> <!-- /.container -->
+</div> <!-- /.col-sm-6 -->
+</div> <!-- /.container-fluid -->
 
 </body>
 </html>
