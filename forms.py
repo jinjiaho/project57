@@ -10,9 +10,9 @@ class AddUserForm(Form):
 	submit = SubmitField('Add User')
 
 class LoginForm(Form):
-	username = StringField('Username', validators=[DataRequired("Please enter a usename")])
+	username = StringField('Username', validators=[DataRequired("Please enter a username")])
 	password = PasswordField('Password', validators=[DataRequired('Please enter a password')])
-	remember = BooleanField('Remember me')
+	remember = BooleanField()
 	submit = SubmitField("Login")
 
 class RetrievalForm(Form):	
