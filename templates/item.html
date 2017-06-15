@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{item}}{% endblock %}
+{% block title %}{{name}}{% endblock %}
 
 {% block content %}
 <style>
@@ -35,7 +35,7 @@
             <div class="col-md-3">
                 <div class="card">
                     <div class="content">
-                        <img src="/static/css/item/{{category}}/{{picture}}"/>
+                        <img src="/static/img/items/{{category}}/{{picture}}"/>
                     </div>
                 </div>
             </div>
@@ -54,11 +54,13 @@
 
 <script>
 var chartData;
+
+
 function getData(callback) {
     $.ajax({
         type: "POST",
-        url: "/api/getData",
-        data: JSON.stringify("{{item}}"),
+        url: "/api/getChartData",
+        data: JSON.stringify("{{name}}"),
         dataType: "json",
         contentType: "application/json",
         success: function(response, status, jqXHR) {
@@ -83,7 +85,7 @@ function initChart(dataSources) {
             type: 'area'
         },
         title: {
-            text: '{{item}}'
+            text: '{{name}}'
         },
         subtitle: {
             text: 'Quantity remaining'
