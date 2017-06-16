@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}
+<a class="navbar-brand" href="javascript:history.back()"><img src="/static/img/back.png"/></a>
+<a class="navbar-brand" href="#" style="padding-left:0;">Cart</a>
+{% endblock %}
+
+{% block content%}
+
+<style>
+    .main-panel > .content {
+        padding: 20px 5px !important;
+    }
+
+    .navbar-brand {
+        float:left;
+    }
+
+    .navbar-brand img {
+        height: 20px;
+    }
+
+    .content img {
+        height: 50px;
+        max-width: 76px;
+    }
+
+    #cart-table tbody td span {
+        text-transform: capitalize;
+    }
+
+
+</style>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <form id="cart-form">
+                        <div class="content table-responsive table-full-width">
+                            <table id="cart-table" class="table table-hover">
+                                <thead>
+                                    <th></th>
+                                    <th>Item</th>
+                                    <th>Qty</th>
+                                    <th></th>
+                                </thead>
+                                <tbody>
+                                    
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                            <div class='button-wrapper' align="center">
+                            <button type='submit' class='btn btn-success'>Confirm</button></div>
+                        </div>
+                        
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(function() {
+    alert(localStorage.length);
+    for (var key in localStorage) {
+        var item_name = key;
+        alert(item_name + " "+localStorage[key])
+        var new_row = $('<tr/>');
+        $('<td/><img/>').appendTo(new_row);
+        $('<td/><span/>').text(item_name).appendTo(new_row);
+        var input = $('<td/>').append($('<input/>', {
+            'type':'number',
+            'name':key,
+            'value':localStorage[key],
+            'style':'max-width: 60px;'
+        }));
+        input.appendTo(new_row);
+        $('<span/>', {
+            'class':'x'
+        }).text("x").appendTo($('<td/>')).appendTo(new_row);
+        $('#cart-table tbody').prepend(new_row);
+    }
+
+})
+
+$("td .x").click(function() {
+    $(this).parent().remove();
+    location.reload();
+})
+
+$("#cart-form").on('submit', function(event) {
+    event.preventDefault();
+    localStorage.clear();
+    $(this).submit();  
+})
+
+</script>
+
+
+{% endblock %}

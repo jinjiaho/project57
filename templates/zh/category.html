@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+
+</button>
+<a class="navbar-brand" href="#">{{category}} Month Review</a>
+
+
+{% endblock %}
+
+{% block content %}
+<style>
+    .card .content {
+        padding:0;
+    }
+    .container-fluid .date { float:right }
+
+    .tablesorter .tablesorter-filter-row .disabled { 
+    display: none;
+}
+</style>
+<script type="text/javascript">
+
+var dayarray=new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+var montharray=new Array("January","February","March","April","May","June","July","August","September","October","November","December")
+
+function getthedate(){
+var mydate=new Date()
+var year=mydate.getYear()
+if (year < 1000)
+year+=1900
+var day=mydate.getDay()
+var month=mydate.getMonth()
+var daym=mydate.getDate()
+if (daym<10)
+daym="0"+daym
+var hours=mydate.getHours()
+var minutes=mydate.getMinutes()
+var seconds=mydate.getSeconds()
+var dn="AM"
+if (hours>=12)
+dn="PM"
+if (hours>12){
+hours=hours-12
+}
+if (hours==0)
+hours=12
+if (minutes<=9)
+minutes="0"+minutes
+if (seconds<=9)
+seconds="0"+seconds
+//change font size here
+var cdate="<small><font color='000000' face='Arial'><b>"+dayarray[day]+", "+montharray[month]+" "+daym+", "+year+" "+hours+":"+minutes+":"+seconds+" "+dn
++"</b></font></small>"
+if (document.all)
+document.all.clock.innerHTML=cdate
+else if (document.getElementById)
+document.getElementById("clock").innerHTML=cdate
+else
+document.write(cdate)
+}
+if (!document.all&&!document.getElementById)
+getthedate()
+function goforit(){
+if (document.all||document.getElementById)
+setInterval("getthedate()",1000)
+}
+
+    function downloadCSV(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    // CSV file
+    csvFile = new Blob([csv], {type: "text/csv"});
+
+    // Download link
+    downloadLink = document.createElement("a");
+
+    // File name
+    downloadLink.download = filename;
+
+    // Create a link to the file
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+
+    // Hide download link
+    downloadLink.style.display = "none";
+
+    // Add the link to DOM
+    document.body.appendChild(downloadLink);
+
+    // Click download link
+    downloadLink.click();
+}
+    function exportTableToCSV(filename) {
+    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var d = new Date();
+    var month = monthNames[d.getMonth()];
+    var year = d.getFullYear();
+    var csv = [];
+    var rows = $('#review').find("tbody tr:visible");
+    var header1 = ["Monthly Review of {{category}}","","","","Month: "+month,"Year:"+year]
+    var header2 = ["Property: Ascott Raffles Place Singapore"]//Property is hard coded for now
+    var header3 = ["","","","","",""];
+    var header4 = ["Name","Unit","Initial quantity","In","Out","Remaining quantity"];
+    csv.push(header1.join(","));
+    csv.push(header2);
+    csv.push(header3.join(","));
+    csv.push(header4.join(","));
+    for (var i = 0; i < rows.length; i++) {
+        var row = [], cols = rows[i].querySelectorAll("td, th");
+        
+        for (var j = 0; j < cols.length; j++) 
+            row.push(cols[j].innerText);
+        
+        csv.push(row.join(","));        
+    }
+
+    // Download CSV file
+    downloadCSV(csv.join("\n"), filename);
+}
+
+jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+
+$(document).ready(function() { 
+    $("#review").tablesorter({
+        sortList: [[4,1]],
+        theme:'red',
+        showProcessing: true,
+        widgets: ["filter"],
+        widgetOptions : {
+
+      // extra css class applied to the table row containing the filters & the inputs within that row
+      filter_cssFilter   : '',
+
+      // If there are child rows in the table (rows with class name from "cssChildRow" option)
+      // and this option is true and a match is found anywhere in the child row, then it will make that row
+      // visible; default is false
+      filter_childRows   : false,
+
+      // if true, filters are collapsed initially, but can be revealed by hovering over the grey bar immediately
+      // below the header row. Additionally, tabbing through the document will open the filter row when an input gets focus
+      filter_hideFilters : false,
+
+      // Set this option to false to make the searches case sensitive
+      filter_ignoreCase  : true,
+
+      // jQuery selector string of an element used to reset the filters
+      filter_reset : '.reset',
+
+      // Use the $.tablesorter.storage utility to save the most recent filters
+      filter_saveFilters : true,
+
+      // Delay in milliseconds before the filter widget starts searching; This option prevents searching for
+      // every character while typing and should make searching large tables faster.
+      filter_searchDelay : 300,
+
+      // Set this option to true to use the filter to find text from the start of the column
+      // So typing in "a" will find "albert" but not "frank", both have a's; default is false
+      filter_startsWith  : true,
+
+      // filter_formatter : {
+      //   6 : function($cell, indx){
+      //     return $.tablesorter.filterFormatter.uiDatepicker( $cell, indx, {
+      //       from : '01/01/1999', // default from date
+      //       to   : '01/01/2022',  // default to date
+      //       changeMonth: true,
+      //       changeYear : true
+      //     });
+      //   }
+      // }    
+  }
+
+
+    }); 
+});
+
+</script>
+<div class="container-fluid">
+<span>Property: Ascott Raffles Place Singapore</span>
+<span align="right" id="clock" class="date"></span>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card card-plain">
+               <!--  <div class="header">
+                    <h4 class="title">Logs</h4>
+                    <p class="category">Movement of Inventory</p>
+                </div> -->
+                <div class="content table-responsive table-full-width" style="margin-top: 20px;">
+                    <table id="review" class="table table-hover">
+                        <thead>
+                            <th>Name</th>
+                            <th class="filter-false sorter-false">Unit</th>
+                            <th class="filter-false sorter-false">Initial Quantity</th>
+                            <th class="filter-false sorter-false">In</th>
+                            <th class="filter-false sorter-false">Out</th>
+                            <th class="filter-false sorter-false">Remaining Quantity</th>
+                        </thead>
+                        <tbody>
+                        {% for item in itemtype %}
+                            <tr class="clickable-row" data-href="/inventory/{{item.name}}">
+                                <td>{{item.name}}</td>
+                                <td>{{item.unit}}</td>
+                                <td>{{item.starting}}</td>
+                                <td>{{item.recieved}}</td>
+                                <td>{{item.demand}}</td>
+                                <td>{{item.remaining}}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-bottom:30px;">
+        <div class="col-xs-12" align="center">
+            <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+            <body onLoad="goforit()">
+        </div>
+
+    </div>
+</div>
+{% endblock %}
