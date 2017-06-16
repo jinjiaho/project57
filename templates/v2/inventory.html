@@ -1,42 +1,5 @@
-{% extends "base.html" %}
-{% block sidebar %}
-<div class="sidebar-wrapper">
-    <div class="logo">
-        <a href="" class="simple-text" style="text-align:left;">
-        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
-            Supervisor
-        </a>
-    </div>
+{% extends "v2/base.html" %}
 
-    <ul class="nav">
-        <li>
-            
-                <i class="pe-7s-graph"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
-        <li class="active">
-            <a href="/inventory">
-                <i class="pe-7s-rocket"></i>
-                <p>Inventory</p>
-            </a>
-        </li>
-        <li>
-            <a href="/logs">
-                <i class="pe-7s-news-paper"></i>
-                <p>Logs</p>
-            </a>
-        </li>
-        <li>
-            <a href="/">
-                <i class="pe-7s-power"></i>
-                <p>Log Out</p>
-            </a>
-        </li>
-        
-    </ul>
-</div>
-{% endblock %}
 
 {% block title %}Inventory{% endblock %}
 
@@ -96,14 +59,14 @@
                           
 
                           {% for item in supplies %}
-                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="inventory/{{item.name}}"><div class="alert alert-danger">
+                          <a href="{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="{{item.sku}}"><div class="alert alert-danger">
                               <img src="/static/img/items/supplies/{{item.name}}.jpg"/>
                               <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                             </div></a>
                           </div>
                           {% endfor %}
-                            <a href="Guest Supplies">
+                            <a href="/review/Guest Supplies">
                             <button class="btn btn-default btn-block" id="btn_getData" >Month Review</button></a>
 
                           </div>
@@ -120,14 +83,14 @@
                           
 
                           {% for item in hampers %}
-                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="inventory/{{item.name}}"><div class="alert alert-warning">
+                          <a href="{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="{{item.sku}}"><div class="alert alert-warning">
                               <img src="/static/img/items/hampers/{{item.file}}.jpg"/>
                               <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                             </div></a>
                           </div>
                           {% endfor %}
-                          <a href="Guest Hampers">
+                          <a href="/review/Guest Hampers">
                           <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
 
 
@@ -145,8 +108,8 @@
 
 
                           {% for item in kitchenware %}
-                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="inventory/{{item.name}}"><div class="alert alert-warning">
+                          <a href="{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                            <a href="{{item.sku}}"><div class="alert alert-warning">
                               <img src="/static/img/items/kitchenware/{{item.file}}.jpg"/>
                               <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
 
@@ -154,7 +117,7 @@
                             </div></a>
                           </div>
                           {% endfor %}
-                          <a href="Kitchenware">
+                          <a href="/review/Kitchenware">
                           <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
 
                           </div>
