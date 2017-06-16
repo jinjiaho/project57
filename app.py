@@ -327,7 +327,7 @@ def dashboard():
 	# l = getLogs()
 
 
-	return render_template('v2/dashboard.html', items = i, logs = l)
+	return render_template('dashboard.html', items = i, logs = l)
 
 
 @app.route('/inventory/')

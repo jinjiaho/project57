@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+    
+<span class="cart-group">
+    <a id="cart-icon" data-toggle="modal" data-target="#cartModal" class="cart-icon">
+        <div id="cart-notif" class="cart-notif hide"></span>
+        <span id="cart-qty" class="cart-qty"></span></div>
+        <img class="my-cart-icon" src="/static/img/cart.png" />
+    </a>
+</span>
+
+
+<a class="navbar-brand" href="#">{{location}}</a>
+{% endblock %}
+
+{% block content%}
+<style>
+.navbar-header {
+  margin: 0;
+}
+
+</style>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="content all-icons">
+                        <div class="row">
+                            {% for item in things %}
+                            <div class="mobile-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6" align='center'>
+                                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}">
+                                    <div class="mobile-icon-detail">
+                                        <img src="/static/img/items/{{item.category}}/{{item.picture}}"/><br/>
+                                        <div class="name">{{item.name}}</div>
+                                    </div>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="qtyModal" class="modal fade" data-backdrop="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="qtyForm">
+                <div class="modal-header">
+                    <span class="close" data-dismiss="modal">&times;</span>
+                    <h4 id="form-header"></h4>
+                </div>
+                <div class="modal-body">
+                    <div id="modal-picture" class='modal-pic' align="center"><img src=""/></div>
+                    <div class="qty-display form-fields">
+                        <input id="modal-input-name" type="hidden" name="item" value="" />
+                        <input id="modal-input-qty" type="number" name="qty" value="" placeholder="Enter quantity"/>
+                        <input id="modal-input-sku" type="hidden" name="sku" value="" />
+                    </div>
+                </div>
+                <div class="modal-footer" align="center" style="margin-top: 15px;">
+                    <button type="submit" class="btn btn-success my-cart-btn" style="">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div id="cartModal" class="modal fade" data-backdrop="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <form method='POST'>
+          <div class="modal-header">
+            <span class="close" data-dismiss="modal">&times;</span>
+            <h4 id="form-header">Cart</h4>
+          </div>
+          <div class="modal-body">
+            <table id="cart-table" class="table table-hover">
+              <thead>
+                <th>Item</th>
+                <th></th>
+                <th>Qty</th>
+                <th></th>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss='modal' value="close">Close</button>
+            <button type="submit" class="btn btn-success" value="submit">Confirm</button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/shelves.js" type="text/javascript"></script>
+{% endblock %}

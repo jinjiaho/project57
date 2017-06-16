@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+    <!-- Metadata -->
+    <title>Inventory Management | Ascott</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- JQuery -->
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/js/jquery-ui.js" type="text/javascript"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap-checkbox-radio-switch.js"></script>
+
+    <!--  Tablesorter -->
+    <link rel="stylesheet" type="text/css" href="/static/tablesorter/css/theme.default.min.css">
+    <link rel="stylesheet" href="/static/tablesorter/css/filter.formatter.min.css">
+    <script type="text/javascript" src="/static/tablesorter/js/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="/static/tablesorter/js/jquery.tablesorter.widgets.min.js"></script> 
+    <script type="text/javascript" src="/static/tablesorter/js/jquery.tablesorter.widgets-filter-formatter.js"></script> 
+
+    <!--  Highcharts -->
+    <script src="/static/highstocks/highstock.js"></script>
+
+    <!-- Fonts -->
+    <link href='/static/css/roboto.css' rel='stylesheet' type='text/css'>
+    <!--     <link href="/static/css/pe-icon-7-stroke.css" rel="stylesheet" /> -->
+
+    <!-- Custom CSS -->
+    <!-- <link href="/static/css/collapse.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet"> -->
+
+    <!-- Custom JS -->
+    <!-- APPEND YOUR CUSTOM JS FILES HERE -->
+
+</head>
+<body>
+
+    <!-- top navigation bar -->
+    {% include 'widgets/navbar.html' %}
+
+    <!-- content block -->
+    {% block content %}{% endblock %}
+
+    <!-- footer block -->
+    {% include 'widgets/footer.html' %}
+
+
+<script>
+
+// TODO: encapsulate in separate JS file
+var navlist = document.getElementById("nav-left");
+var li = navlist.getElementsByTagName("a");
+
+for (var i=0; i < li.length; i++) {
+    if (~window.location.pathname.indexOf(li[i].pathname)) {
+        // add ".active" for navbar highlighting of current page
+        li[i].parentNode.className += " active";
+    }
+}
+
+</script>
+
+</body>
+</html>
