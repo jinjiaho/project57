@@ -3,10 +3,10 @@ from wtforms import StringField, PasswordField, SubmitField, RadioField, validat
 from wtforms.validators import DataRequired, Email, Length
 
 class AddUserForm(Form):
-	name = StringField('Name of User', validators=[DataRequired("Please enter the name of the newcomer.")])
-	username= StringField('Create a Username', validators=[DataRequired("Please enter a username.")])
-	role = RadioField('Role of User', choices=[('attendent','Room Attendant'),('supervisor','Supervisor')],validators=[DataRequired('Input Choice')])
-	password = PasswordField('Password', validators=[DataRequired("Please enter a password."), Length(min=6, message="Passwords must be 6 characters or more.")])
+	name = StringField('Name of User:', validators=[DataRequired("Please enter the name of the newcomer.")])
+	username= StringField('New Username:', validators=[DataRequired("Please enter a username.")])
+	role = RadioField('Role of User:', choices=[('attendent','Room Attendant'),('supervisor','Supervisor')],validators=[DataRequired('Input Choice')])
+	password = PasswordField('New Password:', validators=[DataRequired("Please enter a password."), Length(min=6, message="Passwords must be 6 characters or more.")])
 	submit = SubmitField('Add User')
 
 class LoginForm(Form):

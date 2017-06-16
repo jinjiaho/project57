@@ -4,7 +4,7 @@ from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
 import copy
-from forms import LoginForm, RetrievalForm
+from forms import LoginForm, RetrievalForm, AddUserForm
 import csv
 # from flask.ext.cache import Cache
 
@@ -181,6 +181,7 @@ def login():
 	form = LoginForm()
 
 	if request.method == "POST":
+
 		if form.validate() == False:
 			return render_template("login.html", form=form)
 		else: 
@@ -193,13 +194,14 @@ def login():
 			# check if user and pass data is correct by executing the db
 			# data is stored as a tuple
 			data = cursor.fetchone()
-	
+			
 			if data is None: 
 				# username does not match records
 				flash('User does not exist')
 				return redirect('/login')
 
-			elif password != data[1]:
+			# elif password != hashpass:
+			elif check_password_hash(data[1],password) ==False:
 				# password does not match records
 				flash('Incorrect password')
 				return redirect('/login')
@@ -234,14 +236,58 @@ def login():
 def admin():
 
 	form = AddUserForm()
-	if request.method=="POST":
-		if form.validate == False:
+	if request.method =="GET":
+#--------------users table-------------------------
+		conn = mysql.connect()
+		cursor = conn.cursor()
+
+		cursor.execute("SELECT role, name FROM Ascott_InvMgmt.User;")
+
+		data = cursor.fetchall()
+		print(data)
+		things = []
+		for item in data:
+			things.append(
+				{"role": item[0],
+				"name": item[1]})
+
+#-------------NFCID----------------------------------
+
+		cursor.execute("SELECT location FROM Ascott_InvMgmt.Items;")
+
+		data1 = cursor.fetchall()
+ 		data2 = list(set(list(data1))) #displays all unique NFC id tags.
+		
+		# for each unique NFC id, i want to display the set of items.
+		for NFC in data2:
+			# NFC=string.rstrip(',')
+			NFC1 = NFC[0].encode('ascii')		
+			cursor.execute("SELECT name FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(NFC1))
+
+			data3=cursor.fetchall()
+			
+			items=[]
+			for item in data3:
+				items.append({"name":item[0]})
+			print(items)
+
+
+
+
+		return render_template('admin.html', form=form, users=things, NFC=NFC, items=items)
+
+
+
+	
+
+	if request.method == "POST":
+		if form.validate() == False:
 			return render_template('admin.html', form=form)
 		else:
-			username=form.username.data
-			password=form.password.data
-			role=form.role.data
-			name=form.name.data
+			username = form.username.data
+			password = generate_password_hash(form.password.data)
+			role = form.role.data
+			name = form.name.data
 
 			newuser=[username,password,role,name]
 			
@@ -256,13 +302,11 @@ def admin():
 
 			cursor.execute(query)
 			# cursor.execute("COMMIT")
-			return "congrats"
+			flash("User is added!")
+			return redirect(url_for('admin'))
 
-			
 
-
-	elif request.method =="GET":
-		return render_template('admin.html', form=form)
+	
 
 
 
