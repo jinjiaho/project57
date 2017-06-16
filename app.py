@@ -207,7 +207,7 @@ def quoted(s):
 
 @app.route('/')
 def hello():
-	# user authentication
+	# # user authentication
 	logged_in = auth()
 	if not logged_in:
 		return redirect('/login')
@@ -267,7 +267,7 @@ def login():
 
 	elif request.method =="GET":
 
-		# user authentication
+	# 	# # user authentication
 		logged_in = auth()
 		if not logged_in:
 			return render_template('login.html', form=form)
