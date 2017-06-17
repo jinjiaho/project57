@@ -13,37 +13,42 @@ body {
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <!-- <a class="navbar-brand" href="#"><img alt="Ascott" src="/static/img/favicon.png"></a> -->
+            <a class="navbar-brand" style="padding:5px 15px;"><img alt="Ascott" src="/static/img/favicon.png" style="max-height:40px;"></a>
         </div>
 
         <!-- Collect nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
+            <ul class="nav navbar-nav" id="nav-left">
 
 				<!-- Dashboard -->
-				<li {% if self._TemplateReference__context.name == "dashboard.html" %}class="active"{% endif %}>
-			  	<a href="dashboard">Overview</a>
+				<li>
+			  	<a href="/dashboard">Overview</a>
+				</li>
+
+				<!-- Review -->
+				<li>
+			  	<a href="/review">Review</a>
 				</li>
 
 				<!-- Inventory -->
-				<li {% if self._TemplateReference__context.name == "inventory.html" or self._TemplateReference__context.name == "item.html" %}class="active"{% endif %}>
-			  	<a href="inventory">Inventory</a>
+				<li>
+			  	<a href="/inventory">Inventory</a>
 				</li>
 
 				<!-- Logs/Reports -->
-				<li {% if self._TemplateReference__context.name == "logs.html" %}class="active"{% endif %}>
-			  	<a href="logs">Logs/Reports</a>
+				<li>
+			  	<a href="/logs">Logs/Reports</a>
 				</li>
 
 				<!-- Admin -->
-				<li {% if self._TemplateReference__context.name == "admin.html" %}class="active"{% endif %}>
-			  	<a href="admin">Admin</a>
+				<li>
+			  	<a href="/admin">Admin</a>
 				</li>
 
             </ul>
 
 				<!-- Account info/logout -->
-				<ul class="nav navbar-nav navbar-right">
+				<ul class="nav navbar-nav navbar-right" id="nav-right">
 					<li class="dropdown">			
 						<a href="" class="dropdown-toggle" data-toggle="dropdown">
 							Logged in as <b>{{session['name']}}</b> <b class="caret"></b>

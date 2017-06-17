@@ -1,6 +1,7 @@
-# Flask core python files
-flask/
-
 # python compiled files
+flask/*.pyc
+flask/ext/*.pyc
 *.pyc
-inventory.csv
+
+# others
+*.csv

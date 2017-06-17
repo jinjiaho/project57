@@ -59,5 +59,21 @@
     <!-- footer block -->
     {% include 'widgets/footer.html' %}
 
+
+<script>
+
+// TODO: encapsulate in separate JS file
+var navlist = document.getElementById("nav-left");
+var li = navlist.getElementsByTagName("a");
+
+for (var i=0; i < li.length; i++) {
+    if (~window.location.pathname.indexOf(li[i].pathname)) {
+        // add ".active" for navbar highlighting of current page
+        li[i].parentNode.className += " active";
+    }
+}
+
+</script>
+
 </body>
 </html>

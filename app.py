@@ -93,6 +93,23 @@ def getAllLogs():
 	
 	for row in data:
 
+# # <<<<<<< HEAD
+# 		cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE sku = {};".format(str(row[5])))
+# 		item_data=cursor.fetchall()
+# 		# print(item_data)
+		# print(item_data[0])
+		# print(item_data[1])
+
+# 		things.append(
+# 				{"name": row[0].encode('ascii'),
+# 				"dateTime": row[1],
+# 				"action":row[2],
+# 				"move":row[3],
+# 				"remaining":row[4],
+# 				"item":item_data[0][0].encode('ascii'),
+# 				"category":item_data[0][1].encode('ascii'),
+# 				"location":row[6]})
+# # =======
 		# cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE name = {};".format(str(row[5])))
 		# item_data=cursor.fetchone()
 
@@ -104,6 +121,8 @@ def getAllLogs():
 			"item":row[5].encode('ascii'),
 			"location":row[6]})
 		print(things)
+			
+# >>>>>>> 3684797bc005be1436e23565ece904543746d7b6
 
 	return things
 		
@@ -193,7 +212,7 @@ def quoted(s):
 
 @app.route('/')
 def hello():
-	# user authentication
+	# # user authentication
 	logged_in = auth()
 	if not logged_in:
 		return redirect('/login')
@@ -253,7 +272,7 @@ def login():
 
 	elif request.method =="GET":
 
-		# user authentication
+	# 	# # user authentication
 		logged_in = auth()
 		if not logged_in:
 			return render_template('login.html', form=form)
@@ -314,7 +333,7 @@ def dashboard():
 	# l = getLogs()
 
 
-	return render_template('v2/dashboard.html', items = i, logs = l)
+	return render_template('dashboard.html', items = i, logs = l)
 
 
 @app.route('/inventory/')
@@ -373,13 +392,22 @@ def item(sku):
 	except:
 		return render_template('item.html', name = None)
 
-# @app.route('/inventory/<category>')
-# def category(category):
-# 	category = category
-# 	itemtype = getAllInventory(category)
-# 	return render_template('category.html', category=category, itemtype=itemtype, 
-# 		role = role,
-# 		user = session['username'])
+@app.route('/review/<category>')
+def category(category):
+	category = category
+	itemtype = getAllInventory(category)
+	return render_template('category.html', category=category, itemtype=itemtype, 
+		role = role,
+		user = session['username'])
+
+@app.route('/review')
+def review():
+	supplies = getAllInventory('Guest Supplies')
+	hampers = getAllInventory('Guest Hampers')
+	kitchenware = getAllInventory('Kitchenware')
+	return render_template('review.html', supplies = supplies,
+		hampers = hampers,
+		kitchenware = kitchenware, user=session['username'])
 
 
 @app.route('/logs')
