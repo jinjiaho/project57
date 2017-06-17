@@ -27,7 +27,7 @@ adminmode = False
 
 
 #---------------------------GLOBAL VARIABLES----------------------
- role = ""
+role = ""
 
 #----------------------------METHODS-------------------------
 # Returns all the items based on category and amount in or out within the last month for each item
@@ -445,21 +445,24 @@ def shelf(tag_id):
 		now = datetime.now()
 		form_data = request.form
 		user = session['username']
-		
-		conn = mysql.connect()
-		cursor = conn.cursor()
-		for item, qty in form_data.iteritems():
-			cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location="+tag_id+";")
-			qty_left = cursor.fetchone()[0]  - qty
-			if (qty_left > 0):
-				# query for stock out
-				cursor.execute("UPDATE Items SET qty_left = (qty_left - "+qty") WHERE qty_left - "+ qty+" >= 0 AND sku="+item+" AND location="+tag_id+";");
-				# create log for each item
-				cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
-			else:
-				flash('Not enough in store!')
 
-		return redirect('/scan')
+		print(form_data)
+		return hello()
+		
+		# conn = mysql.connect()
+		# cursor = conn.cursor()
+		# for item, qty in form_data.iteritems():
+		# 	cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location="+tag_id+";")
+		# 	qty_left = cursor.fetchone()[0]  - qty
+		# 	if (qty_left > 0):
+		# 		# query for stock out
+		# 		print("UPDATE Items SET qty_left = qty_left-"+qty+" WHERE qty_left >= "+qty+" AND sku="+item+" AND location="+tag_id+";")
+		# 		# create log for each item
+		# 		print("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
+		# 	else:
+		# 		flash('Not enough in store!')
+
+		# return redirect('/scan')
 
 	else:
 
@@ -481,56 +484,6 @@ def shelf(tag_id):
 			user = session['username'], 
 			location = tag_id)
 	
-
-
-# @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
-# def checkout(tag_id):
-# 	if request.method == 'GET':
-# 		return render_template('cart.html')
-# 	else:
-# 		now = datetime.now()
-# 		form_data = request.form
-# 		user = session['username']
-		
-# 		conn = mysql.connect()
-# 		cursor = conn.cursor()
-# 		for item, qty in form_data.iteritems():
-# 			cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
-
-# 		flash("Success!")
-# 		return redirect('scanner.html')
-
-# @app.route('/storeroom/')
-# def storeroom():
-# #get data input from location from mobilephone. data output from db is in tuple
-# #this userinput is hard coded
-# 	catItems = getFromLevels("Level4C2")
-# 	return render_template("storeroom.html", catGoods=catItems)
-
-# @app.route('/storeroom/<things>', methods=["GET","POST"])	
-# def retrieval(things):
-# 	things=things
-# 	form = RetrievalForm()
-
-
-# 	if request.method == "POST":
-# 		if form.validate() == False:
-# 			return render_template("retrieval.html",things=things,form=form)
-# 		elif type(form.amount.data)!=int:
-# 			return render_template("retrieval.html",things=things,form=form)
-
-# 		else:	
-# 			input = form.amount.data
-			
-# 			# flash('this has been added to the cart')
-# 			# return redirect(url_for('storeroom/'))
-# 			return ('you did it!!!!!')
-
-
-# 	elif request.method=="GET":
-# 		return render_template('retrieval.html',things=things, form=form)
-
-# 	return render_template("retrieval.html", things=things)
 
 @app.route('/logout')
 def logout():

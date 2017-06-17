@@ -32,6 +32,12 @@ function updateCart() {
   // localStorage.clear();
 }
 
+function clearCartSubmit() {
+  localStorage.setItem('cart', JSON.stringify([]));
+  document.getElementById('cartForm').submit();
+}
+
+  
 
 $(function () {
   updateCart();
@@ -102,13 +108,14 @@ $(function () {
     $('#qtyModal').hide();
 
   });
-
+  
   $('#cartModal tbody a.remove_item').click(function remove_row(e) {
     e.preventDefault();  
     var id = $(this).data('target');
     console.log(id);
     $(id).remove();
   });
+ 
 
 
 });
