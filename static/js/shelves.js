@@ -24,7 +24,7 @@ function updateCart() {
             + item.sku + '"><td><img src="' 
             + item.picture + '"/></td>' + item.name + '</td><td><input type="number" name="' 
             + item.sku + '" value="' + item.qty 
-            + '"/></td><td><a href="" onclick="remove_row()" class="remove_item" data-target="#'
+            + '"/></td><td><a onclick="deleteRow(this)" href="javascript:void(0);"'
             + item.sku + '">&times;</a></td></tr>');
       }
     }
@@ -37,12 +37,13 @@ function clearCartSubmit() {
   document.getElementById('cartForm').submit();
 }
 
-  
+function deleteRow(r) {
+    var row = r.parentNode.parentNode.rowIndex;
+    document.getElementById('cart-table').deleteRow(row);
+  }
 
 $(function () {
   updateCart();
-
-
 
   // When an item is clicked, open a modal with the item information
   $(".openModal").click(function() {
@@ -108,15 +109,6 @@ $(function () {
     $('#qtyModal').hide();
 
   });
-  
-  $('#cartModal tbody a.remove_item').click(function remove_row(e) {
-    e.preventDefault();  
-    var id = $(this).data('target');
-    console.log(id);
-    $(id).remove();
-  });
- 
-
 
 });
 
