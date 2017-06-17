@@ -1,33 +1,39 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, g
+from flask_babel import Babel
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
-import os
-import copy
-import re
 from forms import LoginForm, RetrievalForm, AddUserForm
-import csv
+import os, copy, re, csv
 # from flask.ext.cache import Cache
 
-app = Flask(__name__)
-app.config['DEBUG'] = True
 
-app.secret_key = "development-key"
-
+##########################
+##        CONFIG        ##
+##########################
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_object('config.DevConfig') # default configurations
+app.config.from_pyfile('myConfig1.cfg') # override with instanced configuration (in "/instance"), if any
 
+# Babel init
+babel = Babel(app)
+
+# mysql init
 mysql = MySQL()
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'classroom'
-app.config['MYSQL_DATABASE_DB'] = 'Ascott_InvMgmt'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
-adminmode = False
 
+
+adminmode = False
 role = ""
 
-#----------------------------METHODS-------------------------
+###########################
+##        METHODS        ##
+###########################
+
+# TODO: encapsulate all methods in separate classes and .py files
+
 # Returns all the items based on category and amount in or out within the last month for each item
 def getAllInventory(category):
 	conn = mysql.connect()
@@ -182,12 +188,8 @@ def getChartData():
 
 # true if user is authenticated, else false
 def auth():
-	# print session.keys()[0], type(session.keys()[0])
 	if u'logged_in' in session:
-		# print session['logged_in'], type(session['logged_in'])
 		return session['logged_in']
-	# else:
-		# print "You're not logged in"
 	return False
 
 # wrapper function for route redirection
@@ -196,32 +198,58 @@ def filter_role(roles_routes):
 		if session['role'] == k:
 			return redirect(v)
 
-#----------------------------ROUTING ------------------------
-
-@app.template_filter('quoted')
-def quoted(s):
-    l = re.findall('\'([^\']*)\'', str(s))
+@app.template_filter('lang_strip')
+def lang_strip(s):
+    l = re.search(r"(?m)(?<=(en\/)|(zh\/)|(ms\/)|(ta\/)).*$", str(s.encode('ascii')))
     if l:
-        return l[0]
+        return l.group()
     return None
+
+
+
+@app.before_request
+def before():
+	# localization setting
+	if request.view_args and 'lang_code' in request.view_args:
+	    if request.view_args['lang_code'] not in ('en', 'ms', 'ta', 'zh'):
+	    	g.current_lang = "en" # default localisation
+	        # return abort(404)
+	    else:
+	    	g.current_lang = request.view_args['lang_code']
+	    	session["lang_code"] = g.current_lang
+	    	request.view_args.pop('lang_code')
+
+	# user authentication
+	if u'logged_in' not in session:
+		session["logged in"] = False
+
+
+@babel.localeselector
+def get_locale():
+    return g.get('current_lang', 'en')
+
+
+##########################
+##        ROUTES        ##
+##########################
+
 
 @app.route('/')
 def hello():
-	# # user authentication
-	logged_in = auth()
-	if not logged_in:
-		return redirect('/login')
+	# user authentication
+	# logged_in = auth()
+	if not session["logged in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
 	else:
 		# user already logged in previously
 		if session['role'] == "supervisor":
-			return redirect('/dashboard')
+			return redirect(url_for("dashboard", lang_code=session["lang_code"]))
 		elif session['role'] == "attendant":
-			return redirect('/scan')
+			return redirect(url_for("scan", lang_code=session["lang_code"]))
 
-@app.route('/login', methods=["GET", "POST"])
+@app.route('/<lang_code>/login', methods=["GET", "POST"])
 def login():
 	
-	error = ""
 	# create a login form to collect username & password
 	form = LoginForm()
 
@@ -243,12 +271,12 @@ def login():
 			if data is None: 
 				# username does not match records
 				flash('User does not exist')
-				return redirect('/login')
+				return redirect(url_for("login", lang_code=get_locale()))
 
 			elif password != data[1]:
 				# password does not match records
 				flash('Incorrect password')
-				return redirect('/login')
+				return redirect(url_for("login", lang_code=get_locale()))
 
 			else:
 				# username & password match
@@ -261,25 +289,25 @@ def login():
 
 				# check role
 				if data[2] == "supervisor":
-					return redirect('/dashboard')
+					return redirect(url_for("dashboard", lang_code=get_locale()))
 				elif data[2] =="attendant":
-					return redirect('/scan')
+					return redirect(url_for("scan", lang_code=get_locale()))
 
-	elif request.method =="GET":
+	elif request.method == "GET":
 
-	# 	# # user authentication
+		# user authentication
 		logged_in = auth()
 		if not logged_in:
 			return render_template('login.html', form=form)
 		else:
 			# user already logged in previously
 			if session['role'] == "supervisor":
-				return redirect('/dashboard')
+				return redirect(url_for("dashboard", lang_code=get_locale()))
 			elif session['role'] == "attendant":
-				return redirect('/scan')
+				return redirect(url_for("scan", lang_code=get_locale()))
 
 
-@app.route('/admin', methods=["GET","POST"])
+@app.route('/<lang_code>/admin', methods=["GET","POST"])
 def admin():
 
 	form = AddUserForm()
@@ -315,13 +343,13 @@ def admin():
 
 
 
-@app.route('/dashboard')
+@app.route('/<lang_code>/dashboard')
 def dashboard():
 
 	# user authentication
 	logged_in = auth()
 	if not logged_in:
-		return redirect('/login')
+		return redirect(url_for("login", lang_code=get_locale()))
 
 	i = getInventoryLow()
 	l=0
@@ -331,7 +359,7 @@ def dashboard():
 	return render_template('dashboard.html', items = i, logs = l)
 
 
-@app.route('/inventory/')
+@app.route('/<lang_code>/inventory')
 def inventory():
 	# conn = mysql.connect()
 	# cursor = conn.cursor()
@@ -365,7 +393,7 @@ def inventory():
 		hampers = hampers,
 		kitchenware = kitchenware)
 
-@app.route('/inventory/<int:sku>')
+@app.route('/<lang_code>/inventory/<int:sku>')
 def item(sku):
 
 	# user authentication
@@ -387,7 +415,7 @@ def item(sku):
 	except:
 		return render_template('item.html', name = None)
 
-@app.route('/review/<category>')
+@app.route('/<lang_code>/review/<category>')
 def category(category):
 	category = category
 	itemtype = getAllInventory(category)
@@ -395,7 +423,7 @@ def category(category):
 		role = role,
 		user = session['username'])
 
-@app.route('/review')
+@app.route('/<lang_code>/review')
 def review():
 	supplies = getAllInventory('Guest Supplies')
 	hampers = getAllInventory('Guest Hampers')
@@ -405,13 +433,13 @@ def review():
 		kitchenware = kitchenware, user=session['username'])
 
 
-@app.route('/logs')
+@app.route('/<lang_code>/logs')
 def logs():
 
 	# user authentication
 	logged_in = auth()
 	if not logged_in:
-		return redirect('/login')
+		return redirect(url_for("login", lang_code=get_locale()))
 
 	logs=getAllLogs()
 	# names=getUniqueNames()
@@ -422,19 +450,19 @@ def logs():
 		user = session['username'])
 	# names=names, items=items)
 
-@app.route('/scan')
+@app.route('/<lang_code>/scan')
 def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
-@app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
+@app.route('/<lang_code>/shelves/<tag_id>/', methods=['GET', 'POST'])
 # @cache.cached(timeout=50)
 def shelf(tag_id):
 
 	# user authentication
 	logged_in = auth()
 	if not logged_in:
-		return redirect('/login')
+		return redirect(url_for("login", lang_code=get_locale()))
 
 	if request.method == 'GET':
 
@@ -456,7 +484,7 @@ def shelf(tag_id):
 			user = session['username'], 
 			location = tag_id)
 	else:
-		return redirect('/scan')
+		return redirect(url_for("scan", lang_code=get_locale()))
 
 
 # @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
@@ -511,7 +539,7 @@ def shelf(tag_id):
 @app.route('/logout')
 def logout():
 	session.clear()
-	return redirect('/login')
+	return redirect(url_for("login", lang_code=get_locale()))
 
 
 @app.errorhandler(404)
