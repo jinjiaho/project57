@@ -25,7 +25,9 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 adminmode = False
 
-role = ""
+
+#---------------------------GLOBAL VARIABLES----------------------
+ role = ""
 
 #----------------------------METHODS-------------------------
 # Returns all the items based on category and amount in or out within the last month for each item
@@ -160,7 +162,6 @@ def getChartData():
 
 		return jsonify(responseData)
 
-
 # true if user is authenticated, else false
 def auth():
 	# print session.keys()[0], type(session.keys()[0])
@@ -176,6 +177,10 @@ def filter_role(roles_routes):
 	for k,v in roles.items():
 		if session['role'] == k:
 			return redirect(v)
+
+# case query for mobile input
+def input_handler(qty, user):
+	query = 'UPDATE Items SET qty_left = CASE WHEN action'
 
 #----------------------------ROUTING ------------------------
 
@@ -408,7 +413,27 @@ def shelf(tag_id):
 	if not logged_in:
 		return redirect('/login')
 
-	if request.method == 'GET':
+	if request.method == 'POST':
+		now = datetime.now()
+		form_data = request.form
+		user = session['username']
+		
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		for item, qty in form_data.iteritems():
+			cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location="+tag_id+";")
+			qty_left = cursor.fetchone()[0]  - qty
+			if (qty_left > 0):
+				# query for stock out
+				cursor.execute("UPDATE Items SET qty_left = (qty_left - "+qty") WHERE qty_left - "+ qty+" >= 0 AND sku="+item+" AND location="+tag_id+";");
+				# create log for each item
+				cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
+			else:
+				flash('Not enough in store!')
+
+		return redirect('/scan')
+
+	else:
 
 		conn = mysql.connect()
 		cursor = conn.cursor()
@@ -427,8 +452,7 @@ def shelf(tag_id):
 			role = role,
 			user = session['username'], 
 			location = tag_id)
-	else:
-		return redirect('/scan')
+	
 
 
 # @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
