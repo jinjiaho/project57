@@ -112,6 +112,7 @@ a.thumbnail.active, a.thumbnail:focus, a.thumbnail:hover, a:focus, a:hover {
 {% endif %}
 
 <!-- If there are items running low, display those items -->
+<div class="row" style="margin-left:0; margin-right:0">
 <div id="overview-item-outer">
 {% for i in items %}
 <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
@@ -128,7 +129,7 @@ a.thumbnail.active, a.thumbnail:focus, a.thumbnail:hover, a:focus, a:hover {
   </div>
 </a>
 {% endfor %}
-</div>
+</div></div>
 
 <!-- 2nd header: Today's transactions -->
 <div class="row">

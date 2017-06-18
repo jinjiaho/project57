@@ -19,6 +19,7 @@ app.config.from_pyfile('myConfig1.cfg') # override with instanced configuration 
 
 # Babel init
 babel = Babel(app)
+languages = ('en', 'zh', 'ms', 'ta')
 
 # mysql init
 mysql = MySQL()
@@ -96,27 +97,6 @@ def getAllLogs():
 	things = []
 	
 	for row in data:
-
-# # <<<<<<< HEAD
-# 		cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE sku = {};".format(str(row[5])))
-# 		item_data=cursor.fetchall()
-# 		# print(item_data)
-		# print(item_data[0])
-		# print(item_data[1])
-
-# 		things.append(
-# 				{"name": row[0].encode('ascii'),
-# 				"dateTime": row[1],
-# 				"action":row[2],
-# 				"move":row[3],
-# 				"remaining":row[4],
-# 				"item":item_data[0][0].encode('ascii'),
-# 				"category":item_data[0][1].encode('ascii'),
-# 				"location":row[6]})
-# # =======
-		# cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE name = {};".format(str(row[5])))
-		# item_data=cursor.fetchone()
-
 		things.append({"name": row[0].encode('ascii'),
 			"dateTime": row[1],
 			"action":row[2],
@@ -124,10 +104,8 @@ def getAllLogs():
 			"remaining":row[4],
 			"item":row[5].encode('ascii'),
 			"location":row[6]})
-		print(things)
+		# print(things)
 			
-# >>>>>>> 3684797bc005be1436e23565ece904543746d7b6
-
 	return things
 		
 
@@ -211,7 +189,7 @@ def lang_strip(s):
 def before():
 	# localization setting
 	if request.view_args and 'lang_code' in request.view_args:
-	    if request.view_args['lang_code'] not in ('en', 'ms', 'ta', 'zh'):
+	    if request.view_args['lang_code'] not in languages:
 	    	g.current_lang = "en" # default localisation
 	        # return abort(404)
 	    else:
@@ -221,7 +199,7 @@ def before():
 
 	# user authentication
 	if u'logged_in' not in session:
-		session["logged in"] = False
+		session["logged_in"] = False
 
 
 @babel.localeselector
@@ -237,11 +215,10 @@ def get_locale():
 @app.route('/')
 def hello():
 	# user authentication
-	# logged_in = auth()
-	if not session["logged in"]:
+	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
 	else:
-		# user already logged in previously
+		# user already logged_in previously
 		if session['role'] == "supervisor":
 			return redirect(url_for("dashboard", lang_code=session["lang_code"]))
 		elif session['role'] == "attendant":
@@ -296,11 +273,10 @@ def login():
 	elif request.method == "GET":
 
 		# user authentication
-		logged_in = auth()
-		if not logged_in:
-			return render_template('login.html', form=form)
+		if not session["logged_in"]:
+			return render_template("login.html", form=form)
 		else:
-			# user already logged in previously
+			# user already logged_in previously
 			if session['role'] == "supervisor":
 				return redirect(url_for("dashboard", lang_code=get_locale()))
 			elif session['role'] == "attendant":
@@ -339,7 +315,10 @@ def admin():
 
 
 	elif request.method =="GET":
-		return render_template('admin.html', form=form)
+		if not session["logged_in"]:
+			return redirect(url_for("login", lang_code=session["lang_code"]))
+		else:
+			return render_template('admin.html', form=form)
 
 
 
@@ -354,7 +333,6 @@ def dashboard():
 	i = getInventoryLow()
 	l=0
 	# l = getLogs()
-
 
 	return render_template('dashboard.html', items = i, logs = l)
 
@@ -380,9 +358,8 @@ def inventory():
 	# print(items)
 
 	# user authentication
-	logged_in = auth()
-	if not logged_in:
-		return redirect('/login')
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
 			
 	# get current list of all items listed in db
 	supplies = getAllInventory('Guest Supplies')
@@ -397,26 +374,37 @@ def inventory():
 def item(sku):
 
 	# user authentication
-	logged_in = auth()
-	if not logged_in:
-		return redirect('/login')
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
 
 	name = item
 	cursor = mysql.connect().cursor()
 
-	query = "SELECT name FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
+	query = "SELECT name, category, picture, location FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
 	cursor.execute(query)
 	data = cursor.fetchall()
+	d = [[s.encode('ascii') for s in list] for list in data]
 
-	print data
+	r = []
+	for i in data:
+		r.append({"name": i[0].encode('ascii'),
+			"category": i[1].encode('ascii'),
+			"picture": i[2].encode('ascii'),
+			"location": i[3].encode('ascii')})
+
+	# print d
 	try:
-		name = data[0][0]
-		return render_template('item.html', name = name)
+		return render_template('v2/item.html', item = r)
 	except:
-		return render_template('item.html', name = None)
+		return render_template('v2/item.html', item = None)
 
 @app.route('/<lang_code>/review/<category>')
 def category(category):
+
+	# user authentication
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
+
 	category = category
 	itemtype = getAllInventory(category)
 	return render_template('category.html', category=category, itemtype=itemtype, 
@@ -425,6 +413,11 @@ def category(category):
 
 @app.route('/<lang_code>/review')
 def review():
+
+	# user authentication
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
+
 	supplies = getAllInventory('Guest Supplies')
 	hampers = getAllInventory('Guest Hampers')
 	kitchenware = getAllInventory('Kitchenware')
@@ -437,9 +430,8 @@ def review():
 def logs():
 
 	# user authentication
-	logged_in = auth()
-	if not logged_in:
-		return redirect(url_for("login", lang_code=get_locale()))
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
 
 	logs=getAllLogs()
 	# names=getUniqueNames()
@@ -452,6 +444,11 @@ def logs():
 
 @app.route('/<lang_code>/scan')
 def scanner():
+
+	# user authentication
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
+
 	return render_template('scanner.html')
 
 # RA shelf view
@@ -460,9 +457,8 @@ def scanner():
 def shelf(tag_id):
 
 	# user authentication
-	logged_in = auth()
-	if not logged_in:
-		return redirect(url_for("login", lang_code=get_locale()))
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
 
 	if request.method == 'GET':
 
