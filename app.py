@@ -53,7 +53,8 @@ def getAllInventory(category):
 		remaining_quantity = item[2]
 		initial_quantity = remaining_quantity + delivered_out - recieved
 		items.append(
-			{"name": item[1],
+			{"sku": item[0],
+			"name": item[1],
 			"remaining": item[2],
 			"unit": item[3],
 			"starting": initial_quantity,
