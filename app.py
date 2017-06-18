@@ -34,7 +34,7 @@ def getAllInventory(category):
 	cursor = conn.cursor()
 
 	cursor.execute(
-		"SELECT sku, name, qty_left, unit, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+		"SELECT sku, name, qty_left, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
 	items = []
 	for item in data:
@@ -58,7 +58,8 @@ def getAllInventory(category):
 			"starting": initial_quantity,
 			"recieved": recieved,
 			"demand": delivered_out,
-			"file": item[4]})
+			"picture": item[4].encode('ascii'),
+			"category": item[5].encode('ascii')})
 		
 	return items
 
@@ -327,7 +328,7 @@ def dashboard():
 	# l = getLogs()
 
 
-	return render_template('dashboard.html', items = i, logs = l)
+	return render_template('v2/dashboard.html', items = i, logs = l)
 
 
 @app.route('/inventory/')
@@ -375,16 +376,18 @@ def item(sku):
 	name = item
 	cursor = mysql.connect().cursor()
 
-	query = "SELECT name FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
+	query = "SELECT name,category,picture FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
 	cursor.execute(query)
 	data = cursor.fetchall()
 
-	print data
+	print(data)
 	try:
 		name = data[0][0]
-		return render_template('v2/item.html', name = name)
+		category = data[0][1]
+		picture = data[0][2]
+		return render_template('item.html', name = name, category=category, picture=picture)
 	except:
-		return render_template('v2/item.html', name = None)
+		return render_template('item.html', name = None)
 
 @app.route('/review/<category>')
 def category(category):
