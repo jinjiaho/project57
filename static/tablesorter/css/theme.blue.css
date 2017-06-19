@@ -173,9 +173,7 @@ caption {
 }
 /* optional disabled input styling */
 .tablesorter-blue .tablesorter-filter-row .disabled {
-	opacity: 0.5;
-	filter: alpha(opacity=50);
-	cursor: not-allowed;
+	display: none;
 }
 /* hidden filter row */
 .tablesorter-blue .tablesorter-filter-row.hideme td {

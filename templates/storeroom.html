@@ -21,6 +21,10 @@
   margin: 0;
 }
 
+a:focus {
+  outline: none;
+}
+
 </style>
 <div class="content">
     <div class="container-fluid">
@@ -51,7 +55,7 @@
 <div id="qtyModal" class="modal fade" data-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="qtyForm">
+            <form id="qtyForm" data-role={{role}}>
                 <div class="modal-header">
                     <span class="close" data-dismiss="modal">&times;</span>
                     <h4 id="form-header"></h4>
@@ -62,6 +66,9 @@
                         <input id="modal-input-name" type="hidden" name="item" value="" />
                         <input id="modal-input-qty" type="number" name="qty" value="" placeholder="Enter quantity"/>
                         <input id="modal-input-sku" type="hidden" name="sku" value="" />
+                        <input type="radio" name="action" value="in" />In
+                        <input type="radio" name="action" value="out" checked/>Out
+                        <input type="radio" name="action" value="check" />Check
                     </div>
                 </div>
                 <div class="modal-footer" align="center" style="margin-top: 15px;">
@@ -76,7 +83,7 @@
 <div id="cartModal" class="modal fade" data-backdrop="false">
   <div class="modal-dialog">
     <div class="modal-content">
-        <form>
+        <form method='POST' id="cartForm">
           <div class="modal-header">
             <span class="close" data-dismiss="modal">&times;</span>
             <h4 id="form-header">Cart</h4>
@@ -85,7 +92,11 @@
             <table id="cart-table" class="table table-hover">
               <thead>
                 <th>Item</th>
+                <th></th>
                 <th>Qty</th>
+                <!-- {% if role=='supervisor' %}
+                <th>Action</th>
+                {% endif %} -->
                 <th></th>
               </thead>
               <tbody>
@@ -94,7 +105,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss='modal' value="close">Close</button>
-            <button type="submit" class="btn btn-success" value="submit">Confirm</button>
+            <button type="button" onclick="clearCartSubmit()" class="btn btn-success" value="submit">Confirm</button>
           </div>
         </form>
     </div>

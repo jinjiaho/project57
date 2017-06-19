@@ -1,0 +1,76 @@
+<style>
+body { 
+	padding-top: 80px;
+}
+</style>
+
+<nav class="navbar navbar-default navbar-fixed-top" roles="navigation"><div class="container-fluid">
+
+		<!-- NAVBAR TITLE -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" style="padding:5px 15px;"><img alt="Ascott" src="/static/img/favicon.png" style="max-height:40px;"></a>
+        </div>
+
+        <!-- Collect nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav" id="nav-left">
+
+				<!-- Dashboard -->
+				<li>
+			  	<a href="/{{g.current_lang}}/dashboard">{{_('Overview')}}</a>
+				</li>
+
+				<!-- Inventory -->
+				<li>
+			  	<a href="/{{g.current_lang}}/inventory">{{_('Inventory')}}</a>
+			  	</li>
+
+
+
+				<!-- Logs -->
+				<li>
+			  	<a href="/{{g.current_lang}}/logs">{{_('Logs')}}</a>
+				</li>
+
+				<!-- Review/Reports -->
+				<li class="dropdown">
+				<a href="" class="dropdown-toggle" data-toggle="dropdown">{{_('Reports')}}<b class="caret"></b></a>
+				<ul class="dropdown-menu">
+			  		<li><a href="/{{g.current_lang}}/review/Guest Supplies">Guest Supplies</a></li>
+			  		<li><a href="/{{g.current_lang}}/review/Guest Hampers">Guest Hampers</a></li>
+			  		<li><a href="/{{g.current_lang}}/review/Kitchenware">Kitchenware</a></li>
+			  	</ul>
+				</li>
+
+				<!-- Admin -->
+				<li>
+			  	<a href="/{{g.current_lang}}/admin">{{_('Admin')}}</a>
+				</li>
+
+            </ul>
+
+				<!-- Account info/logout -->
+				<ul class="nav navbar-nav navbar-right" id="nav-right">
+					<li class="dropdown">			
+						<a href="" class="dropdown-toggle" data-toggle="dropdown">
+							{{_('Logged in as')}}  <b>{{session['name']}}</b> <b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href='/logout' onclick='changeRefreshInterval(0);'>{{_('Logout')}}</a></li>
+		 					<li role="seperator" class="divider"></li>
+							<li><a href='/en/{{request.path | lang_strip}}'>English</a></li>
+							<li><a href='/zh/{{request.path | lang_strip}}'>中文</a></li>
+							<li><a href='/ms/{{request.path | lang_strip}}'>Bahasa Melayu</a></li>
+							<li><a href='/ta/{{request.path | lang_strip}}'>தமிழ்</a></li>
+						</ul>
+					</li>
+				</ul>
+
+        </div>
+
+</div></nav>

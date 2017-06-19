@@ -34,7 +34,7 @@
               <div class="content all-icons panel">
                   <div class="row">
                     {% for item in supplies %}
-                    <a href="{{item.name}}">
+                    <a href="{{item.sku}}">
                       <div class="font-icon-list col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <div class="alert alert-danger">
                           <div class="img-wrapper" align='center'>
@@ -50,7 +50,7 @@
                     {% endfor %}
                   </div>
                   <div class="row">
-                      <a href="Guest Supplies">
+                      <a href="/review/Guest Supplies">
                         <div class="btn-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12" align="center">
                           <button class="btn btn-default btn-block" id="btn_getData">Month Review</button>
                         </div>
@@ -63,12 +63,12 @@
           
           <div class="card sup-view">
               <button class="header accordion">
-                  <h4 class="title">Guest Hamper</h4>
+                  <h4 class="title">Guest Hampers</h4>
               </button>
               <div class="content all-icons panel">
                   <div class="row">
                     {% for item in hampers %}
-                    <a href="{{item.name}}">
+                    <a href="{{item.sku}}">
                       <div class="font-icon-list col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <div class="alert alert-warning">
                           <div class="img-wrapper" align='center'>
@@ -84,7 +84,7 @@
                     {% endfor %}
                   </div>
                   <div class="row">
-                    <a href="Guest Hampers">
+                    <a href="/review/Guest Hampers">
                       <div class="btn-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12" align="center">
                         <button class="btn btn-default btn-block" id="btn_getData">Month Review</button>
                       </div>
@@ -102,7 +102,7 @@
               <div class="content all-icons panel">
                   <div class="row">
                     {% for item in kitchenware %}
-                    <a href="{{item.name}}">
+                    <a href="{{item.sku}}">
                       <div class="font-icon-list col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <div class="alert alert-warning">
                           <div class="img-wrapper" align='center'>
@@ -118,7 +118,7 @@
                     {% endfor %}
                   </div>
                   <div class="row">
-                    <a href="Kitchenware">
+                    <a href="/review/Kitchenware">
                     <div class="btn-wrapper col-lg-12 col-md-12 col-sm-12 col-xs-12" align="center">
                       <button class="btn btn-default btn-block" id="btn_getData">Month Review</button>
                     </div></a>

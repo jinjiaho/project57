@@ -1,200 +1,186 @@
-{% extends "base.html" %}
-
-{% block title %}Dashboard{% endblock %}
-
-<style>
-
-</style>
-<div class="sidebar-wrapper">
-    <div class="logo">
-        <a href="" class="simple-text" style="text-align:left;">
-        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
-            Supervisor
-        </a>
-    </div>
-
-    <ul class="nav">
-        <li class="active">
-            <a href="/">
-                <i class="pe-7s-graph"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
-        <li>
-            <a href="/inventory">
-                <i class="pe-7s-rocket"></i>
-                <p>Inventory</p>
-            </a>
-        </li>
-        <li>
-            <a href="/logs">
-                <i class="pe-7s-news-paper"></i>
-                <p>Logs</p>
-            </a>
-        </li>
-                <li>
-            <a href="/tasks">
-                <i class="pe-7s-note2"></i>
-                <p>Tasks</p>
-            </a>
-        </li>
-        <li>
-            <a href="/">
-                <i class="pe-7s-power"></i>
-                <p>Log Out</p>
-            </a>
-        </li>
-        
-    </ul>
-</div>
+{% extends "v2/base.html" %}
 
 {% block content %}
-<div class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <style>
-                .all-icons .sup-detail input{
-                    color: #f30615;
-                }
-            </style>
+<style>
 
-            <div class="col-md-12">
-                <div class="card">
-                    <a href="{{url_for('inventory')}}"><div class="header">
-                        <h4 class="title">Running Low</h4>
-                        <p class="category"></p>
-                    </div></a>
-                    <div class="content all-icons">
-                        <div class="row">
-                            <div class="sup-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                                <a href="/inventory/Ascott%20Pen">
-                                    <div class="sup-detail alert alert-danger">
-                                        <div class="img-wrapper">
-                                            <img src="/static/img/items/Guest Supplies/Ascott Pen.jpg"/>
-                                        </div>
-                                        <div class="alert-group">
-                                            <div class="alert-label">Pen</div>
-                                            <div class="alert-number">47</div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="sup-list col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xs-12">
-                                <a href="/inventory/Shaving%20Kit">
-                                    <div class="sup-detail alert alert-danger">
-                                        <div class="img-wrapper">
-                                            <img src="/static/img/items/Guest Supplies/Shaving Kit.jpg"/>
-                                        </div>
-                                        <div class="alert-group">
-                                            <div class="alert-label">Shaving Kit</div>
-                                            <div class="alert-number">50</div>
-                                        </div>
-                                    </div>
-                                </a>
+a.thumbnail {
+    border: 1.5px solid #ddd;
+}
 
-                            </div>
-                            <div class="sup-list col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xs-12">
-                                <a href="/inventory/Milk">
-                                    <div class="sup-detail alert alert-danger">
-                                        <div class="img-wrapper">
-                                            <img src="/static/img/items/Guest Hampers/Milk (1L).jpg"/>
-                                        </div>
-                                        <div class="alert-group">
-                                            <div class="alert-label">Milk</div>
-                                            <div class="alert-number">26</div>
-                                        </div>
-                                    </div>
-                                </a>
+a.thumbnail > img {
+    max-width: 120px;
+}
 
-                            </div>
-                        </div>
-                        <div class="footer">
-                            <hr>
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Updated 3 minutes ago
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+.sup-view .font-icon-list {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.overview-item-group {
+  min-height: 120px;
+}
+
+.overview-item-img {
+  float: left;
+  max-height: 100px;
+  margin-bottom: 5px;
+  width: calc(40%);
+}
+
+.overview-item-img img {
+  max-height: 90px;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.alert-group {
+  width: calc(60%);
+  float: left;
+  align-content: center;
+  vertical-align: middle;
+  padding-left: 10px;
+  position: relative;
+    display: inline-block;
+}
+
+.overview-item-label {
+  max-height: 41px;
+  /*text-align:center;*/
+  margin: 10px auto;
+  overflow: hidden;
+}
+
+.overview-item-number {
+  font-size: 24pt;
+  width: 100%;
+  position: relative;
+  bottom: 10px;
+  /*text-align:center;*/
+  margin-top: 10px;
+}
+
+.alert-danger {
+    border: 2px solid  #EA4858;
+  /*background-color: #EA4858;*/
+  background-color: white;
+}
+
+.alert-warning {
+    border: 2px solid #ffc600;
+  /*background-color: #ffc600;*/
+  background-color: white;
+
+}
 
 
+</style>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card ">
-                    <a href="/logs"><div class="header">
-                        <h4 class="title">Recent Activity</h4>
-                        <p class="category">Latest inventory movement</p>
-                    </div></a>
-                    <div class="">
-                        <table id="recent">
-                            <thead>
-                                <th>Name</th>
-                                <th>Item</th>
-                                <th>Qty</th>
-                                <th>In/Out</th>
-                                <th>Date-Time</th>
-                                <th>Qty Left</th>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Ah Moi</td>
-                                    <td>Conditioner</td>
-                                    <td>3</td>
-                                    <td>Out</td>
-                                    <td>3 minutes ago</td>
-                                    <td>98</td>
-                                </tr>
-                                <tr>
-                                    <td>Nisha</td>
-                                    <td>Shampoo</td>
-                                    <td>5</td>
-                                    <td>Out</td>
-                                    <td>2 hours ago</td>
-                                    <td>134</td>
-                                </tr>
-                                <tr>
-                                    <td>Sok Ting</td>
-                                    <td>Toothbrush</td>
-                                    <td>10</td>
-                                    <td>Out</td>
-                                    <td>At 4pm yesterday</td>
-                                    <td>253</td>
-                                </tr>
-                            </tbody>
-                        </table>
+<div class="container">
 
-                        <div class="footer">
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Updated 3 minutes ago
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <style>
-                table {
-                    margin-bottom: 0 !important;
-                }
-
-                td:first-child {
-                    padding-left: 5px !important;
-                }
-            </style>
-        </div>
-    </div>
+<!-- 1st header: Low inventory -->
+<div class="row">
+<div class="col-xs-7">
+    <h3 style="margin-bottom:0px;">{{_('Low inventory')}}</h3>
 </div>
+<div class="col-xs-5">
+    <div class="pull-right" style="margin-top:25px;">
+        <a href="inventory">{{_('View all items')}} <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
+    </div><!-- /input-group -->
+</div>
+</div><hr>
 
+<!-- If no items running low, display this text -->
+{% if not items %}
+<div class="col-md-12 text-center">
+    <h3 class="text-info">{{_('No items in need of restocking')}}</h3>
+</div>
+{% endif %}
+
+<!-- If there are items running low, display those items -->
+<div class="row" style="margin-left:0; margin-right:0">
+<div id="overview-item-outer">
+{% for i in items %}
+<a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+  <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
+    <div class="overview-item-group alert {% if i.qty_left > i.reorder_pt and i.qty_left <= 1.2*i.reorder_pt %}alert-warning{% endif %}{% if i.qty_left <= i.reorder_pt%}alert-danger{% endif %}">
+      <div class="overview-item-img" align='center'>
+        <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
+      </div>
+      <div class="alert-group pull-right">
+        <div class="overview-item-label">{{i.name}}</div>
+        <div class="overview-item-number">{{i.qty_left}}</div>
+      </div>
+    </div>
+  </div>
+</a>
+{% endfor %}
+</div></div>
+
+<!-- 2nd header: Today's transactions -->
+<div class="row">
+<div class="col-xs-7">
+    <h3 style="margin-bottom:0px;">{{_("Today's transactions")}}</h3>
+</div>
+<div class="col-xs-5">
+    <div class="pull-right" style="margin-top:25px;">
+        <a href="logs">{{_('View more')}} <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
+    </div><!-- /input-group -->
+</div>
+</div><hr>
+
+<!-- Table of transactions -->
+<div class="col-md-12" style="margin-bottom:30px;"><table id="recent">
+    <thead>
+        <th>Name</th>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>In/Out</th>
+        <th>Date-Time</th>
+        <th>Qty Left</th>
+    </thead>
+    <tbody>
+    {% for log in l %}
+        <tr>
+                                <td>{{log.name}}</td>
+                                <td>{{log.item}}</td>
+                                <td>{{log.category}}</td>
+                                <td>{{log.action}}</td>
+                                <td>{{log.move}}</td>
+                                <td>{{log.remaining}}</td>
+                                <td>{{log.dateTime}}</td>
+                                <td>{{log.location}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table></div>
+
+
+
+</div><!-- /.container -->
 <script>
 $(document).ready(function() { 
+
+    // initialise log table
     $("#recent").tablesorter({
         sortList: [[4,1]],
         showProcessing: true,
         widgets: ["filter"]
-    }); 
+    });
+
+    // filter 
+    // var items = $('#overview-item-outer a');
+    // $('#overview-filter').keyup(function() {
+
+    //     $('#overview-item-outer a').children('div').show();
+    //     var filter = $("#overview-filter").val().toLowerCase();
+
+    //     if (filter != '') {
+    //         items.filter(function() {
+    //             return $(this).find("#overview-item-label").text().toLowerCase().contains(filter);
+    //         }).hide();
+    //     }
+    // });
+
 });
 </script>
 
