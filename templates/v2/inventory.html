@@ -55,7 +55,7 @@
             <button class="btn btn-default header accordion btn-block" id="accordion" >
               <h4>Guest Supplies</h4>
             </button>
-            <div class="card">
+            <div class="content panel all-icons" style="display:none;">
                 <div class="row">
                   {% for item in supplies %}
                   <a href="/{{g.current_lang}}/inventory/{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
@@ -83,7 +83,7 @@
             <button class="btn btn-default header accordion btn-block" >
               <h4>Guest Hampers</h4>
             </button>
-            <div class="card">
+            <div class="card" style="display:none;">
                 <div class="row">
                   {% for item in hampers %}
                   <a href="/{{g.current_lang}}/inventory/{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
@@ -109,7 +109,7 @@
             <button class="btn btn-default header accordion btn-block" >
               <h4>Kitchenware</h4>
             </button>
-            <div class="card">
+            <div class="card" style="display:none;">
                 <div class="row">
                   {% for item in kitchenware %}
                   <a href="/{{g.current_lang}}/inventory/{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
