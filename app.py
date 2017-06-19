@@ -3,7 +3,7 @@ from flask_babel import Babel
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
-from forms import LoginForm, RetrievalForm, AddUserForm
+from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation
 import os, copy, re, csv
 # from flask.ext.cache import Cache
 
@@ -259,6 +259,7 @@ def login():
 	form = LoginForm()
 
 	if request.method == "POST":
+
 		if form.validate() == False:
 			return render_template("login.html", form=form)
 		else: 
@@ -272,13 +273,14 @@ def login():
 			# check if user and pass data is correct by executing the db
 			# data is stored as a tuple
 			data = cursor.fetchone()
-	
+			
 			if data is None: 
 				# username does not match records
 				flash('User does not exist')
 				return redirect(url_for("login", lang_code=get_locale()))
 
-			elif password != data[1]:
+			# elif password != hashpass:
+			elif check_password_hash(data[1],password) ==False:
 				# password does not match records
 				flash('Incorrect password')
 				return redirect(url_for("login", lang_code=get_locale()))
@@ -315,38 +317,143 @@ def login():
 def admin():
 
 	form = AddUserForm()
-	if request.method=="POST":
-		if form.validate == False:
-			return render_template('admin.html', form=form)
-		else:
-			username=form.username.data
-			password=form.password.data
-			role=form.role.data
-			name=form.name.data
+	form2 = CreateNewItem()
+	form3 =AddNewLocation()
 
-			newuser=[username,password,role,name]
-			
+	#--------------users table-------------------------
+	conn = mysql.connect()
+	cursor = conn.cursor()
 
-			conn = mysql.connect()
-			cursor = conn.cursor()
+	cursor.execute("SELECT role, name FROM Ascott_InvMgmt.User;")
 
-			# TODO: string parameterisation
-			query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
+	data = cursor.fetchall()
+	# print(data)
+	things = []
+	for item in data:
+		things.append(
+			{"role": item[0],
+			"name": item[1]})
 
-			# query = "INSERT INTO User (username,password,role,name) VALUES ();"
+#-------------NFCID----------------------------------
 
-			cursor.execute(query)
-			# cursor.execute("COMMIT")
-			return "congrats"
+	cursor.execute("SELECT location FROM Ascott_InvMgmt.Items;")
 
-			
+	data1 = cursor.fetchall()
+	data2 = list(set(list(data1))) #displays all unique NFC id tags.
+	
+	NFCs=[]
+	group={}
+	items=[]
+	
+
+	for idNFC in data2:
+		NFCs.append(
+			{"NFC": idNFC[0].encode('ascii')})
+	
+	for i in NFCs:
+		 
+		val = i['NFC'] #details of NFC location 
+
+		#fetch all item names pertaining to the tag.
+		cursor.execute("SELECT name FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(val))
+		data3=cursor.fetchall()
+		
+		group[val] = data3
 
 
-	elif request.method =="GET":
+	if request.method =="GET":
+
+		# user authentication
 		if not session["logged_in"]:
 			return redirect(url_for("login", lang_code=session["lang_code"]))
-		else:
-			return render_template('admin.html', form=form)
+
+		cursor.execute("SELECT DISTINCT name FROM Ascott_InvMgmt.Items;")
+		items = cursor.fetchall()
+		# print (items)
+		flat_items = [item.encode('ascii') for sublist in items for item in sublist]
+		return render_template('admin.html', form=form, form2=form2,form3=form3, users=things, group=group, item_list=flat_items)
+
+	
+
+	elif request.method == "POST":
+
+		if request.form['name-form'] =='form':
+			if form.validate() == False:
+				return render_template('admin.html', form=form, form2=form2,form3=form3, users=things, group=group)
+			else:
+				username = form.username.data
+				password = generate_password_hash(form.password.data)
+				role = form.role.data
+				name = form.name.data
+
+				newuser=[username,password,role,name]
+				
+
+				conn = mysql.connect()
+				cursor = conn.cursor()
+
+				# TODO: string parameterisation
+				query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
+
+				# query = "INSERT INTO User (username,password,role,name) VALUES ();"
+
+				cursor.execute(query)
+				# cursor.execute("COMMIT")
+				flash("User is added!")
+				return redirect(url_for('admin'))
+
+		elif request.form['name-form'] =='form2':
+			if form2.validate() == False:
+				return render_template('admin.html', form=form, form2=form2,form3=form3, users=things, group=group)
+			else: 
+				sku = form2.sku.data
+
+				
+
+				# query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_Invmgmt.Items WHERE sku ='{}'".format(sku))
+
+				itemname=form2.itemname.data
+				location=form2.location.data
+				qtyleft=form2.qtyleft.data
+				reorderpt=form2.reorderpt.data
+				batchqty=form2.batchqty.data
+				category=form2.category.data
+				picture=form2.picture.data
+				unit=form2.unit.data
+
+				newitem=[sku,itemname,location,qtyleft,reorderpt,batchqty,category,picture,unit]
+
+				conn = mysql.connect()
+				cursor = conn.cursor()
+
+				# TODO: string parameterisation
+				query = "INSERT INTO Items VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(newitem[0],newitem[1],newitem[2],newitem[3],newitem[4],newitem[5],newitem[6],newitem[7],newitem[8])
+	
+				cursor.execute(query)
+				# cursor.execute("COMMIT")
+				flash("New item is added!")
+				return redirect(url_for('admin'))
+
+		elif request.form['name-form'] =='form3':
+			if form3.validate() == False:
+				return render_template('admin.html', form=form, form2=form2,form3=form3, users=things, group=group)
+			else: 
+				location = form3.location.data
+				description= form3.description.data
+
+				newlocation = [location,description]
+				
+				conn = mysql.connect()
+				cursor = conn.cursor()
+
+				# TODO: string parameterisation
+				query = "INSERT INTO LocationInfo VALUES ('{}','{}'); COMMIT".format(newlocation[0],newlocation[1])
+	
+				cursor.execute(query)
+				# cursor.execute("COMMIT")
+				flash("New Location is Added!")
+				
+				return redirect(url_for('admin'))
 
 
 

@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `User`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `User` (
   `username` varchar(45) NOT NULL UNIQUE,
-  `password` varchar(45) NOT NULL,
+  `password` varchar(256) NOT NULL,
   `role` varchar(15) NOT NULL,
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`username`)
@@ -40,10 +40,10 @@ CREATE TABLE `User` (
 
 LOCK TABLES `User` WRITE;
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;
-INSERT INTO `User` VALUES ('mabeltan','nuggets','attendant','Mabel Tan'),
-('henrylai','henry','supervisor','Henry Lai'),
-('suroot','password','supervisor','Supervisor (root)'),
-('raroot','password','attendant','Room Attendant (root)');
+INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('attendant','pbkdf2:sha1:1000$LDh1UfDE$896ed1b7bdf7aa75e066a9747b105ae3fdda3c96','attendent','root');
+INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('raroot','pbkdf2:sha1:1000$7AV6JX9G$9b0d373b8b2f1b5f8dbe5859c9c6610b82711721','attendent','raroot');
+INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('supervisor','pbkdf2:sha1:1000$maoeJq4L$3160cd6a06f45c42302ba3b588ed5c73fbd4d7c6','supervisor','supervisor');
+INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('suroot','password','supervisor','Supervisor (root)');
 /*!40000 ALTER TABLE `User` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

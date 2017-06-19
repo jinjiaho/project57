@@ -4,6 +4,7 @@
 
 {% block content %}
 
+
 <style>
 
 .active{
@@ -21,79 +22,435 @@
 
 </style>
 
+<body>
+
+
 <ul class="nav nav-tabs">
-  <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
-  <li><a data-toggle="tab" href="#menu1">Create a New User</a></li>
-  <li><a data-toggle="tab" href="#menu2">Add a New Item</a></li>
-  <li><a data-toggle="tab" href="#menu2">Group Items</a></li>
+  <li class="active"><a data-toggle="tab" href="#tab1">Home</a></li>
+  <li><a data-toggle="tab" href="#tab2">Create New User</a></li>
+  <li><a data-toggle="tab" href="#tab3">Add New Item</a></li>
+  <li><a data-toggle="tab" href="#tab4">Group Items</a></li>
 </ul>
+
+<script type="text/javascript">
+
+// $('a[href="' + location.hash + '"]').trigger('click');
+
+
+// $(document).ready(function(){ 
+//     var x = location.hash;   
+//     activaTab('x');
+// });
+
+// function activaTab(tabId){
+//     $('.nav-tabs a[href="#' + tabId + '"]').tab('show');
+// };
+
+// function getData() {
+//     $.ajax({
+//         type: "POST",
+//         url: "/admin",
+//         data: JSON.stringify($("#itemname").val()),
+//         dataType: "json",    
+//         success: function(response, status, jqXHR) {
+//             console.log("Success!");
+//         }
+//     });
+// }
+
+// getData();
+
+
+
+</script>
 
 <div class="tab-content">
   
-  <div id="home" class="tab-pane fade in active">
-    <h3>HOME</h3>
-    <p>Some content.</p>
-  </div>
-  
-  <div id="menu1" class="tab-pane fade">
-    
-    <h3>Create A User</h3>
-    <form method="POST">
-        {{ form.hidden_tag() }}
+    <div id="tab1" class="tab-pane fade in active">
+        <h3>HOME</h3>
 
-        <div class="block input-icon input-icon-right">
-        {{ form.name.label }}
-        {% if form.name.errors %}
-            {% for error in form.name.errors %}
-            <p class="error-message">{{ error }}</p>
-            {% endfor %}
-        {% endif %}
-        {{ form.name }}
+        <h4>Current Users (possibly to if login and last login)</h4>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                
+                    <th>Name</th>
+                    <th>Role</th>
+                </thead>
+                
+                <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.role }}</td>
+                    
+                <tr>
+                {% endfor %}
+                </tbody>
+
+            </table>
         </div>
 
-        <div class="block input-icon input-icon-right">
-        {{ form.username.label }}
-        {% if form.username.errors %}
-            {% for error in form.username.errors %}
-            <p class="error-message">{{ error }}</p>
-            {% endfor %}
-        {% endif %}
-        {{ form.username }}
+        <h4>NFC Tags Grouping</h4>
+
+        
+        {% for key, values in group.iteritems() %}
+        
+        <!--find a way to create a button-->
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ key }}" aria-expanded="false" aria-controls="collapseExample">{{ key }}</button>
+        <div class="collapse" id="{{ key }}">
+        
+            <ul class="list-group">
+
+                {% for i in values %}
+                    <li class="list-group-item"><a href="/inventory"> {{ i[0].encode('ascii') }} </a></li>
+
+                {% endfor %}                
+        
+
+            </ul>
+
         </div>
 
-        <div class="block input-icon input-icon-right">
-        {{ form.password.label }}
-        {% if form.password.errors %}
-            {% for error in form.password.errors %}
-            <p class="error-message">{{ error }}</p>
-            {% endfor %}
-        {% endif %}
-        {{ form.password }}
-        </div>
-
-        <div class="block input-icon input-icon-right">
-        {% for subfield in form.role %}
-            <tr>
-                <td>{{ subfield }}</td>
-                <td>{{ subfield.label }}</td>
-                <br>
-            </tr>
         {% endfor %}
+        
+
+    </div>
+    
+    
+    
+<!-- ******************* NEW USER TAB *****************************-->  
+    <div id="tab2" class="tab-pane fade" >
+
+        <h3>Create A New User</h3>
+        <form method="POST" action="/admin" >
+            {{ form.hidden_tag() }}
+            <input type="hidden" name="name-form" value='form')>
+        
+
+        <div class="row form-group">
+            {{ form.name.label }}
+            {% if form.name.errors %}
+                {% for error in form.name.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form.name(class="form-control", placeholder="Name of User")}}
+            </div>
+        </div>
+        
+
+        <div class="row form-group">
+            {{ form.username.label }} 
+            {% if form.username.errors %}
+                {% for error in form.username.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form.username(class="form-control", placeholder="Username") }}
+            </div>
+        </div>
+        
+
+        <div class="row form-group">
+            {{ form.password.label }}
+            {% if form.password.errors %}
+                {% for error in form.password.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="form-group">
+            {{ form.password(class="form-control", placeholder="Password") }}
+            </div>
+        </div>
+       
+
+        <div class="row form-group">
+            {{ form.role.label }} <br>
+            {% for subfield in form.role %}
+                <tr>
+                    <td>{{ subfield }}</td>
+                    <td>{{ subfield.label }}</td>
+                    <br>
+                </tr>
+            {% endfor %}
+        </div>
+        <br>
+
+        <div class="row form-group"> 
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul class="error-message">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+                 </ul>
+                {% endif %}
+            {% endwith %}
         </div>
 
-        {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
-
-    </form>
-    
-  </div>
+        {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary", onclick="activaTab('tab2');") }}
 
 
+        </form>
 
-  <div id="menu2" class="tab-pane fade">
-    <h3>Menu 2</h3>
-    <p>Some content in menu 2.</p>
-  </div>
+    </div>
+
+<!--#........................TAB3.............................  -->
+    <div id="tab3" class="tab-pane fade">
+        <h3>Add A New Item</h3>
+        <form method="POST" action="/admin">
+            {{ form.hidden_tag() }}
+            <input type="hidden"  name="name-form" value='form2' >
+        
+
+        <div class="row form-group">
+            {{ form2.sku.label }}
+            {% if form2.sku.errors %}
+                {% for error in form2.sku.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form2.sku(class="form-control", placeholder="SKU Number")}}
+            </div>
+        </div>
+
+        <div class="row form-group">
+            {{ form2.itemname.label }}
+            {% if form2.itemname.errors %}
+                {% for error in form2.itemname.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form2.itemname(class="form-control typeahead", placeholder="Name of Item")}}
+            </div>
+        </div>
+
+        <!-- <div class="row form-group">
+            {{ form2.location.label }} <br>
+            {% for subfield in form2.location %}
+                <tr>
+                    <td>{{ subfield }}</td>
+                    <td>{{ subfield.label }}</td>
+                    <br>
+                </tr>
+            {% endfor %}
+        </div>
+        <br> -->
+        <div class="row form-group">
+            {{ form2.location.label }}
+            {% if form2.location.errors %}
+                {% for error in form2.location.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form2.location(class="form-control")}}
+            </div>
+        </div>
+        
+
+        <div class="row form-group">
+            {{ form2.qtyleft.label }} 
+            {% if form2.qtyleft.errors %}
+                {% for error in form2.qtyleft.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form2.qtyleft(class="form-control", placeholder="Quantity Available") }}
+            </div>
+        </div>
+        
+
+        <div class="row form-group">
+            {{ form2.reorderpt.label }}
+            {% if form2.reorderpt.errors %}
+                {% for error in form2.reorderpt.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="form-group">
+            {{ form2.reorderpt(class="form-control", placeholder="Reorder Point") }}
+            </div>
+        </div>
+
+        <div class="row form-group">
+            {{ form2.batchqty.label }}
+            {% if form2.batchqty.errors %}
+                {% for error in form2.batchqty.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="form-group">
+            {{ form2.batchqty(class="form-control", placeholder="Batch Size Per Box") }}
+            </div>
+        </div>
+
+        <div class="row form-group">
+            {{ form2.category.label }}
+            {% if form2.category.errors %}
+                {% for error in form2.category.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form2.category(class="form-control")}}
+            </div>
+        </div>
+
+        <div class="row form-group">
+            {{ form2.picture.label }}
+            {% if form2.picture.errors %}
+                {% for error in form2.picture.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="form-group">
+            {{ form2.picture(class="form-control", placeholder="Picture File Name") }}
+            </div>
+        </div>
+
+        <div class="row form-group">
+            {{ form2.unit.label }}
+            {% if form2.unit.errors %}
+                {% for error in form2.unit.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form2.unit(class="form-control")}}
+            </div>
+        </div>
+       
+
+        <div class="row form-group"> 
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul class="error-message">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+                 </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {{ form2.submitTwo(class="width-35 pull-right btn btn-sm btn-primary") }}
+
+        
+        </form> 
+
+
+    </div>
+
+
+    <div id="tab4" class="tab-pane fade">
+        <form method="POST" action="/admin">
+            {{ form.hidden_tag() }}
+            <input type="hidden"  name="name-form" value='form3' >
+        <h3> Add a New Location Tag </h3>
+
+        <div class="row form-group">
+            {{ form3.location.label }}
+            {% if form3.location.errors %}
+                {% for error in form3.location.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form3.location(class="form-control", placeholder="Location of tag (No Spaces")}}
+            </div>
+        </div>
+
+
+        <div class="row form-group">
+            {{ form3.description.label }}
+
+            <div class="form-group">
+            {{ form3.description(class="form-control", placeholder="Simple description of tag")}}
+            </div>
+        </div>
+
+        <div class="row form-group"> 
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul class="error-message">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+                 </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        {{ form3.submitThree(class="width-35 pull-right btn btn-sm btn-primary") }}
+
+
+
+        </form>
+    </div>
+
+
 </div>
 
+<script>
+var substringMatcher = function(strs) {
+  return function findMatches(q, cb) {
+    var matches, substringRegex;
 
+    // an array that will be populated with substring matches
+    matches = [];
+
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        matches.push(str);
+      }
+    });
+
+    cb(matches);
+  };
+};
+
+var all_items = {{ item_list|safe }};
+
+$('.typeahead').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+},
+{
+  name: 'all_items',
+  source: substringMatcher(all_items)
+});
+</script>
+
+
+</body>
 {% endblock %}
+
+
+
