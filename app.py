@@ -379,17 +379,25 @@ def item(sku):
 	if not logged_in:
 		return redirect('/login')
 
+	
+	
 	name = item
 	cursor = mysql.connect().cursor()
 
-	query = "SELECT name FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
+	query = "SELECT name, location, category, picture FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
 	cursor.execute(query)
 	data = cursor.fetchall()
 
 	print data
 	try:
 		name = data[0][0]
-		return render_template('item.html', name = name)
+		locList = []
+		for i in data:
+			locList.append(i[1])
+		location = data[0][1]
+		category = data[0][2]
+		picture = data[0][3]
+		return render_template('item.html', name = name, locList = locList, category = category, picture = picture)
 	except:
 		return render_template('item.html', name = None)
 
