@@ -423,6 +423,7 @@ def item(sku):
 			"location": i[3].encode('ascii')})
 
 	# print d
+	print r
 	try:
 		return render_template('v2/item.html', item = r)
 	except:
