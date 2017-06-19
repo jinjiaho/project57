@@ -404,14 +404,14 @@ def category(category):
 		role = role,
 		user = session['username'])
 
-@app.route('/review')
-def review():
-	supplies = getAllInventory('Guest Supplies')
-	hampers = getAllInventory('Guest Hampers')
-	kitchenware = getAllInventory('Kitchenware')
-	return render_template('v2/review.html', supplies = supplies,
-		hampers = hampers,
-		kitchenware = kitchenware, user=session['username'])
+# @app.route('/review')
+# def review():
+# 	supplies = getAllInventory('Guest Supplies')
+# 	hampers = getAllInventory('Guest Hampers')
+# 	kitchenware = getAllInventory('Kitchenware')
+# 	return render_template('v2/review.html', supplies = supplies,
+# 		hampers = hampers,
+# 		kitchenware = kitchenware, user=session['username'])
 
 
 @app.route('/logs')
