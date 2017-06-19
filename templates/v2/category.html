@@ -1,64 +1,17 @@
-{% extends "base.html" %}
-{% block sidebar %}
-<link rel="stylesheet" type="text/css" href="bootstrap.min.css">
-<div class="sidebar-wrapper">
-    <div class="logo">
-        <a href="http://www.creative-tim.com" class="simple-text" style="text-align:left;">
-        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
-            Supervisor
-        </a>
-    </div>
+{% extends "v2/base.html" %}
 
-    <ul class="nav">
-        <li>
-            <a href="/">
-                <i class="pe-7s-graph"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
-        
-        <li>
-            <a href="/inventory">
-                <i class="pe-7s-rocket"></i>
-                <p>Inventory</p>
-            </a>
-        </li>
-
-        <li>
-            <a href="/tasks">
-                <i class="pe-7s-note2"></i>
-                <p>Tasks</p>
-            </a>
-        </li>
-        <li>
-            <a href="/">
-                <i class="pe-7s-power"></i>
-                <p>Log Out</p>
-            </a>
-        </li>
-        
-    </ul>
-</div>
-{% endblock %}
-
-{% block title %}
-<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
-    <span class="sr-only">Toggle navigation</span>
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-
-</button>
-<a class="navbar-brand" href="#">{{category}} Month Review</a>
-
-
-{% endblock %}
+{% block title %}{{category}}{% endblock %}
 
 {% block content %}
 <style>
     .card .content {
         padding:0;
     }
+    .container-fluid .date { float:right }
+
+    .tablesorter .tablesorter-filter-row .disabled { 
+    display: none;
+}
 </style>
 <script type="text/javascript">
 
@@ -133,9 +86,20 @@ setInterval("getthedate()",1000)
     downloadLink.click();
 }
     function exportTableToCSV(filename) {
+    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var d = new Date();
+    var month = monthNames[d.getMonth()];
+    var year = d.getFullYear();
     var csv = [];
-    var rows = document.querySelectorAll("table tr");
-    
+    var rows = $('#review').find("tbody tr:visible");
+    var header1 = ["Monthly Review of {{category}}","","","","Month: "+month,"Year:"+year]
+    var header2 = ["Property: Ascott Raffles Place Singapore"]//Property is hard coded for now
+    var header3 = ["","","","","",""];
+    var header4 = ["Name","Unit","Initial quantity","In","Out","Remaining quantity"];
+    csv.push(header1.join(","));
+    csv.push(header2);
+    csv.push(header3.join(","));
+    csv.push(header4.join(","));
     for (var i = 0; i < rows.length; i++) {
         var row = [], cols = rows[i].querySelectorAll("td, th");
         
@@ -148,6 +112,12 @@ setInterval("getthedate()",1000)
     // Download CSV file
     downloadCSV(csv.join("\n"), filename);
 }
+
+jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
 
 $(document).ready(function() { 
     $("#review").tablesorter({
@@ -203,8 +173,9 @@ $(document).ready(function() {
 });
 
 </script>
-<span id="clock"></span>
 <div class="container-fluid">
+<span>Category: {{category}}</span>
+<span align="right" id="clock" class="date"></span>
     <div class="row">
 
         <div class="col-md-12">
@@ -217,15 +188,15 @@ $(document).ready(function() {
                     <table id="review" class="table table-hover">
                         <thead>
                             <th>Name</th>
-                            <th>Unit</th>
-                            <th>Initial Quantity</th>
-                            <th>In</th>
-                            <th>Out</th>
-                            <th>Remaining Quantity</th>
+                            <th class="filter-false sorter-false">Unit</th>
+                            <th class="filter-false sorter-false">Initial Quantity</th>
+                            <th class="filter-false sorter-false">In</th>
+                            <th class="filter-false sorter-false">Out</th>
+                            <th class="filter-false sorter-false">Remaining Quantity</th>
                         </thead>
                         <tbody>
                         {% for item in itemtype %}
-                            <tr>
+                            <tr class="clickable-row" data-href="/inventory/{{item.sku}}">
                                 <td>{{item.name}}</td>
                                 <td>{{item.unit}}</td>
                                 <td>{{item.starting}}</td>
@@ -250,3 +221,4 @@ $(document).ready(function() {
     </div>
 </div>
 {% endblock %}
+

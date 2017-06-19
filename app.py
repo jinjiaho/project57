@@ -41,7 +41,7 @@ def getAllInventory(category):
 	cursor = conn.cursor()
 
 	cursor.execute(
-		"SELECT sku, name, qty_left, unit, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+		"SELECT sku, name, qty_left, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
 	items = []
 	for item in data:
@@ -58,13 +58,17 @@ def getAllInventory(category):
 		remaining_quantity = item[2]
 		initial_quantity = remaining_quantity + delivered_out - recieved
 		items.append(
-			{"name": item[1],
+
+			{"sku":item[0],
+			"name": item[1],
 			"remaining": item[2],
 			"unit": item[3],
 			"starting": initial_quantity,
 			"recieved": recieved,
 			"demand": delivered_out,
-			"file": item[4]})
+			"picture": item[4].encode('ascii'),
+			"category": item[5].encode('ascii')
+			})
 		
 	return items
 
@@ -129,6 +133,27 @@ def getInventoryLow():
 			"category": i[5].encode('ascii')})
 		
 	return r
+
+def getDailyLogs():
+
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	cursor.execute(
+		"SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE day(date_time) = day(now());")
+	data=cursor.fetchall()
+	things = []
+	
+	for row in data:
+		things.append({"name": row[0].encode('ascii'),
+			"dateTime": row[1],
+			"action":row[2],
+			"move":row[3],
+			"remaining":row[4],
+			"item":row[5].encode('ascii'),
+			"location":row[6]})
+		print(things)
+			
+	return things
 
 # POST for getting chart data
 @app.route('/api/getChartData', methods=["POST"])
@@ -334,10 +359,11 @@ def dashboard():
 		return redirect(url_for("login", lang_code=get_locale()))
 
 	i = getInventoryLow()
-	l=0
+	l = getDailyLogs()
 	# l = getLogs()
 
 	return render_template('dashboard.html', items = i, logs = l)
+
 
 
 @app.route('/<lang_code>/inventory')
@@ -368,7 +394,7 @@ def inventory():
 	supplies = getAllInventory('Guest Supplies')
 	hampers = getAllInventory('Guest Hampers')
 	kitchenware = getAllInventory('Kitchenware')
-	return render_template('inventory.html',
+	return render_template('v2/inventory.html',
 		supplies = supplies,
 		hampers = hampers,
 		kitchenware = kitchenware)
@@ -398,6 +424,14 @@ def item(sku):
 	# print d
 	try:
 		return render_template('v2/item.html', item = r)
+# =======
+# 	print(data)
+# 	try:
+# 		name = data[0][0]
+# 		category = data[0][1]
+# 		picture = data[0][2]
+# 		return render_template('item.html', name = name, category=category, picture=picture)
+# >>>>>>> b1fcaf40dc6f258ef881c7d5b27fa57d50f88415
 	except:
 		return render_template('v2/item.html', item = None)
 
@@ -410,9 +444,10 @@ def category(category):
 
 	category = category
 	itemtype = getAllInventory(category)
-	return render_template('category.html', category=category, itemtype=itemtype, 
+	return render_template('v2/category.html', category=category, itemtype=itemtype, 
 		role = role,
 		user = session['username'])
+
 
 @app.route('/<lang_code>/review')
 def review():
@@ -428,6 +463,16 @@ def review():
 		hampers = hampers,
 		kitchenware = kitchenware, user=session['username'])
 
+# @app.route('/review')
+# def review():
+# 	supplies = getAllInventory('Guest Supplies')
+# 	hampers = getAllInventory('Guest Hampers')
+# 	kitchenware = getAllInventory('Kitchenware')
+# 	return render_template('v2/review.html', supplies = supplies,
+# 		hampers = hampers,
+# 		kitchenware = kitchenware, user=session['username'])
+# >>>>>>> b1fcaf40dc6f258ef881c7d5b27fa57d50f88415
+
 
 @app.route('/<lang_code>/logs')
 def logs():
@@ -439,7 +484,7 @@ def logs():
 	logs=getAllLogs()
 	# names=getUniqueNames()
 	# items=getUniqueItems()
-	return render_template('logs.html',
+	return render_template('v2/logs.html',
 		logs=logs, 
 		role = role,
 		user = session['username'])
