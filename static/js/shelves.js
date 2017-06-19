@@ -22,10 +22,13 @@ function updateCart() {
         item.qty = parseInt(item.qty);
         cartTable.append('<tr class="cart_item" id="'
             + item.sku + '"><td><img src="' 
-            + item.picture + '"/></td>' + item.name + '</td><td><input type="number" name="' 
+            + item.picture + '"/></td><td>' + item.name + '</td><td><input type="number" name="' 
             + item.sku + '" value="' + item.qty 
-            + '"/></td><td><a onclick="deleteRow(this)" href="javascript:void(0);"'
-            + item.sku + '">&times;</a></td></tr>');
+            + '"/><br/><select><option value="out">Out</option>' 
+            + '<option value="in">In</option>'
+            + '<option value="check">Check</option></select></td>'
+            + '<td><a onclick="deleteRow(this)" href="javascript:void(0);">&times;</a></td></tr>');
+        $('#'+item.sku+' option[value="'+item.action+'"]').attr('selected', 'selected');
       }
     }
   }
@@ -65,10 +68,12 @@ $(function () {
     // reset localStorage. Use if localStorage is messed up.
     // localStorage.clear();
     // Get information from modal
+    var role = $(this).data('role');
     var item_sku = $(this).find($('#modal-input-sku')).val();
     var item_name = $(this).find($("#modal-input-name")).val();
     var item_qty = parseInt($(this).find($('#modal-input-qty')).val());
     var item_pic = $("#modal-picture img").attr('src');
+    var action = $("input[action]").val();
     console.log(item_sku + ", " + item_name + ", " + item_qty + ", " + item_pic);
     
     // if there is no cart object, create one with the form data
