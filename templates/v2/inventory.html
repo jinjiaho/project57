@@ -58,8 +58,8 @@
             <div class="card">
                 <div class="row">
                   {% for item in supplies %}
-                  <a href="{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                  <a href="{{item.sku}}"><div class="alert alert-danger">
+                  <a href="/{{g.current_lang}}/inventory/{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                  <a href="/{{g.current_lang}}/inventory/{{item.sku}}"><div class="alert alert-danger">
                   <img src="/static/img/items/{{item.category}}/{{item.picture}}"/>
                   <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                   </div></a>
@@ -86,8 +86,8 @@
             <div class="card">
                 <div class="row">
                   {% for item in hampers %}
-                  <a href="{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                  <a href="{{item.sku}}"><div class="alert alert-danger">
+                  <a href="/{{g.current_lang}}/inventory/{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                  <a href="/{{g.current_lang}}/inventory/{{item.sku}}"><div class="alert alert-danger">
                   <img src="/static/img/items/{{item.category}}/{{item.picture}}"/>
                   <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                   </div></a>
@@ -112,8 +112,8 @@
             <div class="card">
                 <div class="row">
                   {% for item in kitchenware %}
-                  <a href="{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                  <a href="{{item.sku}}"><div class="alert alert-danger">
+                  <a href="/{{g.current_lang}}/inventory/{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                  <a href="/{{g.current_lang}}/inventory/{{item.sku}}"><div class="alert alert-danger">
                   <img src="/static/img/items/{{item.category}}/{{item.picture}}"/>
                   <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
                   </div></a>

@@ -196,7 +196,7 @@ $(document).ready(function() {
                         </thead>
                         <tbody>
                         {% for item in itemtype %}
-                            <tr class="clickable-row" data-href="/inventory/{{item.sku}}">
+                            <tr class="clickable-row" data-href="/{{g.current_lang}}/inventory/{{item.sku}}">
                                 <td>{{item.name}}</td>
                                 <td>{{item.unit}}</td>
                                 <td>{{item.starting}}</td>
