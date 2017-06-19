@@ -25,7 +25,7 @@ languages = ('en', 'zh', 'ms', 'ta')
 mysql = MySQL()
 mysql.init_app(app)
 
-
+# global vars
 adminmode = False
 role = ""
 
@@ -163,7 +163,6 @@ def getChartData():
 
 		return jsonify(responseData)
 
-
 # true if user is authenticated, else false
 def auth():
 	if u'logged_in' in session:
@@ -176,6 +175,7 @@ def filter_role(roles_routes):
 		if session['role'] == k:
 			return redirect(v)
 
+
 @app.template_filter('lang_strip')
 def lang_strip(s):
     l = re.search(r"(?m)(?<=(en\/)|(zh\/)|(ms\/)|(ta\/)).*$", str(s.encode('ascii')))
@@ -183,6 +183,9 @@ def lang_strip(s):
         return l.group()
     return None
 
+# case query for mobile input
+def input_handler(qty, user):
+	query = 'UPDATE Items SET qty_left = CASE WHEN action'
 
 
 @app.before_request
@@ -222,7 +225,7 @@ def hello():
 		if session['role'] == "supervisor":
 			return redirect(url_for("dashboard", lang_code=session["lang_code"]))
 		elif session['role'] == "attendant":
-			return redirect(url_for("scan", lang_code=session["lang_code"]))
+			return redirect(url_for("scanner", lang_code=session["lang_code"]))
 
 @app.route('/<lang_code>/login', methods=["GET", "POST"])
 def login():
@@ -268,7 +271,7 @@ def login():
 				if data[2] == "supervisor":
 					return redirect(url_for("dashboard", lang_code=get_locale()))
 				elif data[2] =="attendant":
-					return redirect(url_for("scan", lang_code=get_locale()))
+					return redirect(url_for("scanner", lang_code=get_locale()))
 
 	elif request.method == "GET":
 
@@ -280,7 +283,7 @@ def login():
 			if session['role'] == "supervisor":
 				return redirect(url_for("dashboard", lang_code=get_locale()))
 			elif session['role'] == "attendant":
-				return redirect(url_for("scan", lang_code=get_locale()))
+				return redirect(url_for("scanner", lang_code=get_locale()))
 
 
 @app.route('/<lang_code>/admin', methods=["GET","POST"])
@@ -460,7 +463,30 @@ def shelf(tag_id):
 	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
 
-	if request.method == 'GET':
+	if request.method == 'POST':
+		now = datetime.now()
+		form_data = request.form
+		user = session['username']
+
+		print(form_data)
+		return hello()
+		
+		# conn = mysql.connect()
+		# cursor = conn.cursor()
+		# for item, qty in form_data.iteritems():
+		# 	cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location="+tag_id+";")
+		# 	qty_left = cursor.fetchone()[0]  - qty
+		# 	if (qty_left > 0):
+		# 		# query for stock out
+		# 		print("UPDATE Items SET qty_left = qty_left-"+qty+" WHERE qty_left >= "+qty+" AND sku="+item+" AND location="+tag_id+";")
+		# 		# create log for each item
+		# 		print("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
+		# 	else:
+		# 		flash('Not enough in store!')
+
+		# return redirect('/scan')
+
+	else:
 
 		conn = mysql.connect()
 		cursor = conn.cursor()
@@ -479,8 +505,9 @@ def shelf(tag_id):
 			role = role,
 			user = session['username'], 
 			location = tag_id)
-	else:
-		return redirect(url_for("scan", lang_code=get_locale()))
+# <<<<<<< HEAD
+# 	else:
+# 		return redirect(url_for("scan", lang_code=get_locale()))
 
 
 # @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
@@ -531,6 +558,9 @@ def shelf(tag_id):
 # 		return render_template('retrieval.html',things=things, form=form)
 
 # 	return render_template("retrieval.html", things=things)
+# =======
+	
+# >>>>>>> ce4495d2f9e2602556e384a44cb683e0df1c27ad
 
 @app.route('/logout')
 def logout():
