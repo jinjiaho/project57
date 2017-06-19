@@ -1,42 +1,5 @@
-{% extends "base.html" %}
-{% block sidebar %}
-<div class="sidebar-wrapper">
-    <div class="logo">
-        <a href="" class="simple-text" style="text-align:left;">
-        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
-            Supervisor
-        </a>
-    </div>
+{% extends "v2/base.html" %}
 
-    <ul class="nav">
-        <li>
-            
-                <i class="pe-7s-graph"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
-        <li class="active">
-            <a href="/inventory">
-                <i class="pe-7s-rocket"></i>
-                <p>Inventory</p>
-            </a>
-        </li>
-        <li>
-            <a href="/logs">
-                <i class="pe-7s-news-paper"></i>
-                <p>Logs</p>
-            </a>
-        </li>
-        <li>
-            <a href="/">
-                <i class="pe-7s-power"></i>
-                <p>Log Out</p>
-            </a>
-        </li>
-        
-    </ul>
-</div>
-{% endblock %}
 
 {% block title %}Inventory{% endblock %}
 
@@ -52,7 +15,7 @@
   }
 
   .alert .alert-label {
-    /*font-size: 24pt;*/
+    font-size: 9pt;
     padding: 10px 10px;
     float: left;
     height: inherit;
@@ -61,7 +24,7 @@
   }
 
   .alert .alert-label span {
-    font-size: 24pt;
+    font-size: 10pt;
   }
 
 
@@ -71,7 +34,7 @@
   }
 
   .btn-block {
-    width: 49%;
+    width: 100%;
     float:left;
   }
 
@@ -85,98 +48,92 @@
 
 </style>
 <div class="content">
-    <div class="container-fluid">
-        <div class="row">
-                <div class="card">
-                    <button class="header accordion">
-                        <h4 class="title">Guest Supplies</h4>
-                    </button>
-                    <div class="content all-icons panel">
-                        <div class="row">
-                          
+    <div class="container">
 
-                          {% for item in supplies %}
-                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="inventory/{{item.name}}"><div class="alert alert-danger">
-                              <img src="/static/img/items/supplies/{{item.name}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
-                            </div></a>
-                          </div>
-                          {% endfor %}
-                            <a href="Guest Supplies">
-                            <button class="btn btn-default btn-block" id="btn_getData" >Month Review</button></a>
-
-                          </div>
-
-                    </div>
+      <div class= "row">
+        <div class="card">
+            <button class="btn btn-default header accordion btn-block" id="accordion" >
+              <h4>Guest Supplies</h4>
+            </button>
+            <div class="card">
+                <div class="row">
+                  {% for item in supplies %}
+                  <a href="{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                  <a href="{{item.sku}}"><div class="alert alert-danger">
+                  <img src="/static/img/items/{{item.category}}/{{item.picture}}"/>
+                  <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
+                  </div></a>
                   </div>
-                
-                <div class="card">
-                    <button class="header accordion">
-                        <h4 class="title">Guest Hampers</h4>
-                    </button>
-                    <div class="content all-icons panel">
-                        <div class="row">
-                          
-
-                          {% for item in hampers %}
-                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="inventory/{{item.name}}"><div class="alert alert-warning">
-                              <img src="/static/img/items/hampers/{{item.file}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
-                            </div></a>
-                          </div>
-                          {% endfor %}
-                          <a href="Guest Hampers">
-                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
-
-
-                          </div>
-                          
-                        </div>
-                    </div>
-                <div class="card">
-                    <button class="header accordion">
-                        <h4 class="title">Kitchenware</h4>
-                    </button>
-                    <div class="content all-icons panel">
-                        <div class="row">
-                          
-
-
-                          {% for item in kitchenware %}
-                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="inventory/{{item.name}}"><div class="alert alert-warning">
-                              <img src="/static/img/items/kitchenware/{{item.file}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
-
-
-                            </div></a>
-                          </div>
-                          {% endfor %}
-                          <a href="Kitchenware">
-                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
-
-                          </div>
-                          
-                    </div>
+                  {% endfor %}
                 </div>
-
-                <!-- </div>
-                </div>
-            </div> -->
-
+                <div class="card">
+                  <a href="/review/Guest Supplies">
+                  <button class="btn btn-default btn-block" id="btn_getData" >Month Review</button></a>
                 </div>
             </div>
+        </div>
+      </div>
+
+      <hr>
 
 
+
+      <div class= "row">
+        <div class="card">
+            <button class="btn btn-default header accordion btn-block" >
+              <h4>Guest Hampers</h4>
+            </button>
+            <div class="card">
+                <div class="row">
+                  {% for item in hampers %}
+                  <a href="{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                  <a href="{{item.sku}}"><div class="alert alert-danger">
+                  <img src="/static/img/items/{{item.category}}/{{item.picture}}"/>
+                  <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
+                  </div></a>
+                  </div>
+                  {% endfor %}
+                </div>
+                <div class="card">
+                  <a href="/review/Guest Hampers">
+                  <button class="btn btn-default btn-block" id="btn_getData" >Month Review</button></a>
+                </div>
+            </div>
         </div>
-        <div class="row buttons">
-          
-          <button class="btn btn-primary btn-block" id="btn_newItem">New Item</button>
+      </div>
+
+      <hr>
+
+      <div class= "row">
+        <div class="card">
+            <button class="btn btn-default header accordion btn-block" >
+              <h4>Kitchenware</h4>
+            </button>
+            <div class="card">
+                <div class="row">
+                  {% for item in kitchenware %}
+                  <a href="{{item.sku}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                  <a href="{{item.sku}}"><div class="alert alert-danger">
+                  <img src="/static/img/items/{{item.category}}/{{item.picture}}"/>
+                  <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
+                  </div></a>
+                  </div>
+                  {% endfor %}
+                </div>
+                <div class="card">
+                  <a href="/review/Kitchenware">
+                  <button class="btn btn-default btn-block" id="btn_getData" >Month Review</button></a>
+                </div>
+            </div>
         </div>
+      </div>
+
+
+
+
     </div>
 </div>
+
 
 <script>
 var acc = document.getElementsByClassName("accordion");
@@ -193,6 +150,7 @@ for (i = 0; i < acc.length; i++) {
         }
     }
 }
+
 
 </script>
 

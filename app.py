@@ -1,42 +1,47 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, g
+from flask_babel import Babel
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
-import os
-import copy
-import re
 from forms import LoginForm, RetrievalForm, AddUserForm
-import csv
+import os, copy, re, csv
 # from flask.ext.cache import Cache
 
-app = Flask(__name__)
-app.config['DEBUG'] = True
 
-app.secret_key = "development-key"
-
+##########################
+##        CONFIG        ##
+##########################
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_object('config.DevConfig') # default configurations
+app.config.from_pyfile('myConfig1.cfg') # override with instanced configuration (in "/instance"), if any
 
+# Babel init
+babel = Babel(app)
+languages = ('en', 'zh', 'ms', 'ta')
+
+# mysql init
 mysql = MySQL()
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'classroom'
-app.config['MYSQL_DATABASE_DB'] = 'Ascott_InvMgmt'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
+
+# global vars
 adminmode = False
-
-
-#---------------------------GLOBAL VARIABLES----------------------
 role = ""
 
-#----------------------------METHODS-------------------------
+###########################
+##        METHODS        ##
+###########################
+
+# TODO: encapsulate all methods in separate classes and .py files
+
 # Returns all the items based on category and amount in or out within the last month for each item
 def getAllInventory(category):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
 	cursor.execute(
-		"SELECT sku, name, qty_left, unit, picture FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+		"SELECT sku, name, qty_left, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
 	items = []
 	for item in data:
@@ -53,14 +58,17 @@ def getAllInventory(category):
 		remaining_quantity = item[2]
 		initial_quantity = remaining_quantity + delivered_out - recieved
 		items.append(
-			{"sku": item[0],
+
+			{"sku":item[0],
 			"name": item[1],
 			"remaining": item[2],
 			"unit": item[3],
 			"starting": initial_quantity,
 			"recieved": recieved,
 			"demand": delivered_out,
-			"file": item[4]})
+			"picture": item[4].encode('ascii'),
+			"category": item[5].encode('ascii')
+			})
 		
 	return items
 
@@ -93,27 +101,6 @@ def getAllLogs():
 	things = []
 	
 	for row in data:
-
-# # <<<<<<< HEAD
-# 		cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE sku = {};".format(str(row[5])))
-# 		item_data=cursor.fetchall()
-# 		# print(item_data)
-		# print(item_data[0])
-		# print(item_data[1])
-
-# 		things.append(
-# 				{"name": row[0].encode('ascii'),
-# 				"dateTime": row[1],
-# 				"action":row[2],
-# 				"move":row[3],
-# 				"remaining":row[4],
-# 				"item":item_data[0][0].encode('ascii'),
-# 				"category":item_data[0][1].encode('ascii'),
-# 				"location":row[6]})
-# # =======
-		# cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE name = {};".format(str(row[5])))
-		# item_data=cursor.fetchone()
-
 		things.append({"name": row[0].encode('ascii'),
 			"dateTime": row[1],
 			"action":row[2],
@@ -121,10 +108,8 @@ def getAllLogs():
 			"remaining":row[4],
 			"item":row[5].encode('ascii'),
 			"location":row[6]})
-		print(things)
+		# print(things)
 			
-# >>>>>>> 3684797bc005be1436e23565ece904543746d7b6
-
 	return things
 		
 
@@ -148,6 +133,27 @@ def getInventoryLow():
 			"category": i[5].encode('ascii')})
 		
 	return r
+
+def getDailyLogs():
+
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	cursor.execute(
+		"SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE day(date_time) = day(now());")
+	data=cursor.fetchall()
+	things = []
+	
+	for row in data:
+		things.append({"name": row[0].encode('ascii'),
+			"dateTime": row[1],
+			"action":row[2],
+			"move":row[3],
+			"remaining":row[4],
+			"item":row[5].encode('ascii'),
+			"location":row[6]})
+		print(things)
+			
+	return things
 
 # POST for getting chart data
 @app.route('/api/getChartData', methods=["POST"])
@@ -184,12 +190,8 @@ def getChartData():
 
 # true if user is authenticated, else false
 def auth():
-	# print session.keys()[0], type(session.keys()[0])
 	if u'logged_in' in session:
-		# print session['logged_in'], type(session['logged_in'])
 		return session['logged_in']
-	# else:
-		# print "You're not logged in"
 	return False
 
 # wrapper function for route redirection
@@ -198,36 +200,61 @@ def filter_role(roles_routes):
 		if session['role'] == k:
 			return redirect(v)
 
+
+@app.template_filter('lang_strip')
+def lang_strip(s):
+    l = re.search(r"(?m)(?<=(en\/)|(zh\/)|(ms\/)|(ta\/)).*$", str(s.encode('ascii')))
+    if l:
+        return l.group()
+    return None
+
 # case query for mobile input
 def input_handler(qty, user):
 	query = 'UPDATE Items SET qty_left = CASE WHEN action'
 
-#----------------------------ROUTING ------------------------
 
-@app.template_filter('quoted')
-def quoted(s):
-    l = re.findall('\'([^\']*)\'', str(s))
-    if l:
-        return l[0]
-    return None
+@app.before_request
+def before():
+	# localization setting
+	if request.view_args and 'lang_code' in request.view_args:
+	    if request.view_args['lang_code'] not in languages:
+	    	g.current_lang = "en" # default localisation
+	        # return abort(404)
+	    else:
+	    	g.current_lang = request.view_args['lang_code']
+	    	session["lang_code"] = g.current_lang
+	    	request.view_args.pop('lang_code')
+
+	# user authentication
+	if u'logged_in' not in session:
+		session["logged_in"] = False
+
+
+@babel.localeselector
+def get_locale():
+    return g.get('current_lang', 'en')
+
+
+##########################
+##        ROUTES        ##
+##########################
+
 
 @app.route('/')
 def hello():
-	# # user authentication
-	logged_in = auth()
-	if not logged_in:
-		return redirect('/login')
+	# user authentication
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
 	else:
-		# user already logged in previously
+		# user already logged_in previously
 		if session['role'] == "supervisor":
-			return redirect('/dashboard')
+			return redirect(url_for("dashboard", lang_code=session["lang_code"]))
 		elif session['role'] == "attendant":
-			return redirect('/scan')
+			return redirect(url_for("scanner", lang_code=session["lang_code"]))
 
-@app.route('/login', methods=["GET", "POST"])
+@app.route('/<lang_code>/login', methods=["GET", "POST"])
 def login():
 	
-	error = ""
 	# create a login form to collect username & password
 	form = LoginForm()
 
@@ -249,12 +276,12 @@ def login():
 			if data is None: 
 				# username does not match records
 				flash('User does not exist')
-				return redirect('/login')
+				return redirect(url_for("login", lang_code=get_locale()))
 
 			elif password != data[1]:
 				# password does not match records
 				flash('Incorrect password')
-				return redirect('/login')
+				return redirect(url_for("login", lang_code=get_locale()))
 
 			else:
 				# username & password match
@@ -267,25 +294,24 @@ def login():
 
 				# check role
 				if data[2] == "supervisor":
-					return redirect('/dashboard')
+					return redirect(url_for("dashboard", lang_code=get_locale()))
 				elif data[2] =="attendant":
-					return redirect('/scan')
+					return redirect(url_for("scanner", lang_code=get_locale()))
 
-	elif request.method =="GET":
+	elif request.method == "GET":
 
-	# 	# # user authentication
-		logged_in = auth()
-		if not logged_in:
-			return render_template('login.html', form=form)
+		# user authentication
+		if not session["logged_in"]:
+			return render_template("login.html", form=form)
 		else:
-			# user already logged in previously
+			# user already logged_in previously
 			if session['role'] == "supervisor":
-				return redirect('/dashboard')
+				return redirect(url_for("dashboard", lang_code=get_locale()))
 			elif session['role'] == "attendant":
-				return redirect('/scan')
+				return redirect(url_for("scanner", lang_code=get_locale()))
 
 
-@app.route('/admin', methods=["GET","POST"])
+@app.route('/<lang_code>/admin', methods=["GET","POST"])
 def admin():
 
 	form = AddUserForm()
@@ -317,27 +343,30 @@ def admin():
 
 
 	elif request.method =="GET":
-		return render_template('admin.html', form=form)
+		if not session["logged_in"]:
+			return redirect(url_for("login", lang_code=session["lang_code"]))
+		else:
+			return render_template('admin.html', form=form)
 
 
 
-@app.route('/dashboard')
+@app.route('/<lang_code>/dashboard')
 def dashboard():
 
 	# user authentication
 	logged_in = auth()
 	if not logged_in:
-		return redirect('/login')
+		return redirect(url_for("login", lang_code=get_locale()))
 
 	i = getInventoryLow()
-	l=0
+	l = getDailyLogs()
 	# l = getLogs()
-
 
 	return render_template('dashboard.html', items = i, logs = l)
 
 
-@app.route('/inventory/')
+
+@app.route('/<lang_code>/inventory')
 def inventory():
 	# conn = mysql.connect()
 	# cursor = conn.cursor()
@@ -358,59 +387,68 @@ def inventory():
 	# print(items)
 
 	# user authentication
-	logged_in = auth()
-	if not logged_in:
-		return redirect('/login')
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
 			
 	# get current list of all items listed in db
 	supplies = getAllInventory('Guest Supplies')
 	hampers = getAllInventory('Guest Hampers')
 	kitchenware = getAllInventory('Kitchenware')
-	return render_template('inventory.html',
+	return render_template('v2/inventory.html',
 		supplies = supplies,
 		hampers = hampers,
 		kitchenware = kitchenware)
 
-@app.route('/inventory/<int:sku>')
+@app.route('/<lang_code>/inventory/<int:sku>')
 def item(sku):
 
 	# user authentication
-	logged_in = auth()
-	if not logged_in:
-		return redirect('/login')
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
 
 	
 	
 	name = item
 	cursor = mysql.connect().cursor()
-
-	query = "SELECT name, location, category, picture FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
+	query = "SELECT name, category, picture, location FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
 	cursor.execute(query)
 	data = cursor.fetchall()
+	d = [[s.encode('ascii') for s in list] for list in data]
 
-	print data
+	r = []
+	for i in data:
+		r.append({"name": i[0].encode('ascii'),
+			"category": i[1].encode('ascii'),
+			"picture": i[2].encode('ascii'),
+			"location": i[3].encode('ascii')})
+
+	# print d
 	try:
-		name = data[0][0]
-		locList = []
-		for i in data:
-			locList.append(i[1])
-		location = data[0][1]
-		category = data[0][2]
-		picture = data[0][3]
-		return render_template('item.html', name = name, locList = locList, category = category, picture = picture)
+		return render_template('v2/item.html', item = r)
 	except:
-		return render_template('item.html', name = None)
+		return render_template('v2/item.html', item = None)
 
-@app.route('/review/<category>')
+@app.route('/<lang_code>/review/<category>')
 def category(category):
+
+	# user authentication
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
+
 	category = category
 	itemtype = getAllInventory(category)
-	return render_template('category.html', category=category, itemtype=itemtype, 
+	return render_template('v2/category.html', category=category, itemtype=itemtype, 
 		role = role,
 		user = session['username'])
 
-@app.route('/review')
+
+@app.route('/<lang_code>/review')
 def review():
+
+	# user authentication
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
+
 	supplies = getAllInventory('Guest Supplies')
 	hampers = getAllInventory('Guest Hampers')
 	kitchenware = getAllInventory('Kitchenware')
@@ -418,37 +456,50 @@ def review():
 		hampers = hampers,
 		kitchenware = kitchenware, user=session['username'])
 
+# @app.route('/review')
+# def review():
+# 	supplies = getAllInventory('Guest Supplies')
+# 	hampers = getAllInventory('Guest Hampers')
+# 	kitchenware = getAllInventory('Kitchenware')
+# 	return render_template('v2/review.html', supplies = supplies,
+# 		hampers = hampers,
+# 		kitchenware = kitchenware, user=session['username'])
+# >>>>>>> b1fcaf40dc6f258ef881c7d5b27fa57d50f88415
 
-@app.route('/logs')
+
+@app.route('/<lang_code>/logs')
 def logs():
 
 	# user authentication
-	logged_in = auth()
-	if not logged_in:
-		return redirect('/login')
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
 
 	logs=getAllLogs()
 	# names=getUniqueNames()
 	# items=getUniqueItems()
-	return render_template('logs.html',
+	return render_template('v2/logs.html',
 		logs=logs, 
 		role = role,
 		user = session['username'])
 	# names=names, items=items)
 
-@app.route('/scan')
+@app.route('/<lang_code>/scan')
 def scanner():
+
+	# user authentication
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
+
 	return render_template('scanner.html')
 
 # RA shelf view
-@app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
+@app.route('/<lang_code>/shelves/<tag_id>/', methods=['GET', 'POST'])
 # @cache.cached(timeout=50)
 def shelf(tag_id):
 
 	# user authentication
-	logged_in = auth()
-	if not logged_in:
-		return redirect('/login')
+	if not session["logged_in"]:
+		return redirect(url_for("login", lang_code=session["lang_code"]))
 
 	if request.method == 'POST':
 		now = datetime.now()
@@ -492,12 +543,67 @@ def shelf(tag_id):
 			role = role,
 			user = session['username'], 
 			location = tag_id)
+# <<<<<<< HEAD
+# 	else:
+# 		return redirect(url_for("scan", lang_code=get_locale()))
+
+
+# @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
+# def checkout(tag_id):
+# 	if request.method == 'GET':
+# 		return render_template('cart.html')
+# 	else:
+# 		now = datetime.now()
+# 		form_data = request.form
+# 		user = session['username']
+		
+# 		conn = mysql.connect()
+# 		cursor = conn.cursor()
+# 		for item, qty in form_data.iteritems():
+# 			cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
+
+# 		flash("Success!")
+# 		return redirect('scanner.html')
+
+# @app.route('/storeroom/')
+# def storeroom():
+# #get data input from location from mobilephone. data output from db is in tuple
+# #this userinput is hard coded
+# 	catItems = getFromLevels("Level4C2")
+# 	return render_template("storeroom.html", catGoods=catItems)
+
+# @app.route('/storeroom/<things>', methods=["GET","POST"])	
+# def retrieval(things):
+# 	things=things
+# 	form = RetrievalForm()
+
+
+# 	if request.method == "POST":
+# 		if form.validate() == False:
+# 			return render_template("retrieval.html",things=things,form=form)
+# 		elif type(form.amount.data)!=int:
+# 			return render_template("retrieval.html",things=things,form=form)
+
+# 		else:	
+# 			input = form.amount.data
+			
+# 			# flash('this has been added to the cart')
+# 			# return redirect(url_for('storeroom/'))
+# 			return ('you did it!!!!!')
+
+
+# 	elif request.method=="GET":
+# 		return render_template('retrieval.html',things=things, form=form)
+
+# 	return render_template("retrieval.html", things=things)
+# =======
 	
+# >>>>>>> ce4495d2f9e2602556e384a44cb683e0df1c27ad
 
 @app.route('/logout')
 def logout():
 	session.clear()
-	return redirect('/login')
+	return redirect(url_for("login", lang_code=get_locale()))
 
 
 @app.errorhandler(404)

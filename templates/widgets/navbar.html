@@ -1,6 +1,6 @@
 <style>
 body { 
-	padding-top: 60px;
+	padding-top: 80px;
 }
 </style>
 
@@ -22,27 +22,34 @@ body {
 
 				<!-- Dashboard -->
 				<li>
-			  	<a href="/dashboard">Overview</a>
-				</li>
-
-				<!-- Review -->
-				<li>
-			  	<a href="/review">Review</a>
+			  	<a href="/{{g.current_lang}}/dashboard">{{_('Overview')}}</a>
 				</li>
 
 				<!-- Inventory -->
 				<li>
-			  	<a href="/inventory">Inventory</a>
+			  	<a href="/{{g.current_lang}}/inventory">{{_('Inventory')}}</a>
+			  	</li>
+
+
+
+				<!-- Logs -->
+				<li>
+			  	<a href="/{{g.current_lang}}/logs">{{_('Logs')}}</a>
 				</li>
 
-				<!-- Logs/Reports -->
-				<li>
-			  	<a href="/logs">Logs/Reports</a>
+				<!-- Review/Reports -->
+				<li class="dropdown">
+				<a href="" class="dropdown-toggle" data-toggle="dropdown">{{_('Reports')}}<b class="caret"></b></a>
+				<ul class="dropdown-menu">
+			  		<li><a href="/{{g.current_lang}}/review/Guest Supplies">Guest Supplies</a></li>
+			  		<li><a href="/{{g.current_lang}}/review/Guest Hampers">Guest Hampers</a></li>
+			  		<li><a href="/{{g.current_lang}}/review/Kitchenware">Kitchenware</a></li>
+			  	</ul>
 				</li>
 
 				<!-- Admin -->
 				<li>
-			  	<a href="/admin">Admin</a>
+			  	<a href="/{{g.current_lang}}/admin">{{_('Admin')}}</a>
 				</li>
 
             </ul>
@@ -51,20 +58,15 @@ body {
 				<ul class="nav navbar-nav navbar-right" id="nav-right">
 					<li class="dropdown">			
 						<a href="" class="dropdown-toggle" data-toggle="dropdown">
-							Logged in as <b>{{session['name']}}</b> <b class="caret"></b>
+							{{_('Logged in as')}}  <b>{{session['name']}}</b> <b class="caret"></b>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href='/logout' onclick='changeRefreshInterval(0);'>Logout</a></li>
-		 					<!--<li role="seperator" class="divider"></li>
-							<li><a href='javascript:;' onclick='changeRefreshInterval(60);'>1 minute</a></li>
-							<li><a href='javascript:;' onclick='changeRefreshInterval(120);'>2 minutes</a></li>
-							<li><a href='javascript:;' onclick='changeRefreshInterval(300);'>5 minutes</a></li>
-							<li role="seperator" class="divider"></li>
-							<li><a href='javascript:;' onclick='changeRefreshInterval(600);'>10 minutes</a></li>
-							<li><a href='javascript:;' onclick='changeRefreshInterval(900);'>15 minutes</a></li>
-							<li><a href='javascript:;' onclick='changeRefreshInterval(1800);'>30 minutes</a></li>
-							<li><a href='javascript:;' onclick='changeRefreshInterval(2700);'>45 minutes</a></li>
-							<li><a href='javascript:;' onclick='changeRefreshInterval(3600);'>60 minutes</a></li> -->
+							<li><a href='/logout' onclick='changeRefreshInterval(0);'>{{_('Logout')}}</a></li>
+		 					<li role="seperator" class="divider"></li>
+							<li><a href='/en/{{request.path | lang_strip}}'>English</a></li>
+							<li><a href='/zh/{{request.path | lang_strip}}'>中文</a></li>
+							<li><a href='/ms/{{request.path | lang_strip}}'>Bahasa Melayu</a></li>
+							<li><a href='/ta/{{request.path | lang_strip}}'>தமிழ்</a></li>
 						</ul>
 					</li>
 				</ul>

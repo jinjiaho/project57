@@ -1,18 +1,4 @@
-{% extends "base.html" %}
-
-
-{% block title %}
-<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
-    <span class="sr-only">Toggle navigation</span>
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-
-</button>
-<a class="navbar-brand" href="#">{{category}} Month Review</a>
-
-
-{% endblock %}
+{% extends "v2/base.html" %}
 
 {% block content %}
 <style>
@@ -208,7 +194,7 @@ $(document).ready(function() {
                         </thead>
                         <tbody>
                         {% for item in itemtype %}
-                            <tr class="clickable-row" data-href="/inventory/{{item.name}}">
+                            <tr class="clickable-row" data-href="/inventory/{{item.sku}}">
                                 <td>{{item.name}}</td>
                                 <td>{{item.unit}}</td>
                                 <td>{{item.starting}}</td>

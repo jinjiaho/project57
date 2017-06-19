@@ -55,7 +55,7 @@ a:focus {
 <div id="qtyModal" class="modal fade" data-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="qtyForm">
+            <form id="qtyForm" data-role={{role}}>
                 <div class="modal-header">
                     <span class="close" data-dismiss="modal">&times;</span>
                     <h4 id="form-header"></h4>
@@ -66,6 +66,9 @@ a:focus {
                         <input id="modal-input-name" type="hidden" name="item" value="" />
                         <input id="modal-input-qty" type="number" name="qty" value="" placeholder="Enter quantity"/>
                         <input id="modal-input-sku" type="hidden" name="sku" value="" />
+                        <input type="radio" name="action" value="in" />In
+                        <input type="radio" name="action" value="out" checked/>Out
+                        <input type="radio" name="action" value="check" />Check
                     </div>
                 </div>
                 <div class="modal-footer" align="center" style="margin-top: 15px;">
@@ -91,6 +94,9 @@ a:focus {
                 <th>Item</th>
                 <th></th>
                 <th>Qty</th>
+                <!-- {% if role=='supervisor' %}
+                <th>Action</th>
+                {% endif %} -->
                 <th></th>
               </thead>
               <tbody>
