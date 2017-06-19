@@ -24,9 +24,7 @@ function updateCart() {
             + item.sku + '"><td><img src="' 
             + item.picture + '"/></td><td>' + item.name + '</td><td><input type="number" name="' 
             + item.sku + '" value="' + item.qty 
-            + '"/><br/><select><option value="out">Out</option>' 
-            + '<option value="in">In</option>'
-            + '<option value="check">Check</option></select></td>'
+            + '"/>'+item.action+'</td>'
             + '<td><a onclick="deleteRow(this)" href="javascript:void(0);">&times;</a></td></tr>');
         $('#'+item.sku+' option[value="'+item.action+'"]').attr('selected', 'selected');
       }
@@ -73,7 +71,7 @@ $(function () {
     var item_name = $(this).find($("#modal-input-name")).val();
     var item_qty = parseInt($(this).find($('#modal-input-qty')).val());
     var item_pic = $("#modal-picture img").attr('src');
-    var action = $("input[action]").val();
+    var action = $(this).find($("input[name='action']:checked")).val();
     console.log(item_sku + ", " + item_name + ", " + item_qty + ", " + item_pic);
     
     // if there is no cart object, create one with the form data
@@ -81,7 +79,7 @@ $(function () {
       console.log('no cart, creating new');
 
       // stringify the cart for HTML5 storage
-      localStorage.setItem('cart', JSON.stringify([{'sku':item_sku, 'name': item_name, 'qty': item_qty, 'picture': item_pic}]));
+      localStorage.setItem('cart', JSON.stringify([{'sku':item_sku, 'name': item_name, 'qty': item_qty, 'picture': item_pic, 'action':action}]));
     }
     // Or add it to the current cart
     else {
@@ -102,7 +100,7 @@ $(function () {
       // if item has not been added to the cart
       if (inCart === false) {
         // add to cart
-        thisCart.push({'sku':item_sku, 'name': item_name, 'qty': item_qty, 'picture': item_pic});
+        thisCart.push({'sku':item_sku, 'name': item_name, 'qty': item_qty, 'picture': item_pic, 'action':action});
         // console.log(JSON.stringify({'sku':item_sku, 'name': item_name, 'qty': item_qty, 'picture': item_pic}));
         // stringify
         localStorage.setItem('cart', JSON.stringify(thisCart));

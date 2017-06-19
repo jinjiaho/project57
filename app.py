@@ -94,23 +94,7 @@ def getAllLogs():
 	
 	for row in data:
 
-# # <<<<<<< HEAD
-# 		cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE sku = {};".format(str(row[5])))
-# 		item_data=cursor.fetchall()
-# 		# print(item_data)
-		# print(item_data[0])
-		# print(item_data[1])
 
-# 		things.append(
-# 				{"name": row[0].encode('ascii'),
-# 				"dateTime": row[1],
-# 				"action":row[2],
-# 				"move":row[3],
-# 				"remaining":row[4],
-# 				"item":item_data[0][0].encode('ascii'),
-# 				"category":item_data[0][1].encode('ascii'),
-# 				"location":row[6]})
-# # =======
 		# cursor.execute("SELECT name, category FROM Ascott_InvMgmt.Items WHERE name = {};".format(str(row[5])))
 		# item_data=cursor.fetchone()
 
@@ -123,7 +107,6 @@ def getAllLogs():
 			"location":row[6]})
 		print(things)
 			
-# >>>>>>> 3684797bc005be1436e23565ece904543746d7b6
 
 	return things
 		
@@ -433,7 +416,7 @@ def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
-@app.route('/shelves/<tag_id>/', methods=['GET', 'POST'])
+@app.route('/shelves/<tag_id>/', methods=['GET'])
 # @cache.cached(timeout=50)
 def shelf(tag_id):
 
@@ -442,48 +425,47 @@ def shelf(tag_id):
 	if not logged_in:
 		return redirect('/login')
 
-	if request.method == 'POST':
-		now = datetime.now()
-		form_data = request.form
-		user = session['username']
+	conn = mysql.connect()
+	cursor = conn.cursor()
 
-		print(form_data)
-		return hello()
-		
-		# conn = mysql.connect()
-		# cursor = conn.cursor()
-		# for item, qty in form_data.iteritems():
-		# 	cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location="+tag_id+";")
-		# 	qty_left = cursor.fetchone()[0]  - qty
-		# 	if (qty_left > 0):
-		# 		# query for stock out
-		# 		print("UPDATE Items SET qty_left = qty_left-"+qty+" WHERE qty_left >= "+qty+" AND sku="+item+" AND location="+tag_id+";")
-		# 		# create log for each item
-		# 		print("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
-		# 	else:
-		# 		flash('Not enough in store!')
+	cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
 
-		# return redirect('/scan')
+	data=cursor.fetchall()
+	things = []
+	for item in data:
+		things.append(
+			{"sku":item[0],
+			"name": item[1],
+			"category": item[2],
+			"picture":item[3]})
+	return render_template('storeroom.html', things=things, 
+		role = role,
+		user = session['username'], 
+		location = tag_id)
 
-	else:
+@app.route('/shelves/<tag_id>/cart', methods=['POST'])
+def processCart(tag_id):
+	now = datetime.now()
+	form_data = request.form
+	user = session['username']
+	
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	for item, qty in form_data.iteritems():
+		cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location="+tag_id+";")
+		qty_left = cursor.fetchone()[0]  - qty
+		if (qty_left > 0):
+			# query for stock out
+			print("UPDATE Items SET qty_left = qty_left-"+qty+" WHERE qty_left >= "+qty+" AND sku="+item+" AND location="+tag_id+";")
+			# create log for each item
+			print("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
+		else:
+			flash('Not enough in store!')
 
-		conn = mysql.connect()
-		cursor = conn.cursor()
-
-		cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
-
-		data=cursor.fetchall()
-		things = []
-		for item in data:
-			things.append(
-				{"sku":item[0],
-				"name": item[1],
-				"category": item[2],
-				"picture":item[3]})
-		return render_template('storeroom.html', things=things, 
-			role = role,
-			user = session['username'], 
-			location = tag_id)
+	return render_template('storeroom.html', things=things, 
+		role = role,
+		user = session['username'], 
+		location = tag_id)
 	
 
 @app.route('/logout')
