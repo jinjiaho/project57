@@ -392,7 +392,8 @@ def item(sku):
 		name = data[0][0]
 		category = data[0][1]
 		picture = data[0][2]
-		return render_template('item.html', name = name, category=category, picture=picture)
+		sku = sku
+		return render_template('item.html', name = name, category=category, picture=picture, sku=sku)
 	except:
 		return render_template('item.html', name = None)
 

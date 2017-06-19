@@ -69,7 +69,7 @@ var li = navlist.getElementsByTagName("a");
 for (var i=0; i < li.length; i++) {
     if (~window.location.pathname.indexOf(li[i].pathname)) {
         // add ".active" for navbar highlighting of current page
-        li[i].parentNode.className += " active";
+        li[i].parentNode.className += "inactive";
     }
 }
 
