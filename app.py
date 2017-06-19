@@ -406,9 +406,10 @@ def item(sku):
 	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
 
+	
+	
 	name = item
 	cursor = mysql.connect().cursor()
-
 	query = "SELECT name, category, picture, location FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
 	cursor.execute(query)
 	data = cursor.fetchall()
