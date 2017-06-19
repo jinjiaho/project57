@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `LocationInfo`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `LocationInfo` (
   `location` varchar(45) NOT NULL,
-  `description` varchar(255) NOT NULL,
+  `description` varchar(255) NULL,
 
   PRIMARY KEY (`location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
