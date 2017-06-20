@@ -124,7 +124,7 @@
     <div id="tab2" class="tab-pane fade" >
 
         <h3>Create A New User</h3>
-        <form method="POST" action="/admin" >
+        <form method="POST" action="/{{g.current_lang}}/admin" >
             {{ form.hidden_tag() }}
             <input type="hidden" name="name-form" value='form')>
         
@@ -205,7 +205,7 @@
 <!--#........................TAB3.............................  -->
     <div id="tab3" class="tab-pane fade">
         <h3>Add A New Item</h3>
-        <form method="POST" action="/admin">
+        <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form2' >
         
@@ -363,7 +363,7 @@
 
 
     <div id="tab4" class="tab-pane fade">
-        <form method="POST" action="/admin">
+        <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form3' >
         <h3> Add a New Location Tag </h3>
