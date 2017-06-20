@@ -219,11 +219,13 @@ def before():
 	if request.view_args and 'lang_code' in request.view_args:
 	    if request.view_args['lang_code'] not in languages:
 	    	g.current_lang = "en" # default localisation
-	        # return abort(404)
 	    else:
 	    	g.current_lang = request.view_args['lang_code']
 	    	session["lang_code"] = g.current_lang
 	    	request.view_args.pop('lang_code')
+	else:
+		session["lang_code"] = "en" # default localisation
+		g.current_lang = "en"
 
 	# user authentication
 	if u'logged_in' not in session:
@@ -400,7 +402,7 @@ def admin():
 				cursor.execute(query)
 				# cursor.execute("COMMIT")
 				flash("User is added!")
-				return redirect(url_for('admin'))
+				return redirect(url_for('admin', lang_code=get_locale()))
 
 		elif request.form['name-form'] =='form2':
 			if form2.validate() == False:
@@ -432,7 +434,7 @@ def admin():
 				cursor.execute(query)
 				# cursor.execute("COMMIT")
 				flash("New item is added!")
-				return redirect(url_for('admin'))
+				return redirect(url_for('admin', lang_code=get_locale()))
 
 		elif request.form['name-form'] =='form3':
 			if form3.validate() == False:
@@ -453,7 +455,7 @@ def admin():
 				# cursor.execute("COMMIT")
 				flash("New Location is Added!")
 				
-				return redirect(url_for('admin'))
+				return redirect(url_for('admin', lang_code=get_locale()))
 
 
 
