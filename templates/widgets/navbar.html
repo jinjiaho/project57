@@ -39,7 +39,7 @@ body {
 
 				<!-- Review/Reports -->
 				<li class="dropdown">
-				<a href="" class="dropdown-toggle" data-toggle="dropdown">{{_('Reports')}} <b class="caret"></b></a>
+				<a href="/{{g.current_lang}}/review" class="dropdown-toggle" data-toggle="dropdown" onclick="event.preventDefault();">{{_('Reports')}} <b class="caret"></b></a>
 				<ul class="dropdown-menu">
 			  		<li><a href="/{{g.current_lang}}/review/Guest Supplies">{{_('Guest Supplies')}}</a></li>
 			  		<li><a href="/{{g.current_lang}}/review/Guest Hampers">{{_('Guest Hampers')}}</a></li>

@@ -374,7 +374,7 @@ def admin():
 		items = cursor.fetchall()
 		# print (items)
 		flat_items = [item.encode('ascii') for sublist in items for item in sublist]
-		return render_template('admin.html', form=form, form2=form2,form3=form3, users=things, group=group, item_list=flat_items)
+		return render_template('v2/admin.html', form=form, form2=form2,form3=form3, users=things, group=group, item_list=flat_items)
 
 	
 
@@ -520,17 +520,21 @@ def item(sku):
 	
 	name = item
 	cursor = mysql.connect().cursor()
-	query = "SELECT name, category, picture, location FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
+	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
 	cursor.execute(query)
 	data = cursor.fetchall()
-	d = [[s.encode('ascii') for s in list] for list in data]
+	# d = [[s.encode('ascii') for s in list] for list in data]
 
 	r = []
 	for i in data:
 		r.append({"name": i[0].encode('ascii'),
 			"category": i[1].encode('ascii'),
 			"picture": i[2].encode('ascii'),
-			"location": i[3].encode('ascii')})
+			"location": i[3].encode('ascii'),
+			"qty_left": i[4],
+			"reorder": i[5],
+			"batch_size": i[6],
+			"unit": i[7].encode('ascii')})
 
 	# print d
 	print r

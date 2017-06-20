@@ -7,61 +7,71 @@
     <!-- Info display -->
     <div class="col-md-3">
         <img src="/static/img/items/{{item[0].category}}/{{item[0].picture}}" alt="" class="img-rounded img-responsive hidden-xs hidden-sm">
-        <h3 class="">{{item[0].name}}</h3>
+        <h3 style="line-height:1.2; padding-bottom: 8px;">{{item[0].name}}</h3>
         <!-- <hr class="hidden-xs hidden-sm"> -->
         <p class=""><span class="glyphicon glyphicon-map-marker" aria-hidden="true" style="font-size:20px;"></span> {% for i in item %}
-        {{i.location}}<br><span class="glyphicon glyphicon-map-marker" aria-hidden="true" style="font-size:20px; color:white;"></span> {% endfor %}</p>
+        {{i.location}}<br><span class="glyphicon glyphicon-map-marker" aria-hidden="true" style="font-size:20px; color:transparent;"></span> {% endfor %}</p>
+        <hr style="margin-top:-20px;">
+        <button class="btn btn-default" style="width:100%; background-color: #e6e6e6;" id="btn_getData">Reorder settings</button>
+        <h4 style="line-height:1.5;">Reorder when quantity reaches <b style="font-size: 26px">{{item[0].reorder}}</b></h4>
     </div>
+    <!-- END Info display -->
 
     <!-- Chart display -->
 	<div class="col-md-9">
     <h4>Quantity remaining</h4>
     <div class="panel panel-default">
         <div class="panel-body">
-        <div id="chart" style="height: 400px; margin: 0 auto"></div>
-        <div class="footer" id="update" style="display:none">
-            <hr>
-            <div class="stats">
-                <i class="fa fa-history"></i> Latest stock movement &mdash; 3 minutes ago
+            <div id="chart" style="height: 400px; margin: 0 auto"></div>
+            <div class="col-sm-4"><button class="btn btn-default" style="width:100%;" id="btn_getData">Stock Update</button></div>
+            <div class="col-sm-4"><button class="btn btn-default " style="width:100%;;" id="btn_newItem">Get Data</button></div>
+    		<div class="col-sm-4">
+    			<button class="btn btn-warning" style="width:100%;" id="btn_delItem" data-toggle="modal" data-target="#delModal">Delete</button>
+    		</div>
+            <div id="update" style="display:none">
+                <hr>
+                <div class="stats">
+                    <i class="fa fa-history"></i> Latest stock movement &mdash; 3 minutes ago
+                </div>
             </div>
         </div>
-        <div class="col-sm-3"><button class="btn btn-success" id="btn_getData">New Stock</button></div>
-        <div class="col-sm-3"><button class="btn btn-default" id="btn_getData">Get Data</button></div>
-        <div class="col-sm-3"><button class="btn btn-danger " id="btn_newItem">Use</button></div>
-		<div class="col-sm-3">
-			<button class="btn btn-warning" id="btn_delItem" data-toggle="modal" data-target="#delModal">Delete</button>
-		</div>
     </div>
-    </div></div>
+    <!-- END Chart display -->
 
+
+    <!-- Modal display -->
+    <div id="delModal" class="modal fade" data-backdrop="false" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Delete Items</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Select the locations that you want to delete the item from:</p>
+                        <p><font class="text-danger">(Please make sure the items have been physically removed.)</font></p>
+                        {% for i in item %}
+                            <div class="checkbox-custom">
+                                <input type="checkbox" id="checkbox1"/>
+                                <label>{{i.location}}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-default" value="Submit"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal display -->
+
+    </div>
 
 </div>
 
-<div id="delModal" class="modal fade" data-backdrop="false" role="dialog">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<form method="POST">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Delete Items</h4>
-				</div>
-				<div class="modal-body">
-					<p>Select the locations that you want to delete the item from:</p>
-					<p><font color="red">(Please make sure the items have been physically removed.)</font></p>
-					{% for i in item %}
-						<div class="checkbox-custom">
-							<input type="checkbox" id="checkbox1"/>
-							<label>{{i.location}}</label>
-						</div>
-					{% endfor %}
-				</div>
-				<div class="modal-footer">
-					<input type="submit" class="btn btn-default" value="Submit"/>
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
+
 
 
 <script>
