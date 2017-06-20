@@ -3,32 +3,12 @@
 {% block content %}
 <style>
 
-.thumbnail {
+a.thumbnail {
     border: 1.5px solid #ddd;
 }
 
 a.thumbnail > img {
     max-width: 120px;
-}
-
-a.thumbnail.active, a.thumbnail:focus, a.thumbnail:hover, a:focus, a:hover {
-    color: #ddd;
-    text-decoration: none;
-    border-color: #a94442;
-}
-
-.low, .low:hover {
-    color: #ddd;
-    text-decoration: none;
-    border-color: #EA4858;
-    /*background-color: #EA4858;*/
-}
-
-.medium, .low:hover {
-    color: #ddd;
-    text-decoration: none;
-    border-color: #fff7e5;
-    /*background-color: #fff7e5;*/
 }
 
 .sup-view .font-icon-list {
@@ -80,14 +60,17 @@ a.thumbnail.active, a.thumbnail:focus, a.thumbnail:hover, a:focus, a:hover {
 }
 
 .alert-danger {
+    border: 2px solid  #EA4858;
+  /*background-color: #EA4858;*/
   background-color: white;
 }
 
 .alert-warning {
+    border: 2px solid #ffc600;
+  /*background-color: #ffc600;*/
   background-color: white;
+
 }
-
-
 </style>
 
 <div class="container">

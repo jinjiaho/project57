@@ -19,32 +19,36 @@ USE `Ascott_InvMgmt`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `User`
+-- Table structure for table `LocationInfo`
 --
 
-DROP TABLE IF EXISTS `User`;
+DROP TABLE IF EXISTS `LocationInfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `User` (
-  `username` varchar(45) NOT NULL UNIQUE,
-  `password` varchar(256) NOT NULL,
-  `role` varchar(15) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  PRIMARY KEY (`username`)
+CREATE TABLE `LocationInfo` (
+  `location` varchar(45) NOT NULL,
+  `description` varchar(255) NULL,
+
+  PRIMARY KEY (`location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `User`
---
-
-LOCK TABLES `User` WRITE;
-/*!40000 ALTER TABLE `User` DISABLE KEYS */;
-INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('attendant','pbkdf2:sha1:1000$LDh1UfDE$896ed1b7bdf7aa75e066a9747b105ae3fdda3c96','attendent','Attendant #427');
-INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('raroot','pbkdf2:sha1:1000$7AV6JX9G$9b0d373b8b2f1b5f8dbe5859c9c6610b82711721','attendent','RA (root)');
-INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('supervisor','pbkdf2:sha1:1000$maoeJq4L$3160cd6a06f45c42302ba3b588ed5c73fbd4d7c6','supervisor','Supervisor (root)');
-INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('suroot','password','supervisor','Supervisor (root)');
-/*!40000 ALTER TABLE `User` ENABLE KEYS */;
+LOCK TABLES `LocationInfo` WRITE;
+/*!40000 ALTER TABLE `LocationInfo` DISABLE KEYS */;
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('B1C1',NULL);
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('B1C2',NULL);
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('B1C4',NULL);
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('B1C5',NULL);
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('B2C2',NULL);
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level4C2',NULL);
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level5C1','Level 5 Category 1');
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level5C3',NULL);
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level5C4',NULL);
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level6C2',NULL);
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level7C1','Level 7 Category 1');
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level7C2','');
+INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level8C1','');
+/*!40000 ALTER TABLE `LocationInfo` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -57,3 +61,10 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2017-05-21  2:32:05
+/*
+-- Query: SELECT * FROM Ascott_InvMgmt.LocationInfo
+LIMIT 0, 1000
+
+-- Date: 2017-06-19 23:27
+*/
+
