@@ -1,107 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-		<meta charset="utf-8" />
-		<title>Project 57</title>
+<html>
+<head>
 
-		<meta name="description" content="User login page" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+	<!-- Metadata -->
+	<title>{{_('Inventory Management')}} | Ascott</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="description" content="Login">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
 
-		<!-- bootstrap & fontawesome -->
-		<link rel="stylesheet" href="/static/css/bootstrap.min.css" />
-		<link rel="stylesheet" href="/static/font-awesome/4.5.0/css/font-awesome.min.css" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
 
-		<!-- text fonts -->
-		<link rel="stylesheet" href="/static/css/fonts.googleapis.com.css" />
+	<!-- JQuery JS -->
+	<script src="/static/js/jquery-3.2.1.min.js"></script>
 
-		<!-- ace styles -->
-		<link rel="stylesheet" href="/static/css/ace.min.css" />
+</head>
 
-		<!--[if lte IE 9]>
-			<link rel="stylesheet" href="/static/css/ace-part2.min.css" />
-		<![endif]-->
-		<link rel="stylesheet" href="/static/css/ace-rtl.min.css" />
+<body>
 
-		<!--[if lte IE 9]>
-		  <link rel="stylesheet" href="/static/css/ace-ie.min.css" />
-		<![endif]-->
+<style>
+html {
+  position: relative;
+  min-height: 100%;
+}
 
-		<!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+body {
+    background: #f9f9f9;
+    /* Margin bottom by footer height */
+}
 
-		<!--[if lte IE 8]>
-		<script src="/static/js/html5shiv.min.js"></script>
-		<script src="/static/js/respond.min.js"></script>
-		<![endif]-->
-		<link href="/static/css/custom.css" rel="stylesheet" />
-	</head>
-	<style>
-		.content {
-			position: absolute;
-			top: 0;
-			left: 0;
-			bottom: 0;
-			right: 0;
-		}
+a, a:hover, a:active {
+	text-decoration: none;
+}
 
-		.content .text-container .scanTag {
-			text-align: center;
-			color: #000;
-			font-size: 48pt;
-			font-size: 10vh;
-			line-height: 1.14;
-		}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+   /*Set the fixed height of the footer here */
+  /*height: 60px;*/
+  background-color: #f5f5f5;
+}
+</style>
 
-		#footer .footer-text {
-			color: #555;
-			font-size: 24pt;
-			padding-top: 8px;
-		}
+<div class="container text-center">
+<div class="col-sm-6 col-sm-offset-3" style="margin-top:40px;">
 
-		.text-container {
-			width: 100%;
-			text-align: center;
-			position: relative;
-			top: 27%;
-		}
-		
-	</style>
-	<body class="login-layout">
-		<div id="container">
-			<div id="body">
-				<a href="/{{g.current_lang}}/shelves/Level4C2/">  <!-- hardcoded with an idNFC for now-->
-					<div class="content">
-						<div class="text-container">
-							<span class="scanTag">PLACE PHONE ON TAG</span>
-						</div>
-					</div>
-				</a>
-			</div>
-			
-			<a href=""><div id="footer">
-				<div class="footer-text">History</div>
-			</div></a>
-		</div>
-		<!-- <script type="text/javascript">
-			$(document).ready(function () {
 
-			})
-		</script>
-	-->
-		<!-- basic scripts -->
+    	<!-- NFC -->
+		<div class="col-md-12">
+			<img class="img-responsive center-block" style="max-height:250px;" src="/static/img/nfc.png"/>
+    	</div>
+    	<!-- END NFC -->
 
-		<!--[if !IE]> -->
-		<script src="/static/js/jquery-2.1.4.min.js"></script>
+		<!-- Help text display -->
+		<h3 class="checkbox text-danger"><a href="/{{g.current_lang}}/shelves/Level4C2/">
+			{{_('Tap phone on tag')}}
+		</a></h3>
+		<!-- END Help text display -->
 
-		<!-- <![endif]-->
+</div> <!-- /.col-sm-6 -->
+</div> <!-- /.container-fluid -->
 
-		<!--[if IE]>
-	<script src="/static/js/jquery-1.11.3.min.js"></script>
-	<![endif]-->
-		<script type="text/javascript">
-			if('ontouchstart' in document.documentElement) document.write("<script src='/static/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
-		</script>
+<footer class="footer"><div class="container">
+    <h4 class="text-muted text-center"><a href="">
+		{{_('History')}}
+	</a></h4>
+</div></footer>
 
-		
-	</body>
+</body>
 </html>
