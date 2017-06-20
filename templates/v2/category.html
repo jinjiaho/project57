@@ -1,17 +1,14 @@
 {% extends "v2/base.html" %}
-
-{% block title %}{{category}}{% endblock %}
-
 {% block content %}
 <style>
-    .card .content {
+   /* .card .content {
         padding:0;
     }
     .container-fluid .date { float:right }
 
     .tablesorter .tablesorter-filter-row .disabled { 
     display: none;
-}
+}*/
 </style>
 <script type="text/javascript">
 
@@ -44,7 +41,7 @@ minutes="0"+minutes
 if (seconds<=9)
 seconds="0"+seconds
 //change font size here
-var cdate="<small><font color='000000' face='Arial'><b>"+dayarray[day]+", "+montharray[month]+" "+daym+", "+year+" "+hours+":"+minutes+":"+seconds+" "+dn
+var cdate="<small><font color='000000'><b>"+dayarray[day]+", "+montharray[month]+" "+daym+", "+year+" "+hours+":"+minutes+":"+seconds+" "+dn
 +"</b></font></small>"
 if (document.all)
 document.all.clock.innerHTML=cdate
@@ -173,11 +170,25 @@ $(document).ready(function() {
 });
 
 </script>
-<div class="container-fluid">
-<span>Category: {{category}}</span>
+<div class="container">
 <span align="right" id="clock" class="date"></span>
-    <div class="row">
 
+
+<!-- 1st header: Low inventory -->
+<div class="row">
+<div class="col-xs-7">
+    <h3 style="margin-bottom:0px;">{{category}}</h3>
+</div>
+<div class="col-xs-5">
+    <div class="pull-right" style="margin-top:25px;">
+      <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+      <span align="right" id="clock" class="date"></span>
+      <body onLoad="goforit()">
+    </div><!-- /input-group -->
+</div>
+</div><hr>
+
+<div class="row">
         <div class="col-md-12">
             <div class="card card-plain">
                <!--  <div class="header">

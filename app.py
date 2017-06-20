@@ -41,7 +41,7 @@ def getAllInventory(category):
 	cursor = conn.cursor()
 
 	cursor.execute(
-		"SELECT sku, name, qty_left, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+		"SELECT sku, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
 	items = []
 	for item in data:
@@ -49,25 +49,26 @@ def getAllInventory(category):
 			"SELECT action, qty_moved FROM ascott_invmgmt.logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
 		in_out_data = cursor.fetchall()
 		delivered_out = 0
-		recieved = 0
+		received = 0
 		for i in in_out_data:
 			if i[0].encode('ascii') == 'out':
 				delivered_out = delivered_out + (-1*int(i[1]))
 			elif i[0].encode('ascii') == "in":
-				recieved = recieved + int(i[1])
+				received = received + int(i[1])
 		remaining_quantity = item[2]
-		initial_quantity = remaining_quantity + delivered_out - recieved
+		initial_quantity = remaining_quantity + delivered_out - received
 		items.append(
 
 			{"sku":item[0],
 			"name": item[1],
 			"remaining": item[2],
-			"unit": item[3],
+			"reorder": item[3],
+			"unit": item[4],
 			"starting": initial_quantity,
-			"recieved": recieved,
+			"received": received,
 			"demand": delivered_out,
-			"picture": item[4].encode('ascii'),
-			"category": item[5].encode('ascii')
+			"picture": item[5].encode('ascii'),
+			"category": item[6].encode('ascii')
 			})
 		
 	return items
@@ -552,19 +553,19 @@ def category(category):
 		user = session['username'])
 
 
-@app.route('/<lang_code>/review')
-def review():
+# @app.route('/<lang_code>/review')
+# def review():
 
-	# user authentication
-	if not session["logged_in"]:
-		return redirect(url_for("login", lang_code=session["lang_code"]))
+# 	# user authentication
+# 	if not session["logged_in"]:
+# 		return redirect(url_for("login", lang_code=session["lang_code"]))
 
-	supplies = getAllInventory('Guest Supplies')
-	hampers = getAllInventory('Guest Hampers')
-	kitchenware = getAllInventory('Kitchenware')
-	return render_template('review.html', supplies = supplies,
-		hampers = hampers,
-		kitchenware = kitchenware, user=session['username'])
+# 	supplies = getAllInventory('Guest Supplies')
+# 	hampers = getAllInventory('Guest Hampers')
+# 	kitchenware = getAllInventory('Kitchenware')
+# 	return render_template('review.html', supplies = supplies,
+# 		hampers = hampers,
+# 		kitchenware = kitchenware, user=session['username'])
 
 # @app.route('/review')
 # def review():
