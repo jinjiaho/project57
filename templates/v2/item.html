@@ -12,7 +12,13 @@
         <p class=""><span class="glyphicon glyphicon-map-marker" aria-hidden="true" style="font-size:20px;"></span> {% for i in item %}
         {{i.location}}<br><span class="glyphicon glyphicon-map-marker" aria-hidden="true" style="font-size:20px; color:transparent;"></span> {% endfor %}</p>
         <hr style="margin-top:-20px;">
-        <button class="btn btn-default" style="width:100%; background-color: #e6e6e6;" id="btn_getData">Reorder settings</button>
+        {% if item[0].reorder != 0 %}
+        <p class="text-success"><span class="glyphicon glyphicon-ok" style="font-size:16px;" aria-hidden="true"></span> Item is tracked</p>
+        {% endif %}
+        {% if item[0].reorder == 0 %}
+        <p class="text-danger"><span class="glyphicon glyphicon-remove" style="font-size:16px;" aria-hidden="true"></span> Item is <b>not</b> tracked</p>
+        {% endif %}
+        <button class="btn btn-default" style="width:100%; background-color: #e6e6e6;" data-toggle="modal" data-target="#reorder-settings" id="#reorder-settings">Reorder settings</button>
         <h4 style="line-height:1.5;">Reorder when quantity reaches <b style="font-size: 26px">{{item[0].reorder}}</b></h4>
     </div>
     <!-- END Info display -->
@@ -23,14 +29,14 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div id="chart" style="height: 400px; margin: 0 auto"></div>
-            <div class="col-sm-4"><button class="btn btn-default" style="width:100%;" id="btn_getData">Stock Update</button></div>
-            <div class="col-sm-4"><button class="btn btn-default " style="width:100%;;" id="btn_newItem">Get Data</button></div>
+            <div class="col-sm-4"><button class="btn btn-default" style="width:100%;" id="btn_stockUpdate">Stock Update</button></div>
+            <div class="col-sm-4"><button class="btn btn-default " style="width:100%;;" id="btn_getData">Get Data</button></div>
     		<div class="col-sm-4">
-    			<button class="btn btn-warning" style="width:100%;" id="btn_delItem" data-toggle="modal" data-target="#delModal">Delete</button>
+    			<button class="btn btn-default" style="width:100%;" id="btn_delItem" data-toggle="modal" data-target="#delModal">Delete</button>
     		</div>
             <div id="update" style="display:none">
                 <hr>
-                <div class="stats">
+                <div class="stats" style="margin-left:10px; padding-top:7px;">
                     <i class="fa fa-history"></i> Latest stock movement &mdash; 3 minutes ago
                 </div>
             </div>
@@ -39,7 +45,7 @@
     <!-- END Chart display -->
 
 
-    <!-- Modal display -->
+    <!-- Modal #1 display -->
     <div id="delModal" class="modal fade" data-backdrop="false" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -50,7 +56,7 @@
                     </div>
                     <div class="modal-body">
                         <p>Select the locations that you want to delete the item from:</p>
-                        <p><font class="text-danger">(Please make sure the items have been physically removed.)</font></p>
+                        <b class="text-danger">Please make sure the items have been physically removed.</b>
                         {% for i in item %}
                             <div class="checkbox-custom">
                                 <input type="checkbox" id="checkbox1"/>
@@ -65,7 +71,47 @@
             </div>
         </div>
     </div>
-    <!-- END Modal display -->
+    <!-- END Modal #1 display -->
+
+    <!-- Modal #2 display -->
+    <div id="reorder-settings" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="reorder-form">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Reorder settings</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>Track item quantity?</b>&nbsp;&nbsp;&nbsp;<label class="radio-inline" id="turn-on-par">
+                          <input type="radio" name="on-off" id="turn-on" value="on" {% if item[0].reorder != 0 %}checked{% endif %}> Yes
+                        </label>
+                        <label class="radio-inline" id="turn-off-par">
+                          <input type="radio" name="on-off" id="turn-off" value="off" {% if item[0].reorder == 0 %}checked{% endif %}> No
+                        </label></p>
+                        <div id="pred" style="display:{% if item[0].reorder == 0 %}none{% endif %};">
+                        <b>Choose between automatic reordering prediction or manual input:</b>
+                        <div class="radio">
+                          <label>
+                            <input type="radio" name="manual-auto" id="pred-auto" value="auto" {% if item[0].reorder != 0 %}checked{% endif %}>
+                            Automatic reordering prediction
+                          </label>
+                        </div>
+                        <div class="radio">
+                          <label>
+                            <input type="radio" name="manual-auto" id="pred-manual" value="manual" {% if item[0].reorder == 0 %}checked{% endif %}>
+                            Manual input: <input type="text" class="form-control" id="pred-manual-qty" placeholder="Custom reorder point">
+                          </label>
+                        </div></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default" value="Apply changes" id="submit-reorder">Apply changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal #2 display -->
 
     </div>
 
@@ -75,7 +121,35 @@
 
 
 <script>
-var chartData;
+
+var reorder = {
+    "tracking": $('input[name="on-off"]:checked').val(),
+    "prediction": $('input[name="manual-auto"]:checked').val(),
+    "qty": $('input[id="pred-manual-qty"]').val()
+};
+
+
+function editReorder() {
+    $.ajax({
+        type: "POST",
+        url: "/api/editReorder",
+        data: JSON.stringify(reorder),
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response, status, jqXHR) {
+            var filtered = [];
+            console.log(response)
+            // callback(filtered);
+        }
+    });
+}
+
+$('#reorder-form').submit( function(event) {
+    // event.preventDefault();
+    editReorder();
+});
+
+
 function getData(callback) {
     $.ajax({
         type: "POST",
@@ -86,17 +160,14 @@ function getData(callback) {
         success: function(response, status, jqXHR) {
             var filtered = [];
             for (var c = 0; c < response.length; ++c) {
-                filtered.push([new Date(response[c][0]).getTime(), response[c][1]])
+                filtered.push([new Date(response[c][0]).getTime(), response[c][1]]);
             }
-            chartData = filtered;
-            callback(filtered)
+            callback(filtered);
         }
     });
 }
 
 function initChart(dataSources) {
-
-
     Highcharts.stockChart('chart', {
         rangeSelector: {
             selected: 1
@@ -183,6 +254,16 @@ getData(initChart);
 
 $(document).ready(function(){
     // insert any required code here
+
+
+    $("#turn-on-par").click(function(){
+        $("#pred").show();
+    });
+    $("#turn-off-par").click(function(){
+        $("#pred").hide();
+    });
+
+
 });
 
 </script>

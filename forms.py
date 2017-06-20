@@ -42,3 +42,8 @@ class AddNewLocation(FlaskForm):
 	submitThree = SubmitField("Enter")
 	
 
+class TrackingForm(FlaskForm):
+	enabled = RadioField('Track item quantity? ', choices=[('yes','Yes'),('no','No')])
+	password = PasswordField(validators=[DataRequired('Please enter a password')])
+	remember = BooleanField()
+	submit = SubmitField()

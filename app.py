@@ -168,7 +168,7 @@ def getChartData():
 
 	if not request.json:
 	    print "Bad json format"
-	    abort(400)
+	    page_not_found(400)
 	else:
 		conn = mysql.connect()
 		cursor = conn.cursor()
@@ -188,6 +188,38 @@ def getChartData():
 		responseData = cursor.fetchall()
 
 		return jsonify(responseData)
+
+# POST for getting chart data
+@app.route('/api/editReorder', methods=["POST"])
+def editReorder():
+
+	print "content_type: ", request.content_type
+	print "request.json: ", request.json
+
+	data = str(request.get_json())
+	print(data, type(data))
+
+	if not request.json:
+	    print "Bad json format"
+	    page_not_found(400)
+	else:
+		cursor = mysql.connect().cursor()
+
+		# TODO: string parameterisation
+		query = "SELECT sku FROM Ascott_Invmgmt.Items WHERE name = '{}';".format(request.json)
+
+		# cursor.execute(query)
+		# idItem = cursor.fetchone()[0]
+		# # print(idItem)
+
+		# # query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
+		# query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = 1"
+		# # TODO: string parameterisation
+		# # query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
+		# cursor.execute(query)
+		# responseData = cursor.fetchall()
+
+		return jsonify(data)
 
 # true if user is authenticated, else false
 def auth():
