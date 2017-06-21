@@ -661,55 +661,62 @@ def shelf(tag_id):
 	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
 
-	if request.method == 'GET':
-		conn = mysql.connect()
-		cursor = conn.cursor()
+	conn = mysql.connect()
+	cursor = conn.cursor()
 
-		cursor.execute("SELECT sku, name, category, picture FROM Items WHERE location = '{}';".format(tag_id))
+	cursor.execute("SELECT sku, name, category, picture FROM Items WHERE location = '{}';".format(tag_id))
 
-		data=cursor.fetchall()
-		things = []
-		for item in data:
-			things.append(
-				{"sku":item[0],
-				"name": item[1],
-				"category": item[2],
-				"picture":item[3]})
-		return render_template('storeroom.html', things=things, 
-			role = session['role'],
-			user = session['username'], 
-			location = tag_id)
-	else:
+	data=cursor.fetchall()
+	things = []
+	for item in data:
+		things.append(
+			{"sku":item[0],
+			"name": item[1],
+			"category": item[2],
+			"picture":item[3]})
+	message = None
+	
+
+	if request.method == 'POST':
 		now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		form_data = request.form
 		user = session['username']
 		
-		conn = mysql.connect()
-		cursor = conn.cursor()
-		message = ''
-		for item, info in form_data.iterlists():
-			print(item)
-			print(info[0]+", "+info[1])
-			cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
-			old_qty = cursor.fetchone()[0]
-			qty_input = int(info[0])
-			if info[1] == 'out':
-				qty_left = old_qty  - qty_input
-				qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
-				if qty_left < 0:
-					message = 'Not enough in store!'
+		try:
+			conn = mysql.connect()
+			cursor = conn.cursor()
+			message = ''
+			for item, info in form_data.iterlists():
+				print(item)
+				print(info[0]+", "+info[1])
+				cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
+				old_qty = cursor.fetchone()[0]
+				qty_input = int(info[0])
+				if info[1] == 'out':
+					qty_left = old_qty  - qty_input
+					qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
+					if qty_left < 0:
+						message = 'Not enough in store!'
 
-			elif info[1] == 'in':
-				qty_left = old_qty + qty_input
-			else:
-				qty_left = qty_input
-				qty_input = qty_left - old_qty # change the value of qty to the difference 
-			# query for stock out
-			message += "UPDATE Items SET qty_left="+str(qty_left)+" WHERE qty_left>="+str(0)+" AND sku="+str(item)+" AND location='"+tag_id+"';"
-			# create log for each item
-			message += "\nINSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', 'out', {}, {}, {}, '{}');".format(str(user), now, qty_input, qty_left, item, tag_id)
+				elif info[1] == 'in':
+					qty_left = old_qty + qty_input
+				else:
+					qty_left = qty_input
+					qty_input = qty_left - old_qty # change the value of qty to the difference 
+				# query for stock out
+				cursor.execute("UPDATE Items SET qty_left="+str(qty_left)+" WHERE qty_left>="+str(0)+" AND sku="+str(item)+" AND location='"+tag_id+"';")
+				# create log for each item
+				cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', 'out', {}, {}, {}, '{}');".format(str(user), now, qty_input, qty_left, item, tag_id))
+				message = 'Success!'
+			
+		except:
+			message = "Unexpected error:" + sys.exc_info()[0]
 
-		return message
+    	return render_template('storeroom.html', things=things,
+    		role = session['role'],
+    		user = session['username'], 
+    		location = tag_id,
+    		message = message)
 
 # @app.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
 # def processCart(lang_code, tag_id):

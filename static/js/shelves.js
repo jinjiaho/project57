@@ -46,6 +46,7 @@ function deleteRow(r) {
 
 $(function () {
   updateCart();
+  
 
   // When an item is clicked, open a modal with the item information
   $(".openModal").click(function() {
