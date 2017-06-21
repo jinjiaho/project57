@@ -119,7 +119,6 @@ jQuery(document).ready(function($) {
 $(document).ready(function() { 
     $("#review").tablesorter({
         sortList: [[4,1]],
-        theme:'red',
         showProcessing: true,
         widgets: ["filter"],
         widgetOptions : {
@@ -151,7 +150,7 @@ $(document).ready(function() {
 
       // Set this option to true to use the filter to find text from the start of the column
       // So typing in "a" will find "albert" but not "frank", both have a's; default is false
-      filter_startsWith  : true,
+      filter_startsWith  : false,
 
       // filter_formatter : {
       //   6 : function($cell, indx){
@@ -198,12 +197,12 @@ $(document).ready(function() {
                 <div class="content table-responsive table-full-width" style="margin-top: 20px;">
                     <table id="review" class="table table-hover">
                         <thead>
-                            <th>Name</th>
-                            <th class="filter-false sorter-false">Unit</th>
-                            <th class="filter-false sorter-false">Initial Quantity</th>
-                            <th class="filter-false sorter-false">In</th>
-                            <th class="filter-false sorter-false">Out</th>
-                            <th class="filter-false sorter-false">Remaining Quantity</th>
+                            <th data-placeholder="Search">Name</th>
+                            <th data-filter="false">Unit</th>
+                            <th data-filter="false">Initial Quantity</th>
+                            <th data-filter="false">In</th>
+                            <th data-filter="false">Out</th>
+                            <th data-filter="false">Remaining Quantity</th>
                         </thead>
                         <tbody>
                         {% for item in itemtype %}
@@ -224,8 +223,8 @@ $(document).ready(function() {
         </div>
     </div>
     <div class="row" style="padding-bottom:30px;">
-        <div class="col-xs-12" align="center">
-            <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+<!--         <div class="col-xs-12" align="center">
+            <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button> -->
             <body onLoad="goforit()">
         </div>
 
