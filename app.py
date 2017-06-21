@@ -293,7 +293,7 @@ def hello():
 
 @app.route('/<lang_code>/login', methods=["GET", "POST"])
 def login():
-	
+
 	# create a login form to collect username & password
 	form = LoginForm()
 
@@ -326,6 +326,7 @@ def login():
 
 			else:
 				# username & password match
+				print(data[2])
 				session['username'] = data[0]
 				session['role'] = data[2]
 				session['name'] = data[3]
@@ -350,6 +351,9 @@ def login():
 				return redirect(url_for("dashboard", lang_code=get_locale()))
 			elif session['role'] == "attendant":
 				return redirect(url_for("scanner", lang_code=get_locale()))
+
+	else:
+		return redirect(url_for("hello"))
 
 
 @app.route('/<lang_code>/admin', methods=["GET","POST"])
