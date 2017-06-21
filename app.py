@@ -401,7 +401,7 @@ def admin():
 		val = i['NFC'] #details of NFC location 
 
 		#fetch all item names pertaining to the tag.
-		cursor.execute("SELECT name FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(val))
+		cursor.execute("SELECT name, sku FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(val))
 		data3=cursor.fetchall()
 		
 		group[val] = data3

@@ -68,7 +68,7 @@
             <ul class="list-group">
 
                 {% for i in values %}
-                    <li class="list-group-item"><a href="/{{g.current_lang}}/inventory"> {{ i[0].encode('ascii') }} </a></li>
+                    <li class="list-group-item"><a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }} </a></li>
 
                 {% endfor %}                
         
