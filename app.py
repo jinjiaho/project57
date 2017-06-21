@@ -46,7 +46,7 @@ def getAllInventory(category):
 	items = []
 	for item in data:
 		cursor.execute(
-			"SELECT action, qty_moved FROM Ascott_InvMgmt.logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
+			"SELECT action, qty_moved FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
 		in_out_data = cursor.fetchall()
 		delivered_out = 0
 		received = 0
@@ -693,85 +693,6 @@ def processCart(tag_id):
 		message = 'feedback'
 
 	return redirect('shelves/'+tag_id, message=message)
-
-	# TODO: Discard unnecessary lines. 
-
-	# else:
-
-	# 	conn = mysql.connect()
-	# 	cursor = conn.cursor()
-
-	# 	cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
-
-	# 	data=cursor.fetchall()
-	# 	things = []
-	# 	for item in data:
-	# 		things.append(
-	# 			{"sku":item[0],
-	# 			"name": item[1],
-	# 			"category": item[2],
-	# 			"picture":item[3]})
-	# 	return render_template('storeroom.html', things=things, 
-	# 		role = role,
-	# 		user = session['username'], 
-	# 		location = tag_id)
-# <<<<<<< HEAD
-# 	else:
-# 		return redirect(url_for("scan", lang_code=get_locale()))
-
-
-# @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
-# def checkout(tag_id):
-# 	if request.method == 'GET':
-# 		return render_template('cart.html')
-# 	else:
-# 		now = datetime.now()
-# 		form_data = request.form
-# 		user = session['username']
-		
-# 		conn = mysql.connect()
-# 		cursor = conn.cursor()
-# 		for item, qty in form_data.iteritems():
-# 			cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
-
-# 		flash("Success!")
-# 		return redirect('scanner.html')
-
-# @app.route('/storeroom/')
-# def storeroom():
-# #get data input from location from mobilephone. data output from db is in tuple
-# #this userinput is hard coded
-# 	catItems = getFromLevels("Level4C2")
-# 	return render_template("storeroom.html", catGoods=catItems)
-
-# @app.route('/storeroom/<things>', methods=["GET","POST"])	
-# def retrieval(things):
-# 	things=things
-# 	form = RetrievalForm()
-
-
-# 	if request.method == "POST":
-# 		if form.validate() == False:
-# 			return render_template("retrieval.html",things=things,form=form)
-# 		elif type(form.amount.data)!=int:
-# 			return render_template("retrieval.html",things=things,form=form)
-
-# 		else:	
-# 			input = form.amount.data
-			
-# 			# flash('this has been added to the cart')
-# 			# return redirect(url_for('storeroom/'))
-# 			return ('you did it!!!!!')
-
-
-# 	elif request.method=="GET":
-# 		return render_template('retrieval.html',things=things, form=form)
-
-# 	return render_template("retrieval.html", things=things)
-# # =======
-# >>>>>>> 3e45732bf8f7ce11db7773b8452955ba8bc37d3b
-	
-# >>>>>>> ce4495d2f9e2602556e384a44cb683e0df1c27ad
 
 @app.route('/logout')
 def logout():
