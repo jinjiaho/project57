@@ -673,9 +673,9 @@ def processCart(tag_id):
 	
 	conn = mysql.connect()
 	cursor = conn.cursor()
-	for item, qty in form_data.iteritems():
+	for item, info in form_data.iteritems():
 		print(item)
-		print(qty)
+		print(info)
 		cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
 		# if action == 'out':
 		# 	qty_left = cursor.fetchone()[0]  - qty

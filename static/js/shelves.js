@@ -23,8 +23,9 @@ function updateCart() {
         cartTable.append('<tr class="cart_item" id="'
             + item.sku + '"><td><img src="' 
             + item.picture + '"/></td><td>' + item.name + '</td><td><input type="number" name="' 
-            + item.sku + '" value="' + item.qty 
-            + '"/>'+item.action+'</td>'
+            + item.sku + '[qty]" value="' + item.qty 
+            + '"/>'+item.action+'<input type="hidden" name="' + item.sku 3+ '[action]" value="'
+            + item.action+'" /></td>'
             + '<td><a onclick="deleteRow(this)" href="javascript:void(0);">&times;</a></td></tr>');
         $('#'+item.sku+' option[value="'+item.action+'"]').attr('selected', 'selected');
       }
