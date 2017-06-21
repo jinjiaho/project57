@@ -39,9 +39,9 @@ function clearCartSubmit() {
 }
 
 function deleteRow(r) {
-    var row = r.parentNode.parentNode.rowIndex;
-    document.getElementById('cart-table').deleteRow(row);
-  }
+  var row = r.parentNode.parentNode.rowIndex;
+  document.getElementById('cart-table').deleteRow(row);
+}
 
 $(function () {
   updateCart();
@@ -89,7 +89,7 @@ $(function () {
       // boolean to see if item has already been added to cart
       var inCart = false; 
       var newCart = thisCart.map(function(i) {
-        if (i.name === item_name) {
+        if (i.name === item_name && i.action === action) {
           inCart = true;
           // update quantity for the item
           i.qty = i.qty + item_qty;

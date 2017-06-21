@@ -27,7 +27,6 @@ adminmode = False
 
 
 #---------------------------GLOBAL VARIABLES----------------------
-role = ""
 
 #----------------------------METHODS-------------------------
 # Returns all the items based on category and amount in or out within the last month for each item
@@ -381,7 +380,7 @@ def category(category):
 	category = category
 	itemtype = getAllInventory(category)
 	return render_template('category.html', category=category, itemtype=itemtype, 
-		role = role,
+		role = session['role'],
 		user = session['username'])
 
 @app.route('/review')
@@ -407,7 +406,7 @@ def logs():
 	# items=getUniqueItems()
 	return render_template('logs.html',
 		logs=logs, 
-		role = role,
+		role = session['role'],
 		user = session['username'])
 	# names=names, items=items)
 
@@ -416,7 +415,7 @@ def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
-@app.route('/shelves/<tag_id>/', methods=['GET'])
+@app.route('/shelves/<tag_id>', methods=['GET'])
 # @cache.cached(timeout=50)
 def shelf(tag_id):
 
@@ -428,7 +427,7 @@ def shelf(tag_id):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
-	cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
+	cursor.execute("SELECT sku, name, category, picture FROM Items WHERE location = '{}';".format(tag_id))
 
 	data=cursor.fetchall()
 	things = []
@@ -439,7 +438,7 @@ def shelf(tag_id):
 			"category": item[2],
 			"picture":item[3]})
 	return render_template('storeroom.html', things=things, 
-		role = role,
+		role = session['role'],
 		user = session['username'], 
 		location = tag_id)
 
@@ -452,20 +451,20 @@ def processCart(tag_id):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 	for item, qty in form_data.iteritems():
-		cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location="+tag_id+";")
-		qty_left = cursor.fetchone()[0]  - qty
-		if (qty_left > 0):
-			# query for stock out
-			print("UPDATE Items SET qty_left = qty_left-"+qty+" WHERE qty_left >= "+qty+" AND sku="+item+" AND location="+tag_id+";")
-			# create log for each item
-			print("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
-		else:
-			flash('Not enough in store!')
+		print(item)
+		print(qty)
+		cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
+		# if action == 'out':
+		# 	qty_left = cursor.fetchone()[0]  - qty
+		# 	if (qty_left > 0):
+		# 		# query for stock out
+		# 		print("UPDATE Items SET qty_left="+qty_left+" WHERE qty_left>="+qty+" AND sku="+item+" AND location='"+tag_id+"';")
+		# 		# create log for each item
+		# 		print("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
+		# 	else:
+		# 		flash('Not enough in store!')
 
-	return render_template('storeroom.html', things=things, 
-		role = role,
-		user = session['username'], 
-		location = tag_id)
+	return redirect('shelves/'+tag_id)
 	
 
 @app.route('/logout')
