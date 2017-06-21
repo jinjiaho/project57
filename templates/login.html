@@ -1,21 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 
 	<!-- Metadata -->
-	<title>Inventory Management | Ascott</title>
+	<title>{{_('Inventory Management')}} | Ascott</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="utf-8">
 	<meta name="description" content="Login">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="icon" type="image/png" href="/static/img/favicon.png">
 
-	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="/static/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/static/css/font-awesome.min.css">
-
-	<!-- Fonts CSS -->
-	<link href='/static/css/roboto.css' rel='stylesheet' type='text/css'>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
 
 	<!-- JQuery JS -->
 	<script src="/static/js/jquery-3.2.1.min.js"></script>
@@ -25,9 +22,7 @@
 <body>
 
 <style>
-body {
-	background:#f7f7f7;
-}
+body {background:#f7f7f7;}
 </style>
 
 <div class="container-fluid text-center">
@@ -42,19 +37,9 @@ body {
 
 
     	<!-- Error display -->
-    	{% if form.username.errors %}
-			{% for error in form.username.errors %} 
-			<p class="checkbox text-danger">{{error}}</p>
-			{% endfor %}
+    	{% if form.username.errors or form.password.errors or get_flashed_messages() %}
+			<p class="checkbox text-danger">{{_('Username and/or password do not match records')}}</p>
 		{% endif %}
-    	{% if form.password.errors %}
-			{% for error in form.password.errors %} 
-			<p class="checkbox text-danger">{{error}}</p>
-		{% endfor %}
-		{% endif %}
-    	{% for message in get_flashed_messages() %}
-			<p class="checkbox text-danger">{{message}}</p>
-		{% endfor %}
 		<!-- END Error display -->
 
 
@@ -63,23 +48,26 @@ body {
             <form role="form" method="POST" id="login-form">{{form.hidden_tag()}}
             	<!-- username input -->
                 <div class="form-group">
-                	{{ form.username(class="form-control", placeholder="Username") }}
+                	{{ form.username(class="form-control", placeholder=_("Username")) }}
                 </div>
                 <!-- password input -->
                 <div class="form-group">
-                	{{ form.password(class="form-control", placeholder="Password") }}
+                	{{ form.password(class="form-control", placeholder=_("Password")) }}
                 </div>
                 <!-- checkbox for storing userdata -->
                 <div class="checkbox">
-			        <label>{{ form.remember(checked="checked") }} Remember me for one month</label>
+			        <label>{{ form.remember(checked="checked") }} {{_('Remember for one month')}}</label>
 			    </div>
-			    {{ form.submit(class="btn btn-primary", style="width:100%;") }}
+			    {{ form.submit(class="btn btn-primary", style="width:100%;", value=_("Login")) }}
             </form>
             <p class="checkbox">
-            	<a href="javascript:;" id="forget">Forgot your password?</a>
+            	<a href="/en/login" id="forget">English</a> &bull; 
+            	<a href="/zh/login" id="forget">中文</a> &bull; 
+            	<a href="/ms/login" id="forget">Bahasa Melayu</a> &bull; 
+            	<a href="/ta/login" id="forget">தமிழ்</a>
             </p>
         	<hr>
-        	<p class="text-muted">&copy; The Ascott Limited | SUTD</p>
+        	<p class="text-muted">&copy; The Ascott Limited &bull; SUTD</p>
 	    </div>
 	    <!-- END Form -->
 

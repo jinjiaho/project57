@@ -139,7 +139,7 @@ a.thumbnail.active, a.thumbnail:focus, a.thumbnail:hover, a:focus, a:hover {
 <!-- Recent transactions -->
 <div class="row">
 <div class="col-xs-7">
-    <h3 style="margin-bottom:0px;">Recent transactions</h3>
+    <h3 style="margin-bottom:0px;">Today's transactions</h3>
 </div>
 <div class="col-xs-5">
     <div class="pull-right" style="margin-top:25px;">
@@ -151,38 +151,28 @@ a.thumbnail.active, a.thumbnail:focus, a.thumbnail:hover, a:focus, a:hover {
 <!-- Table of transactions -->
 <div class="col-md-12" style="margin-bottom:30px;"><table id="recent">
     <thead>
-        <th>Name</th>
-        <th>Item</th>
-        <th>Qty</th>
-        <th>In/Out</th>
-        <th>Date-Time</th>
-        <th>Qty Left</th>
+                            <th>Name</th>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>In/Out</th>
+                            <th>Quantity change</th>
+                            <th>Quantity remaining</th>
+                            <th>Date-Time</th>
+                            <th>Location</th>
     </thead>
     <tbody>
+    {% for log in l %}
         <tr>
-            <td>Ah Moi</td>
-            <td>Conditioner</td>
-            <td>3</td>
-            <td>Out</td>
-            <td>3 minutes ago</td>
-            <td>98</td>
+                                <td>{{log.name}}</td>
+                                <td>{{log.item}}</td>
+                                <td>{{log.category}}</td>
+                                <td>{{log.action}}</td>
+                                <td>{{log.move}}</td>
+                                <td>{{log.remaining}}</td>
+                                <td>{{log.dateTime}}</td>
+                                <td>{{log.location}}</td>
         </tr>
-        <tr>
-            <td>Nisha</td>
-            <td>Shampoo</td>
-            <td>5</td>
-            <td>Out</td>
-            <td>2 hours ago</td>
-            <td>134</td>
-        </tr>
-        <tr>
-            <td>Sok Ting</td>
-            <td>Toothbrush</td>
-            <td>10</td>
-            <td>Out</td>
-            <td>At 4pm yesterday</td>
-            <td>253</td>
-        </tr>
+    {% endfor %}
     </tbody>
 </table></div>
 

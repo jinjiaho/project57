@@ -3,32 +3,12 @@
 {% block content %}
 <style>
 
-.thumbnail {
+a.thumbnail {
     border: 1.5px solid #ddd;
 }
 
 a.thumbnail > img {
     max-width: 120px;
-}
-
-a.thumbnail.active, a.thumbnail:focus, a.thumbnail:hover, a:focus, a:hover {
-    color: #ddd;
-    text-decoration: none;
-    border-color: #a94442;
-}
-
-.low, .low:hover {
-    color: #ddd;
-    text-decoration: none;
-    border-color: #EA4858;
-    /*background-color: #EA4858;*/
-}
-
-.medium, .low:hover {
-    color: #ddd;
-    text-decoration: none;
-    border-color: #fff7e5;
-    /*background-color: #fff7e5;*/
 }
 
 .sup-view .font-icon-list {
@@ -80,41 +60,45 @@ a.thumbnail.active, a.thumbnail:focus, a.thumbnail:hover, a:focus, a:hover {
 }
 
 .alert-danger {
+    border: 2px solid  #EA4858;
+  /*background-color: #EA4858;*/
   background-color: white;
 }
 
 .alert-warning {
+    border: 2px solid #ffc600;
+  /*background-color: #ffc600;*/
   background-color: white;
+
 }
-
-
 </style>
 
 <div class="container">
 
-<!-- Items below reorder point -->
-<div class="row"><div class="col-xs-6 col-sm-7 col-md-8">
-    <h3 style="margin-bottom:0px;">Low inventory</h3>
+<!-- 1st header: Low inventory -->
+<div class="row">
+<div class="col-xs-7">
+    <h3 style="margin-bottom:0px;">{{_('Low inventory')}}</h3>
 </div>
-<div class="col-xs-6 col-sm-5 col-md-4">
-    <div class="input-group" style="margin-top:16px;">
-        <input id="overview-filter" type="text" class="form-control" placeholder="Filter">
-        <span class="input-group-btn">
-            <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span></button>
-        </span>
+<div class="col-xs-5">
+    <div class="pull-right" style="margin-top:25px;">
+        <a href="inventory">{{_('View all items')}} <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
     </div><!-- /input-group -->
-</div></div>
-<hr>
+</div>
+</div><hr>
 
-<!-- Iterable item displays -->
+<!-- If no items running low, display this text -->
 {% if not items %}
 <div class="col-md-12 text-center">
-    <h3 class="text-info">No items in need of restocking</h3>
+    <h3 class="text-info">{{_('No items in need of restocking')}}</h3>
 </div>
 {% endif %}
 
-<div id="overview-item-outer">{% for i in items %}
-<a href="/inventory/{{i.sku}}">
+<!-- If there are items running low, display those items -->
+<div class="row" style="margin-left:0; margin-right:0">
+<div id="overview-item-outer">
+{% for i in items %}
+<a href="/{{g.current_lang}}/inventory/{{i.sku}}">
   <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
     <div class="overview-item-group alert {% if i.qty_left > i.reorder_pt and i.qty_left <= 1.2*i.reorder_pt %}alert-warning{% endif %}{% if i.qty_left <= i.reorder_pt%}alert-danger{% endif %}">
       <div class="overview-item-img" align='center'>
@@ -127,26 +111,20 @@ a.thumbnail.active, a.thumbnail:focus, a.thumbnail:hover, a:focus, a:hover {
     </div>
   </div>
 </a>
-<!-- <div class="col-xs-6 col-sm-3 col-md-2"><a href="/inventory/{{i.sku}}" class="thumbnail">
-    <img src="/static/img/items/{{i.category}}/{{i.picture}}" alt="">
-    <div style="padding:9px;" class="text-center {% if i.qty_left > i.reorder_pt and i.qty_left <= 1.2*i.reorder_pt %}text-warning{% endif %}{% if i.qty_left <= i.reorder_pt%}text-danger{% endif %}">
-        <p>{{i.name}}</p>
-        <p style="font-size:30px;">{{i.qty_left}}</p>
-    </div>
-</a></div> -->
-{% endfor %}</div>
+{% endfor %}
+</div></div>
 
-<!-- Recent transactions -->
+<!-- 2nd header: Today's transactions -->
 <div class="row">
 <div class="col-xs-7">
-    <h3 style="margin-bottom:0px;">Recent transactions</h3>
+    <h3 style="margin-bottom:0px;">{{_("Today's transactions")}}</h3>
 </div>
 <div class="col-xs-5">
     <div class="pull-right" style="margin-top:25px;">
-        <a href="logs">See more <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
+        <a href="logs">{{_('View more')}} <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
     </div><!-- /input-group -->
-</div></div>
-<hr>
+</div>
+</div><hr>
 
 <!-- Table of transactions -->
 <div class="col-md-12" style="margin-bottom:30px;"><table id="recent">
@@ -159,36 +137,25 @@ a.thumbnail.active, a.thumbnail:focus, a.thumbnail:hover, a:focus, a:hover {
         <th>Qty Left</th>
     </thead>
     <tbody>
+    {% for log in l %}
         <tr>
-            <td>Ah Moi</td>
-            <td>Conditioner</td>
-            <td>3</td>
-            <td>Out</td>
-            <td>3 minutes ago</td>
-            <td>98</td>
+                                <td>{{log.name}}</td>
+                                <td>{{log.item}}</td>
+                                <td>{{log.category}}</td>
+                                <td>{{log.action}}</td>
+                                <td>{{log.move}}</td>
+                                <td>{{log.remaining}}</td>
+                                <td>{{log.dateTime}}</td>
+                                <td>{{log.location}}</td>
         </tr>
-        <tr>
-            <td>Nisha</td>
-            <td>Shampoo</td>
-            <td>5</td>
-            <td>Out</td>
-            <td>2 hours ago</td>
-            <td>134</td>
-        </tr>
-        <tr>
-            <td>Sok Ting</td>
-            <td>Toothbrush</td>
-            <td>10</td>
-            <td>Out</td>
-            <td>At 4pm yesterday</td>
-            <td>253</td>
-        </tr>
+    {% endfor %}
     </tbody>
 </table></div>
 
 
 
 </div><!-- /.container -->
+
 <script>
 $(document).ready(function() { 
 
@@ -197,22 +164,6 @@ $(document).ready(function() {
         sortList: [[4,1]],
         showProcessing: true,
         widgets: ["filter"]
-    });
-
-    // filter 
-    var items = $('#overview-item-outer a');
-    $('#overview-filter').keyup(function() {
-
-        $('#overview-item-outer a').children('div').show();
-        var filter = $("#overview-filter").val().toLowerCase();
-
-        if (filter != '') {
-            items.filter(function() {
-                return $(this).find("#overview-item-label").text().toLowerCase().contains(filter);
-            }).hide();
-        }
-
-
     });
 
 });

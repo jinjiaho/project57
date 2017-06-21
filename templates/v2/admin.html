@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% extends "v2/base.html" %}
 {% block content %}
 
 <style>
-.active{
+/*.active{
     padding-left: 20px;
 }
 
@@ -13,55 +13,24 @@
 .error-message {
     margin: 10px;
     color: #db4437;
-}
+}*/
 </style>
 
 
 <body>
 
-
-<ul class="nav nav-tabs">
-  <li class="active"><a data-toggle="tab" href="#tab1">Home</a></li>
-  <li><a data-toggle="tab" href="#tab2">Create New User</a></li>
-  <li><a data-toggle="tab" href="#tab3">Add New Item</a></li>
-  <li><a data-toggle="tab" href="#tab4">Group Items</a></li>
+<div class="container">
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#summary" aria-controls="home" role="tab" data-toggle="tab">Summary</a></li>
+    <li role="presentation"><a href="#user" aria-controls="user" role="tab" data-toggle="tab">Add New User</a></li>
+    <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">Add New Item</a></li>
+    <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">Group Settings</a></li>
 </ul>
-
-<script type="text/javascript">
-
-// $('a[href="' + location.hash + '"]').trigger('click');
-
-
-// $(document).ready(function(){ 
-//     var x = location.hash;   
-//     activaTab('x');
-// });
-
-// function activaTab(tabId){
-//     $('.nav-tabs a[href="#' + tabId + '"]').tab('show');
-// };
-
-// function getData() {
-//     $.ajax({
-//         type: "POST",
-//         url: "/admin",
-//         data: JSON.stringify($("#itemname").val()),
-//         dataType: "json",    
-//         success: function(response, status, jqXHR) {
-//             console.log("Success!");
-//         }
-//     });
-// }
-
-// getData();
-
-
-
-</script>
 
 <div class="tab-content">
   
-    <div id="tab1" class="tab-pane fade in active">
+    <div role="tabpanel" id="summary" class="tab-pane fade in active">
         <h3>HOME</h3>
 
         <h4>Current Users (possibly to if login and last login)</h4>
@@ -80,7 +49,7 @@
                     <td>{{ user.name }}</td>
                     <td>{{ user.role }}</td>
                     
-                <tr>
+                </tr>
                 {% endfor %}
                 </tbody>
 
@@ -99,7 +68,7 @@
             <ul class="list-group">
 
                 {% for i in values %}
-                    <li class="list-group-item"><a href="/inventory"> {{ i[0].encode('ascii') }} </a></li>
+                    <li class="list-group-item"><a href="/{{g.current_lang}}/inventory"> {{ i[0].encode('ascii') }} </a></li>
 
                 {% endfor %}                
         
@@ -116,7 +85,7 @@
     
     
 <!-- ******************* NEW USER TAB *****************************-->  
-    <div id="tab2" class="tab-pane fade" >
+    <div role="tabpanel" id="user" class="tab-pane fade">
 
         <h3>Create A New User</h3>
         <form method="POST" action="/{{g.current_lang}}/admin" >
@@ -198,7 +167,7 @@
     </div>
 
 <!--#........................TAB3.............................  -->
-    <div id="tab3" class="tab-pane fade">
+    <div role="tabpanel" id="item" class="tab-pane fade">
         <h3>Add A New Item</h3>
         <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
@@ -226,7 +195,7 @@
                 {% endfor %}
             {% endif %}
 
-            <div class="form-group">
+            <div id="add-item-name" class="form-group">
             {{ form2.itemname(class="form-control typeahead", placeholder="Name of Item")}}
             </div>
         </div>
@@ -357,7 +326,7 @@
     </div>
 
 
-    <div id="tab4" class="tab-pane fade">
+    <div role="tabpanel" id="group" class="tab-pane fade">
         <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form3' >
@@ -407,6 +376,8 @@
 
 </div>
 
+</div>
+
 <script>
 var substringMatcher = function(strs) {
   return function findMatches(q, cb) {
@@ -432,7 +403,7 @@ var substringMatcher = function(strs) {
 
 var all_items = {{ item_list|safe }};
 
-$('.typeahead').typeahead({
+$('#add-item-name .typeahead').typeahead({
   hint: true,
   highlight: true,
   minLength: 1
@@ -441,6 +412,7 @@ $('.typeahead').typeahead({
   name: 'all_items',
   source: substringMatcher(all_items)
 });
+
 </script>
 
 

@@ -1,199 +1,206 @@
-{% extends "base.html" %}
-{% block sidebar %}
-<div class="sidebar-wrapper">
-    <div class="logo">
-        <a href="" class="simple-text" style="text-align:left;">
-        <i class="pe-7m-user" style="font-size:30px;padding-left:12px"></i>
-            Supervisor
-        </a>
-    </div>
-
-    <ul class="nav">
-        <li>
-            
-                <i class="pe-7s-graph"></i>
-                <p>Dashboard</p>
-            </a>
-        </li>
-        <li class="active">
-            <a href="/inventory">
-                <i class="pe-7s-rocket"></i>
-                <p>Inventory</p>
-            </a>
-        </li>
-        <li>
-            <a href="/logs">
-                <i class="pe-7s-news-paper"></i>
-                <p>Logs</p>
-            </a>
-        </li>
-        <li>
-            <a href="/">
-                <i class="pe-7s-power"></i>
-                <p>Log Out</p>
-            </a>
-        </li>
-        
-    </ul>
-</div>
-{% endblock %}
-
-{% block title %}Inventory{% endblock %}
-
+{% extends "v2/base.html" %}
 {% block content %}
 <style>
-  .alert {
-    min-height: 110px;
-  }
-  .alert img {
-    float: left;
-    height: 90px;
-    max-width: 90px;
-  }
-
-  .alert .alert-label {
-    /*font-size: 24pt;*/
-    padding: 10px 10px;
-    float: left;
-    height: inherit;
-    width: calc(100% - 100px);
-    text-align:center;
-  }
-
-  .alert .alert-label span {
-    font-size: 24pt;
-  }
-
-
-
-  .buttons {
-    padding: 15px;
-  }
-
-  .btn-block {
-    width: 49%;
-    float:left;
-  }
-
-  #btn_newItem {
-    margin-top: 0;
-  }
-
-  #btn_getData {
-    margin-right: 1% !important;
-  }
-
-</style>
-<div class="content">
-    <div class="container-fluid">
-        <div class="row">
-                <div class="card">
-                    <button class="header accordion">
-                        <h4 class="title">Guest Supplies</h4>
-                    </button>
-                    <div class="content all-icons panel">
-                        <div class="row">
-                          
-
-                          {% for item in supplies %}
-                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="inventory/{{item.name}}"><div class="alert alert-danger">
-                              <img src="/static/img/items/supplies/{{item.name}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
-                            </div></a>
-                          </div>
-                          {% endfor %}
-                            <a href="Guest Supplies">
-                            <button class="btn btn-default btn-block" id="btn_getData" >Month Review</button></a>
-
-                          </div>
-
-                    </div>
-                  </div>
-                
-                <div class="card">
-                    <button class="header accordion">
-                        <h4 class="title">Guest Hampers</h4>
-                    </button>
-                    <div class="content all-icons panel">
-                        <div class="row">
-                          
-
-                          {% for item in hampers %}
-                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="inventory/{{item.name}}"><div class="alert alert-warning">
-                              <img src="/static/img/items/hampers/{{item.file}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
-                            </div></a>
-                          </div>
-                          {% endfor %}
-                          <a href="Guest Hampers">
-                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
-
-
-                          </div>
-                          
-                        </div>
-                    </div>
-                <div class="card">
-                    <button class="header accordion">
-                        <h4 class="title">Kitchenware</h4>
-                    </button>
-                    <div class="content all-icons panel">
-                        <div class="row">
-                          
-
-
-                          {% for item in kitchenware %}
-                          <a href="inventory/{{item.name}}"><div class="font-icon-list col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                            <a href="inventory/{{item.name}}"><div class="alert alert-warning">
-                              <img src="/static/img/items/kitchenware/{{item.file}}.jpg"/>
-                              <div class="alert-label">{{item.name}}<br><span>{{item.remaining}}</span></div>
-
-
-                            </div></a>
-                          </div>
-                          {% endfor %}
-                          <a href="Kitchenware">
-                          <button class="btn btn-default btn-block" id="btn_getData">Month Review</button></a>
-
-                          </div>
-                          
-                    </div>
-                </div>
-
-                <!-- </div>
-                </div>
-            </div> -->
-
-                </div>
-            </div>
-
-
-        </div>
-        <div class="row buttons">
-          
-          <button class="btn btn-primary btn-block" id="btn_newItem">New Item</button>
-        </div>
-    </div>
-</div>
-
-<script>
-var acc = document.getElementsByClassName("accordion");
-var i;
-
-for (i = 0; i < acc.length; i++) {
-    acc[i].onclick = function(){
-        this.classList.toggle("active");
-        var panel = this.nextElementSibling;
-        if (panel.style.display === "block") {
-            panel.style.display = "none";
-        } else {
-            panel.style.display = "block";
-        }
-    }
+.panel a, .panel a:hover, .panel a:active {
+  text-decoration: none;
 }
 
-</script>
+a.thumbnail {
+    border: 1.5px solid #ddd;
+}
+
+a.thumbnail > img {
+    max-width: 120px;
+}
+
+.sup-view .font-icon-list {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.overview-item-group {
+  min-height: 120px;
+}
+
+.overview-item-img {
+  float: left;
+  max-height: 100px;
+  margin-bottom: 5px;
+  width: calc(40%);
+}
+
+.overview-item-img img {
+  max-height: 90px;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.alert-group {
+  width: calc(60%);
+  float: left;
+  align-content: center;
+  vertical-align: middle;
+  padding-left: 10px;
+  position: relative;
+    display: inline-block;
+}
+
+.overview-item-label {
+  max-height: 41px;
+  /*text-align:center;*/
+  margin: 10px auto;
+  overflow: hidden;
+}
+
+.overview-item-number {
+  font-size: 24pt;
+  width: 100%;
+  position: relative;
+  bottom: 10px;
+  /*text-align:center;*/
+  margin-top: 10px;
+}
+
+.alert-danger {
+    border: 2px solid  #EA4858;
+  /*background-color: #EA4858;*/
+  background-color: white;
+}
+
+.alert-warning {
+    border: 2px solid #ffc600;
+  /*background-color: #ffc600;*/
+  background-color: white;
+
+}
+
+.alert-ok {
+    border: 2px solid #499e4a;
+    color: #3c763d;
+  /*background-color: #EA4858;*/
+  background-color: white;
+}
+</style>
+
+<div class="container">
+
+<!-- 1st row: Inventory list -->
+<div class="row">
+<div class="col-xs-7">
+    <h3 style="margin-bottom:0px;">{{_('Inventory list')}}</h3>
+</div>
+<div class="col-xs-5">
+    <div class="pull-right" style="margin-top:25px;">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search" name="search" id="search">
+            <div class="input-group-btn">
+                <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+            </div>
+        </div>
+    </div><!-- /input-group -->
+</div>
+</div><hr>
+
+
+
+
+<!-- 2nd row: Inventory list -->
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  <div class="panel panel-default">
+    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-supplies" aria-expanded="true" aria-controls="collapse-supplies">
+        <div class="panel-heading text-center" role="tab" id="heading-supplies" style="background-color:#f5f5f5;">
+          <h4 class="panel-title">
+              Guest Supplies
+          </h4>
+        </div>
+    </a>
+    <div id="collapse-supplies" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-supplies">
+      <div class="panel-body">
+        <div class="row" style="margin-left:0; margin-right:0">
+          <div id="overview-item-outer">
+          {% for i in supplies %}
+          <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+            <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
+              <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
+                <div class="overview-item-img" align='center'>
+                  <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
+                </div>
+                <div class="alert-group pull-right">
+                  <div class="overview-item-label">{{i.name}}</div>
+                  <div class="overview-item-number">{{i.remaining}}</div>
+                </div>
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+          </div></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-hampers" aria-expanded="true" aria-controls="collapse-hampers">
+        <div class="panel-heading text-center" role="tab" id="heading-hampers" style="background-color:#f5f5f5;">
+          <h4 class="panel-title">
+              Guest Hampers
+          </h4>
+        </div>
+    </a>
+    <div id="collapse-hampers" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-hampers">
+      <div class="panel-body">
+        <div class="row" style="margin-left:0; margin-right:0">
+          <div id="overview-item-outer">
+          {% for i in hampers %}
+          <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+            <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
+              <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
+                <div class="overview-item-img" align='center'>
+                  <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
+                </div>
+                <div class="alert-group pull-right">
+                  <div class="overview-item-label">{{i.name}}</div>
+                  <div class="overview-item-number">{{i.remaining}}</div>
+                </div>
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+          </div></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-kitchenware" aria-expanded="true" aria-controls="collapse-kitchenware">
+        <div class="panel-heading text-center" role="tab" id="heading-kitchenware" style="background-color:#f5f5f5;">
+          <h4 class="panel-title">
+              Kitchenware
+          </h4>
+        </div>
+    </a>
+    <div id="collapse-kitchenware" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-kitchenware">
+      <div class="panel-body">
+        <div class="row" style="margin-left:0; margin-right:0">
+          <div id="overview-item-outer">
+          {% for i in kitchenware %}
+          <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+            <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
+              <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
+                <div class="overview-item-img" align='center'>
+                  <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
+                </div>
+                <div class="alert-group pull-right">
+                  <div class="overview-item-label">{{i.name}}</div>
+                  <div class="overview-item-number">{{i.remaining}}</div>
+                </div>
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+          </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
 
 {% endblock %}
