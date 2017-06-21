@@ -8,7 +8,7 @@ from dbqueryform import myDetails, myLocation
 class AddUserForm(FlaskForm):
 	name = StringField('Name of User:', validators=[DataRequired("Please enter the name of the newcomer.")])
 	username= StringField('New Username:', validators=[DataRequired("Please enter a username.")])
-	role = RadioField('Role of User:', choices=[('attendent','Room Attendant'),('supervisor','Supervisor')])
+	role = RadioField('Role of User:', choices=[('attendant','Room Attendant'),('supervisor','Supervisor')])
 	password = PasswordField('New Password:', validators=[DataRequired("Please enter a password."), Length(min=6, message="Passwords must be 6 characters or more.")])
 	submit = SubmitField('Add User')
 

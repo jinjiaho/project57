@@ -120,7 +120,8 @@ def getInventoryLow():
 	THRESHOLD = 1.2
 	cursor = mysql.connect().cursor()
 	cursor.execute("""SELECT sku, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.Items
-		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt
+		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt AND
+		qty_left > 0
 		ORDER BY name ASC;""")
 	data = cursor.fetchall()
 
@@ -197,24 +198,27 @@ def editReorder():
 	print "request.json: ", request.json
 
 	data = request.get_json()
-	# print(data, type(data))
-	# print(json_decode.json_loads_byteified(data), type(json_decode.json_loads_byteified(data)))
-	new_reorder = int(data[u"qty"])
-	name = data[u"name"].encode('ascii')
-	print(new_reorder, name)
+	
+	if data["tracking"] == u"off" or (data["qty"] == u"" or data["qty"] == u"0"):
+		print("no qty specified")
+		new_reorder = 0
+	else:
+		new_reorder = int(data[u"qty"])
+	name = data["name"].encode('ascii')
+
 
 	if not request.json:
 	    print "Bad json format"
 	    page_not_found(400)
 	else:
-		cursor = mysql.connect().cursor()
+		conn = mysql.connect()
+		cursor = conn.cursor()
 
-		# TODO: string parameterisation
-		query = "UPDATE Ascott_InvMgmt.Items SET reorder_pt={} WHERE (name='{}' AND sku > 0);".format(new_reorder, name)
-		print query
-		cursor.execute(query)
-		idItem = cursor.fetchone()
-		print(idItem)
+		cursor.execute(
+			"UPDATE Ascott_InvMgmt.Items SET reorder_pt=%s WHERE (name=%s AND sku > 0);", 
+			(new_reorder, name))
+		conn.commit()
+		# idItem = cursor.fetchone()
 
 		# # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
 		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
@@ -223,7 +227,7 @@ def editReorder():
 		# cursor.execute(query)
 		# responseData = cursor.fetchall()
 
-		return jsonify(data)
+		return jsonify("")
 
 # true if user is authenticated, else false
 def auth():
@@ -293,7 +297,7 @@ def hello():
 
 @app.route('/<lang_code>/login', methods=["GET", "POST"])
 def login():
-	
+
 	# create a login form to collect username & password
 	form = LoginForm()
 
@@ -326,6 +330,7 @@ def login():
 
 			else:
 				# username & password match
+				print(data[2])
 				session['username'] = data[0]
 				session['role'] = data[2]
 				session['name'] = data[3]
@@ -350,6 +355,9 @@ def login():
 				return redirect(url_for("dashboard", lang_code=get_locale()))
 			elif session['role'] == "attendant":
 				return redirect(url_for("scanner", lang_code=get_locale()))
+
+	else:
+		return redirect(url_for("hello"))
 
 
 @app.route('/<lang_code>/admin', methods=["GET","POST"])
@@ -394,7 +402,7 @@ def admin():
 		val = i['NFC'] #details of NFC location 
 
 		#fetch all item names pertaining to the tag.
-		cursor.execute("SELECT name FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(val))
+		cursor.execute("SELECT name, sku FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(val))
 		data3=cursor.fetchall()
 		
 		group[val] = data3
