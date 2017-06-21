@@ -4,7 +4,7 @@ from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation
-import os, copy, re, csv
+import os, copy, re, csv, json_decode
 # from flask.ext.cache import Cache
 
 
@@ -46,7 +46,7 @@ def getAllInventory(category):
 	items = []
 	for item in data:
 		cursor.execute(
-			"SELECT action, qty_moved FROM ascott_invmgmt.logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
+			"SELECT action, qty_moved FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
 		in_out_data = cursor.fetchall()
 		delivered_out = 0
 		received = 0
@@ -174,16 +174,16 @@ def getChartData():
 		cursor = conn.cursor()
 
 		# TODO: string parameterisation
-		query = "SELECT sku FROM Ascott_Invmgmt.Items WHERE name = '{}';".format(request.json)
+		query = "SELECT sku FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(request.json)
 
 		cursor.execute(query)
 		idItem = cursor.fetchone()[0]
 		# print(idItem)
 
-		# query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
-		query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = 1"
+		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
+		query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
 		# TODO: string parameterisation
-		# query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
+		# query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
 		cursor.execute(query)
 		responseData = cursor.fetchall()
 
@@ -196,8 +196,12 @@ def editReorder():
 	print "content_type: ", request.content_type
 	print "request.json: ", request.json
 
-	data = str(request.get_json())
-	print(data, type(data))
+	data = request.get_json()
+	# print(data, type(data))
+	# print(json_decode.json_loads_byteified(data), type(json_decode.json_loads_byteified(data)))
+	new_reorder = int(data[u"qty"])
+	name = data[u"name"].encode('ascii')
+	print(new_reorder, name)
 
 	if not request.json:
 	    print "Bad json format"
@@ -206,16 +210,16 @@ def editReorder():
 		cursor = mysql.connect().cursor()
 
 		# TODO: string parameterisation
-		query = "SELECT sku FROM Ascott_Invmgmt.Items WHERE name = '{}';".format(request.json)
+		query = "UPDATE Ascott_InvMgmt.Items SET reorder_pt={} WHERE (name='{}' AND sku > 0);".format(new_reorder, name)
+		print query
+		cursor.execute(query)
+		idItem = cursor.fetchone()
+		print(idItem)
 
-		# cursor.execute(query)
-		# idItem = cursor.fetchone()[0]
-		# # print(idItem)
-
-		# # query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
-		# query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = 1"
+		# # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
+		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
 		# # TODO: string parameterisation
-		# # query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
+		# # query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
 		# cursor.execute(query)
 		# responseData = cursor.fetchall()
 
@@ -445,7 +449,7 @@ def admin():
 
 				
 
-				# query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_Invmgmt.Items WHERE sku ='{}'".format(sku))
+				# query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE sku ='{}'".format(sku))
 
 				itemname=form2.itemname.data
 				location=form2.location.data
@@ -552,7 +556,7 @@ def item(sku):
 	
 	name = item
 	cursor = mysql.connect().cursor()
-	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
+	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit FROM Ascott_InvMgmt.Items WHERE sku = '{}';".format(sku)
 	cursor.execute(query)
 	data = cursor.fetchall()
 	# d = [[s.encode('ascii') for s in list] for list in data]
@@ -673,9 +677,8 @@ def processCart(tag_id):
 	
 	conn = mysql.connect()
 	cursor = conn.cursor()
-	for item, info in form_data.iteritems():
-		print(item)
-		print(info)
+	print(form_data.iterlists())
+	for item, info in form_data.iterlists():
 		cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
 		# if action == 'out':
 		# 	qty_left = cursor.fetchone()[0]  - qty
@@ -689,85 +692,6 @@ def processCart(tag_id):
 		message = 'feedback'
 
 	return redirect('shelves/'+tag_id, message=message)
-
-	# TODO: Discard unnecessary lines. 
-
-	# else:
-
-	# 	conn = mysql.connect()
-	# 	cursor = conn.cursor()
-
-	# 	cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
-
-	# 	data=cursor.fetchall()
-	# 	things = []
-	# 	for item in data:
-	# 		things.append(
-	# 			{"sku":item[0],
-	# 			"name": item[1],
-	# 			"category": item[2],
-	# 			"picture":item[3]})
-	# 	return render_template('storeroom.html', things=things, 
-	# 		role = role,
-	# 		user = session['username'], 
-	# 		location = tag_id)
-# <<<<<<< HEAD
-# 	else:
-# 		return redirect(url_for("scan", lang_code=get_locale()))
-
-
-# @app.route('/shelves/<tag_id>/cart', methods=['GET', 'POST'])
-# def checkout(tag_id):
-# 	if request.method == 'GET':
-# 		return render_template('cart.html')
-# 	else:
-# 		now = datetime.now()
-# 		form_data = request.form
-# 		user = session['username']
-		
-# 		conn = mysql.connect()
-# 		cursor = conn.cursor()
-# 		for item, qty in form_data.iteritems():
-# 			cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, name, location) VALUES ({}, {}, 'retrieval', {}, {}, {});".format(user, now, qty, item, tag_id))
-
-# 		flash("Success!")
-# 		return redirect('scanner.html')
-
-# @app.route('/storeroom/')
-# def storeroom():
-# #get data input from location from mobilephone. data output from db is in tuple
-# #this userinput is hard coded
-# 	catItems = getFromLevels("Level4C2")
-# 	return render_template("storeroom.html", catGoods=catItems)
-
-# @app.route('/storeroom/<things>', methods=["GET","POST"])	
-# def retrieval(things):
-# 	things=things
-# 	form = RetrievalForm()
-
-
-# 	if request.method == "POST":
-# 		if form.validate() == False:
-# 			return render_template("retrieval.html",things=things,form=form)
-# 		elif type(form.amount.data)!=int:
-# 			return render_template("retrieval.html",things=things,form=form)
-
-# 		else:	
-# 			input = form.amount.data
-			
-# 			# flash('this has been added to the cart')
-# 			# return redirect(url_for('storeroom/'))
-# 			return ('you did it!!!!!')
-
-
-# 	elif request.method=="GET":
-# 		return render_template('retrieval.html',things=things, form=form)
-
-# 	return render_template("retrieval.html", things=things)
-# # =======
-# >>>>>>> 3e45732bf8f7ce11db7773b8452955ba8bc37d3b
-	
-# >>>>>>> ce4495d2f9e2602556e384a44cb683e0df1c27ad
 
 @app.route('/logout')
 def logout():

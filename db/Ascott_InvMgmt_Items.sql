@@ -23,7 +23,7 @@ USE `Ascott_InvMgmt`;
 --
 
 DROP TABLE IF EXISTS `Items`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET @saved_cs_client = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Items` (
   `sku` int(11) NOT NULL,
