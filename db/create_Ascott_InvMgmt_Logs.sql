@@ -33,8 +33,6 @@ CREATE TABLE `Logs` (
   `qty_left` int(45) NOT NULL,
   `item` varchar(45) NOT NULL,
   `location` varchar(45) NOT NULL,
-  FOREIGN KEY (`user`) references User (`username`) on delete cascade on update cascade,
-  FOREIGN KEY (`item`) references Item (`name`) on delete cascade on update cascade,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;

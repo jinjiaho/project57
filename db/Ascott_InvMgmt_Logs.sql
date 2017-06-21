@@ -34,8 +34,6 @@ CREATE TABLE `Logs` (
   `qty_left` int(45) NOT NULL,
   `item` varchar(45) NOT NULL,
   `location` varchar(45) NOT NULL,
-  FOREIGN KEY (`user`) references User (`username`) on delete cascade on update cascade,
-  FOREIGN KEY (`item`) references Item (`name`) on delete cascade on update cascade,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -43,7 +41,7 @@ CREATE TABLE `Logs` (
 LOCK TABLES `Logs` WRITE;
 /*!40000 ALTER TABLE `Logs` DISABLE KEYS */;
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('1', 'attendant', '2016-12-19 09:04:00', 'out', '-12', '246', '9', '639');
-INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('2' 'attendant', '2016-12-20 00:51:00', 'out', '-11', '317', '9', '721');
+INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('2', 'attendant', '2016-12-20 00:51:00', 'out', '-11', '317', '9', '721');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('3', 'raroot', '2016-12-24 03:55:00', 'out', '-11', '201', '9', '736');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('4', 'raroot', '2016-12-25 00:20:00', 'in', '500', '500', '4', '635');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('5', 'suroot', '2016-12-29 17:35:00', 'out', '-13', '452', '4', '506');
@@ -102,17 +100,17 @@ INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('58', 'suroot', '2017-02-03 01:54:00', 'out', '-10', '162', '9', '846');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('59', 'suroot', '2017-02-03 14:39:00', 'out', '-5', '105', '1', '690');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('60', 'suroot', '2017-02-03 17:35:00', 'out', '-10', '282', '9', '524');
-INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('61', 'supervisor' '2017-02-04 07:24:00', 'out', '-6', '99', '1', '9');
+INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('61', 'supervisor', '2017-02-04 07:24:00', 'out', '-6', '99', '1', '9');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('62', 'raroot', '2017-02-04 17:35:00', 'out', '-14', '292', '9', '552');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('63', 'suroot', '2017-02-05 03:22:00', 'out', '-7', '92', '1', '282');
-INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('64', 'supervisor' '2017-02-05 10:44:00', 'in', '-15', '147', '9', '978');
+INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('64', 'supervisor', '2017-02-05 10:44:00', 'in', '-15', '147', '9', '978');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('65', 'raroot', '2017-02-06 04:59:00', 'out', '-13', '276', '4', '317');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('66', 'raroot', '2017-02-07 12:17:00', 'out', '-14', '262', '4', '20');
-INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('67', 'supervisor' '2017-02-09 20:35:00', 'out', '-18', '231', '4', '304');
+INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('67', 'supervisor', '2017-02-09 20:35:00', 'out', '-18', '231', '4', '304');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('68', 'raroot', '2017-02-11 16:46:00', 'out', '-9', '222', '4', '6');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('69', 'suroot', '2017-02-13 04:59:00', 'out', '-4', '88', '1', '596');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('70', 'suroot', '2017-02-14 08:59:00', 'out', '-11', '198', '9', '57');
-INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('71', 'supervisor' '2017-02-14 21:56:00', 'out', '-13', '249', '4', '949');
+INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('71', 'supervisor', '2017-02-14 21:56:00', 'out', '-13', '249', '4', '949');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('72', 'raroot', '2017-02-15 09:28:00', 'out', '-11', '136', '9', '244');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('73', 'raroot', '2017-02-15 12:17:00', 'out', '-2', '86', '1', '260');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('74', 'raroot', '2017-02-16 18:20:00', 'out', '-15', '111', '9', '968');
@@ -134,7 +132,7 @@ INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('90', 'supervisor', '2017-02-28 08:59:00', 'out', '-4', '54', '1', '80');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('91', 'suroot', '2017-03-02 03:19:00', 'out', '-14', '132', '9', '639');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('92', 'raroot', '2017-03-04 03:48:00', 'out', '-11', '121', '9', '355');
-INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('93', 'supervisor' '2017-03-05 03:22:00', 'out', '-10', '76', '9', '447');
+INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('93', 'supervisor', '2017-03-05 03:22:00', 'out', '-10', '76', '9', '447');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('94', 'raroot', '2017-03-05 09:34:00', 'out', '-20', '161', '4', '11');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('95', 'suroot', '2017-03-06 02:37:00', 'out', '-6', '48', '1', '387');
 INSERT INTO `Logs` (`id`, `user`, `date_time`, `action`, `qty_moved`, `qty_left`, `item`, `location`) VALUES ('96', 'raroot', '2017-03-07 10:23:00', 'out', '-10', '151', '4', '88');

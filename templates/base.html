@@ -93,6 +93,7 @@
                         </a>
                     </div>
                     <ul class="nav">
+                        {% if role == 'supervisor' %}
                         <li>
                             <a href="/">
                                 <i class="pe-7s-graph"></i>
@@ -124,6 +125,7 @@
                                 <p>Logs</p>
                             </a>
                         </li>
+                        {% endif %}
                         <li>
                             <a href="/logout">
                                 <i class="pe-7s-power"></i>
