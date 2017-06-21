@@ -46,7 +46,7 @@ def getAllInventory(category):
 	items = []
 	for item in data:
 		cursor.execute(
-			"SELECT action, qty_moved FROM ascott_invmgmt.logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
+			"SELECT action, qty_moved FROM Ascott_InvMgmt.logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
 		in_out_data = cursor.fetchall()
 		delivered_out = 0
 		received = 0
@@ -174,16 +174,16 @@ def getChartData():
 		cursor = conn.cursor()
 
 		# TODO: string parameterisation
-		query = "SELECT sku FROM Ascott_Invmgmt.Items WHERE name = '{}';".format(request.json)
+		query = "SELECT sku FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(request.json)
 
 		cursor.execute(query)
 		idItem = cursor.fetchone()[0]
 		# print(idItem)
 
-		# query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
-		query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = 1"
+		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
+		query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
 		# TODO: string parameterisation
-		# query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
+		# query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
 		cursor.execute(query)
 		responseData = cursor.fetchall()
 
@@ -210,16 +210,16 @@ def editReorder():
 		cursor = mysql.connect().cursor()
 
 		# TODO: string parameterisation
-		query = "UPDATE Ascott_Invmgmt.Items SET reorder_pt={} WHERE (name='{}' AND sku > 0);".format(new_reorder, name)
+		query = "UPDATE Ascott_InvMgmt.Items SET reorder_pt={} WHERE (name='{}' AND sku > 0);".format(new_reorder, name)
 		print query
 		cursor.execute(query)
 		idItem = cursor.fetchone()
 		print(idItem)
 
-		# # query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
-		# query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = 1"
+		# # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
+		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
 		# # TODO: string parameterisation
-		# # query = "SELECT datetime, qtyAfter FROM Ascott_Invmgmt.Logs WHERE idItem = {}".format(idItem)
+		# # query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
 		# cursor.execute(query)
 		# responseData = cursor.fetchall()
 
@@ -449,7 +449,7 @@ def admin():
 
 				
 
-				# query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_Invmgmt.Items WHERE sku ='{}'".format(sku))
+				# query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE sku ='{}'".format(sku))
 
 				itemname=form2.itemname.data
 				location=form2.location.data
@@ -556,7 +556,7 @@ def item(sku):
 	
 	name = item
 	cursor = mysql.connect().cursor()
-	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit FROM Ascott_Invmgmt.Items WHERE sku = '{}';".format(sku)
+	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit FROM Ascott_InvMgmt.Items WHERE sku = '{}';".format(sku)
 	cursor.execute(query)
 	data = cursor.fetchall()
 	# d = [[s.encode('ascii') for s in list] for list in data]
