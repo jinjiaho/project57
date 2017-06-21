@@ -197,24 +197,27 @@ def editReorder():
 	print "request.json: ", request.json
 
 	data = request.get_json()
-	# print(data, type(data))
-	# print(json_decode.json_loads_byteified(data), type(json_decode.json_loads_byteified(data)))
-	new_reorder = int(data[u"qty"])
-	name = data[u"name"].encode('ascii')
-	print(new_reorder, name)
+	
+	if data["tracking"] == u"off" and (data["qty"] == u"" or data["qty"] == u"0"):
+		print("no qty specified")
+		new_reorder = 0
+	else:
+		new_reorder = int(data[u"qty"])
+	name = data["name"].encode('ascii')
+
 
 	if not request.json:
 	    print "Bad json format"
 	    page_not_found(400)
 	else:
-		cursor = mysql.connect().cursor()
+		conn = mysql.connect()
+		cursor = conn.cursor()
 
-		# TODO: string parameterisation
-		query = "UPDATE Ascott_InvMgmt.Items SET reorder_pt={} WHERE (name='{}' AND sku > 0);".format(new_reorder, name)
-		print query
-		cursor.execute(query)
-		idItem = cursor.fetchone()
-		print(idItem)
+		cursor.execute(
+			"UPDATE Ascott_InvMgmt.Items SET reorder_pt=%s WHERE (name=%s AND sku > 0);", 
+			(new_reorder, name))
+		conn.commit()
+		# idItem = cursor.fetchone()
 
 		# # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
 		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
