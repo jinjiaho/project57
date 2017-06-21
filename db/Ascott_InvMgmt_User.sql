@@ -40,8 +40,8 @@ CREATE TABLE `User` (
 
 LOCK TABLES `User` WRITE;
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;
-INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('attendant','pbkdf2:sha1:1000$LDh1UfDE$896ed1b7bdf7aa75e066a9747b105ae3fdda3c96','attendent','Attendant #427');
-INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('raroot','pbkdf2:sha1:1000$7AV6JX9G$9b0d373b8b2f1b5f8dbe5859c9c6610b82711721','attendent','RA (root)');
+INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('attendant','pbkdf2:sha1:1000$LDh1UfDE$896ed1b7bdf7aa75e066a9747b105ae3fdda3c96','attendant','Attendant #427');
+INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('raroot','pbkdf2:sha1:1000$7AV6JX9G$9b0d373b8b2f1b5f8dbe5859c9c6610b82711721','attendant','RA (root)');
 INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('supervisor','pbkdf2:sha1:1000$maoeJq4L$3160cd6a06f45c42302ba3b588ed5c73fbd4d7c6','supervisor','Supervisor (root)');
 INSERT INTO `User` (`username`,`password`,`role`,`name`) VALUES ('suroot','password','supervisor','Supervisor (root)');
 /*!40000 ALTER TABLE `User` ENABLE KEYS */;
