@@ -198,7 +198,7 @@ def editReorder():
 
 	data = request.get_json()
 	
-	if data["tracking"] == u"off" and (data["qty"] == u"" or data["qty"] == u"0"):
+	if data["tracking"] == u"off" or (data["qty"] == u"" or data["qty"] == u"0"):
 		print("no qty specified")
 		new_reorder = 0
 	else:
