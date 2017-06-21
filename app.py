@@ -4,7 +4,7 @@ from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation
-import os, copy, re, csv
+import os, copy, re, csv, json_decode
 # from flask.ext.cache import Cache
 
 
@@ -196,8 +196,12 @@ def editReorder():
 	print "content_type: ", request.content_type
 	print "request.json: ", request.json
 
-	data = str(request.get_json())
-	print(data, type(data))
+	data = request.get_json()
+	# print(data, type(data))
+	# print(json_decode.json_loads_byteified(data), type(json_decode.json_loads_byteified(data)))
+	new_reorder = int(data[u"qty"])
+	name = data[u"name"].encode('ascii')
+	print(new_reorder, name)
 
 	if not request.json:
 	    print "Bad json format"
@@ -206,11 +210,11 @@ def editReorder():
 		cursor = mysql.connect().cursor()
 
 		# TODO: string parameterisation
-		query = "SELECT sku FROM Ascott_Invmgmt.Items WHERE name = '{}';".format(request.json)
-
-		# cursor.execute(query)
-		# idItem = cursor.fetchone()[0]
-		# # print(idItem)
+		query = "UPDATE Ascott_Invmgmt.Items SET reorder_pt={} WHERE (name='{}' AND sku > 0);".format(new_reorder, name)
+		print query
+		cursor.execute(query)
+		idItem = cursor.fetchone()
+		print(idItem)
 
 		# # query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = {0}".format(idItem)
 		# query = "SELECT date_time, qty_left FROM Ascott_Invmgmt.Logs WHERE item = 1"
