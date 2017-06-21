@@ -121,19 +121,19 @@
 
 <script>
 
-var reorder = {
-    "name":  "{{item[0].name}}",
-    "tracking": $('input[name="on-off"]:checked').val(),
-    "prediction": $('input[name="manual-auto"]:checked').val(),
-    "qty": $('input[id="pred-manual-qty"]').val()
-};
+// var reorder = {
+//     "name":  "{{item[0].name}}",
+//     "tracking": $('input[name="on-off"]:checked').val(),
+//     "prediction": $('input[name="manual-auto"]:checked').val(),
+//     "qty": $('input[id="pred-manual-qty"]').val()
+// };
 
 
-function editReorder() {
+function editReorder(form) {
     $.ajax({
         type: "POST",
         url: "/api/editReorder",
-        data: JSON.stringify(reorder),
+        data: JSON.stringify(form),
         dataType: "json",
         contentType: "application/json",
         async: false,
@@ -147,8 +147,14 @@ function editReorder() {
 }
 
 $('#reorder-form').submit(function(event) {
+    var reorder = {
+        "name":  "{{item[0].name}}",
+        "tracking": $('input[name="on-off"]:checked').val(),
+        "prediction": $('input[name="manual-auto"]:checked').val(),
+        "qty": $('input[id="pred-manual-qty"]').val()
+    };
     event.preventDefault();
-    console.log(editReorder());
+    console.log(editReorder(reorder));
     location.reload();
 });
 

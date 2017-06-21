@@ -120,7 +120,8 @@ def getInventoryLow():
 	THRESHOLD = 1.2
 	cursor = mysql.connect().cursor()
 	cursor.execute("""SELECT sku, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.Items
-		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt
+		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt AND
+		qty_left > 0
 		ORDER BY name ASC;""")
 	data = cursor.fetchall()
 
@@ -226,7 +227,7 @@ def editReorder():
 		# cursor.execute(query)
 		# responseData = cursor.fetchall()
 
-		return jsonify(data)
+		return jsonify("")
 
 # true if user is authenticated, else false
 def auth():
