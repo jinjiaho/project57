@@ -589,7 +589,7 @@ def category(category):
 	category = category
 	itemtype = getAllInventory(category)
 	return render_template('v2/category.html', category=category, itemtype=itemtype, 
-		role = role,
+		role = session['role'],
 		user = session['username'])
 
 
@@ -630,7 +630,7 @@ def logs():
 	# items=getUniqueItems()
 	return render_template('v2/logs.html',
 		logs=logs, 
-		role = role,
+		role = session['role'],
 		user = session['username'])
 	# names=names, items=items)
 
@@ -644,56 +644,77 @@ def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
-@app.route('/<lang_code>/shelves/<tag_id>/', methods=['GET', 'POST'])
-# @cache.cached(timeout=50)
+@app.route('/<lang_code>/shelves/<tag_id>', methods=['GET'])
 def shelf(tag_id):
 
 	# user authentication
 	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
 
-	if request.method == 'POST':
-		now = datetime.now()
-		form_data = request.form
-		user = session['username']
+	conn = mysql.connect()
+	cursor = conn.cursor()
 
-		print(form_data)
-		return hello()
-		
-		# conn = mysql.connect()
-		# cursor = conn.cursor()
-		# for item, qty in form_data.iteritems():
-		# 	cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location="+tag_id+";")
+	cursor.execute("SELECT sku, name, category, picture FROM Items WHERE location = '{}';".format(tag_id))
+
+	data=cursor.fetchall()
+	things = []
+	for item in data:
+		things.append(
+			{"sku":item[0],
+			"name": item[1],
+			"category": item[2],
+			"picture":item[3]})
+	return render_template('storeroom.html', things=things, 
+		role = session['role'],
+		user = session['username'], 
+		location = tag_id)
+
+@app.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
+def processCart(tag_id):
+	now = datetime.now()
+	form_data = request.form
+	user = session['username']
+	
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	for item, qty in form_data.iteritems():
+		print(item)
+		print(qty)
+		cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
+		# if action == 'out':
 		# 	qty_left = cursor.fetchone()[0]  - qty
 		# 	if (qty_left > 0):
 		# 		# query for stock out
-		# 		print("UPDATE Items SET qty_left = qty_left-"+qty+" WHERE qty_left >= "+qty+" AND sku="+item+" AND location="+tag_id+";")
+		# 		print("UPDATE Items SET qty_left="+qty_left+" WHERE qty_left>="+qty+" AND sku="+item+" AND location='"+tag_id+"';")
 		# 		# create log for each item
 		# 		print("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
 		# 	else:
 		# 		flash('Not enough in store!')
+		message = 'feedback'
 
-		# return redirect('/scan')
+	return redirect('shelves/'+tag_id, message=message)
 
-	else:
+	# TODO: Discard unnecessary lines. 
 
-		conn = mysql.connect()
-		cursor = conn.cursor()
+	# else:
 
-		cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
+	# 	conn = mysql.connect()
+	# 	cursor = conn.cursor()
 
-		data=cursor.fetchall()
-		things = []
-		for item in data:
-			things.append(
-				{"sku":item[0],
-				"name": item[1],
-				"category": item[2],
-				"picture":item[3]})
-		return render_template('storeroom.html', things=things, 
-			role = role,
-			user = session['username'], 
-			location = tag_id)
+	# 	cursor.execute("SELECT sku, name, category, picture FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(tag_id))
+
+	# 	data=cursor.fetchall()
+	# 	things = []
+	# 	for item in data:
+	# 		things.append(
+	# 			{"sku":item[0],
+	# 			"name": item[1],
+	# 			"category": item[2],
+	# 			"picture":item[3]})
+	# 	return render_template('storeroom.html', things=things, 
+	# 		role = role,
+	# 		user = session['username'], 
+	# 		location = tag_id)
 # <<<<<<< HEAD
 # 	else:
 # 		return redirect(url_for("scan", lang_code=get_locale()))
@@ -747,7 +768,8 @@ def shelf(tag_id):
 # 		return render_template('retrieval.html',things=things, form=form)
 
 # 	return render_template("retrieval.html", things=things)
-# =======
+# # =======
+# >>>>>>> 3e45732bf8f7ce11db7773b8452955ba8bc37d3b
 	
 # >>>>>>> ce4495d2f9e2602556e384a44cb683e0df1c27ad
 

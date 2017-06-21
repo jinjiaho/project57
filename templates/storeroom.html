@@ -66,9 +66,13 @@ a:focus {
                         <input id="modal-input-name" type="hidden" name="item" value="" />
                         <input id="modal-input-qty" type="number" name="qty" value="" placeholder="Enter quantity"/>
                         <input id="modal-input-sku" type="hidden" name="sku" value="" />
+                        {% if role=='supervisor' %}
                         <input type="radio" name="action" value="in" />In
                         <input type="radio" name="action" value="out" checked/>Out
                         <input type="radio" name="action" value="check" />Check
+                        {% else %}
+                        <input type="radio" name="action" value="out" checked readonly/>Out
+                        {% endif %}
                     </div>
                 </div>
                 <div class="modal-footer" align="center" style="margin-top: 15px;">
@@ -83,7 +87,7 @@ a:focus {
 <div id="cartModal" class="modal fade" data-backdrop="false">
   <div class="modal-dialog">
     <div class="modal-content">
-        <form method='POST' id="cartForm">
+        <form method='POST' id="cartForm" action='{{location}}/cart'>
           <div class="modal-header">
             <span class="close" data-dismiss="modal">&times;</span>
             <h4 id="form-header">Cart</h4>

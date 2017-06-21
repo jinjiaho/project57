@@ -255,10 +255,10 @@ div.modal .modal-header h4 {
   max-width: 60px;
 }
 
-#cartModal table tbody tr img,
-#cartModal table tbody tr input {
+#cartModal table tbody tr img {
   max-width: 50px;
 }
+
 
 .modal .qty-display input[type=radio] {
   width: auto;
@@ -268,4 +268,6 @@ div.modal .modal-header h4 {
 #cartModal table tbody tr input[type=number] {
   padding: 0 0 0 3px;
   margin-bottom: 5px;
+  max-width: 40px;
+  margin-right: 5px;
 }
