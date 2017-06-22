@@ -1,6 +1,6 @@
 branch-defaults:
   master:
-    environment: null
+    environment: demo
 global:
   application_name: aim-22.06
   branch: null

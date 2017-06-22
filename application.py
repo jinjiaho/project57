@@ -30,19 +30,19 @@ import os, copy, re, csv, json_decode
 ##########################
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
-app = Flask(__name__, instance_relative_config=True)
-app.config.from_object('config.Config') # default configurations
-# app.config.from_pyfile('myConfig1.cfg') # override with instanced configuration (in "/instance"), if any
-app.config.from_pyfile('amazonRDS.cfg')
-# app.config.from_pyfile('myConfig2.cfg')
+application = Flask(__name__, instance_relative_config=True)
+application.config.from_object('config.Config') # default configurations
+# application.config.from_pyfile('myConfig1.cfg') # override with instanced configuration (in "/instance"), if any
+application.config.from_pyfile('amazonRDS.cfg')
+# application.config.from_pyfile('myConfig2.cfg')
 
 # Babel init
-babel = Babel(app)
+babel = Babel(application)
 languages = ('en', 'zh', 'ms', 'ta')
 
 # mysql init
 mysql = MySQL()
-mysql.init_app(app)
+mysql.init_app(application)
 
 # global vars
 adminmode = False
@@ -740,4 +740,4 @@ def page_not_found(e):
 
 ## testing
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=5000)
+	application.run()
