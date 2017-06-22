@@ -202,7 +202,7 @@ def getDailyLogs():
 	return things
 
 # POST for getting chart data
-@app.route('/api/getChartData', methods=["POST"])
+@application.route('/api/getChartData', methods=["POST"])
 def getChartData():
 
 	print "content_type: ", request.content_type
@@ -235,7 +235,7 @@ def getChartData():
 		return jsonify(responseData)
 
 # POST for getting chart data
-@app.route('/api/editReorder', methods=["POST"])
+@application.route('/api/editReorder', methods=["POST"])
 def editReorder():
 
 	print "content_type: ", request.content_type
@@ -286,7 +286,7 @@ def filter_role(roles_routes):
 			return redirect(v)
 
 
-@app.template_filter('lang_strip')
+@application.template_filter('lang_strip')
 def lang_strip(s):
     l = re.search(r"(?m)(?<=(en\/)|(zh\/)|(ms\/)|(ta\/)).*$", str(s.encode('ascii')))
     if l:
@@ -298,7 +298,7 @@ def input_handler(qty, user):
 	query = 'UPDATE Items SET qty_left = CASE WHEN action'
 
 
-@app.before_request
+@application.before_request
 def before():
 	# localization setting
 	if request.view_args and 'lang_code' in request.view_args:
@@ -327,7 +327,7 @@ def get_locale():
 ##########################
 
 
-@app.route('/')
+@application.route('/')
 def hello():
 	# user authentication
 	if not session["logged_in"]:
@@ -339,7 +339,7 @@ def hello():
 		elif session['role'] == "attendant":
 			return redirect(url_for("scanner", lang_code=session["lang_code"]))
 
-@app.route('/<lang_code>/login', methods=["GET", "POST"])
+@application.route('/<lang_code>/login', methods=["GET", "POST"])
 def login():
 
 	# create a login form to collect username & password
@@ -404,7 +404,7 @@ def login():
 		return redirect(url_for("hello"))
 
 
-@app.route('/<lang_code>/admin', methods=["GET","POST"])
+@application.route('/<lang_code>/admin', methods=["GET","POST"])
 def admin():
 
 	form = AddUserForm()
@@ -548,7 +548,7 @@ def admin():
 
 
 
-@app.route('/<lang_code>/dashboard')
+@application.route('/<lang_code>/dashboard')
 def dashboard():
 
 	# user authentication
@@ -564,7 +564,7 @@ def dashboard():
 
 
 
-@app.route('/<lang_code>/inventory')
+@application.route('/<lang_code>/inventory')
 def inventory():
 
 	# user authentication
@@ -582,7 +582,7 @@ def inventory():
 		hampers = hampers,
 		kitchenware = kitchenware)
 
-@app.route('/<lang_code>/inventory/<int:sku>')
+@application.route('/<lang_code>/inventory/<int:sku>')
 def item(sku):
 
 	# user authentication
@@ -616,7 +616,7 @@ def item(sku):
 	except:
 		return render_template('v2/item.html', item = None)
 
-@app.route('/<lang_code>/review/<category>')
+@application.route('/<lang_code>/review/<category>')
 def category(category):
 
 	# user authentication
@@ -631,7 +631,7 @@ def category(category):
 
 
 
-@app.route('/<lang_code>/logs')
+@application.route('/<lang_code>/logs')
 def logs():
 
 	# user authentication
@@ -647,7 +647,7 @@ def logs():
 		user = session['username'])
 	# names=names, items=items)
 
-@app.route('/<lang_code>/scan')
+@application.route('/<lang_code>/scan')
 def scanner():
 
 	# user authentication
@@ -657,7 +657,7 @@ def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
-@app.route('/<lang_code>/shelves/<tag_id>', methods=['GET', 'POST'])
+@application.route('/<lang_code>/shelves/<tag_id>', methods=['GET', 'POST'])
 def shelf(tag_id):
 
 	# user authentication
@@ -721,19 +721,19 @@ def shelf(tag_id):
     		location = tag_id,
     		message = message)
 
-# @app.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
+# @application.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
 # def processCart(lang_code, tag_id):
 	
 
 # 	return redirect('/'+lang_code+'/shelves/'+tag_id)
 
-@app.route('/logout')
+@application.route('/logout')
 def logout():
 	session.clear()
 	return redirect(url_for("login", lang_code=get_locale()))
 
 
-@app.errorhandler(404)
+@application.errorhandler(404)
 def page_not_found(e):
 	"""Return a custom 404 error."""
 	return 'Sorry, nothing at this URL.', 404
