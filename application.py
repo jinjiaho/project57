@@ -8,6 +8,19 @@ import os, copy, re, csv, json_decode
 # from flask.ext.cache import Cache
 
 
+# pip2 install flask
+# pip2 install mysql-python
+# pip2 install mysqlclient
+# pip2 install SQLAlchemy
+# pip2 install flask-babel
+# pip2 install flask-wtf
+# pip2 install flask-mysql
+# pip2 install numpy
+# pip2 install scipy
+# pip2 install statsmodels
+# pip2 install pandas
+
+
 ##########################
 ##        CONFIG        ##
 ##########################
@@ -738,4 +751,4 @@ def page_not_found(e):
 
 ## testing
 if __name__ == '__main__':
-	app.run(debug=True, host='0.0.0.0')
+	app.run(host='0.0.0.0', port=80)
