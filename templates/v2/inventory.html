@@ -45,20 +45,10 @@ a.thumbnail > img {
     display: inline-block;
 }
 
-.overview-item-label {
-  max-height: 41px;
-  /*text-align:center;*/
-  margin: 10px auto;
-  overflow: hidden;
-}
-
-.overview-item-number {
-  font-size: 24pt;
-  width: 100%;
-  position: relative;
-  bottom: 10px;
-  /*text-align:center;*/
-  margin-top: 10px;
+.alert {
+    border: 2px solid  #337ab7;
+  /*background-color: #EA4858;*/
+  background-color: white;
 }
 
 .alert-danger {
@@ -79,6 +69,22 @@ a.thumbnail > img {
     color: #3c763d;
   /*background-color: #EA4858;*/
   background-color: white;
+}
+
+.overview-item-label {
+  max-height: 41px;
+  /*text-align:center;*/
+  margin: 10px auto;
+  overflow: hidden;
+}
+
+.overview-item-number {
+  font-size: 24pt;
+  width: 100%;
+  position: relative;
+  bottom: 10px;
+  /*text-align:center;*/
+  margin-top: 10px;
 }
 </style>
 
@@ -202,7 +208,6 @@ a.thumbnail > img {
 </div>
 
 </div>
-
 <script>
 var substringMatcher = function(strs) {
   return function findMatches(q, cb) {

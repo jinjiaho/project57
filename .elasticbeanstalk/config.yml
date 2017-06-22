@@ -1,0 +1,16 @@
+branch-defaults:
+  master:
+    environment: flask-env
+global:
+  application_name: aim-22.06
+  branch: null
+  default_ec2_keyname: capstone
+  default_platform: python2.7
+  default_region: ap-southeast-1
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: null
+  repository: null
+  sc: git
+  workspace_type: Application
