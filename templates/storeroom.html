@@ -25,27 +25,31 @@ a:focus {
   outline: none;
 }
 
+.card {
+    padding: 0;
+}
+
 </style>
 <div class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card">
-                    <div class="content all-icons">
-                        <div class="row">
-                            {% for item in things %}
-                            <div class="mobile-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6" align='center'>
-                                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}">
+                {% for item in things %}
+                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}">
+                    <div class="card col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                        <div class="content all-icons">
+                            <div class="row">
+                                <div class="mobile-icon-list col-lg-2 col-md-3 col-sm-6 col-xs-12" align='center'>
                                     <div class="mobile-icon-detail">
-                                        <img src="/static/img/items/{{item.category}}/{{item.picture}}"/><br/>
+                                        <img src="/static/img/items/{{item.category}}/{{item.picture}}"/>
                                         <div class="name">{{item.name}}</div>
                                     </div>
-                                </a>
+                                </div>
                             </div>
-                            {% endfor %}
                         </div>
                     </div>
-                </div>
+                </a>
+                {% endfor %}
             </div>
         </div>
     </div>

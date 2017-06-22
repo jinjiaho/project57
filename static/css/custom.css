@@ -7,17 +7,16 @@ body {
 
 #container {
    min-height:100%;
-   position:relative;
+   position:absolute;
+   padding-bottom: 60px;  /* Height of the footer */
+   left: 0;
+   right: 0;
 }
 
 #header {
    padding:10px;
 }
 
-#body {
-  height: 100%;
-   padding-bottom:60px;   /* Height of the footer */
-}
 
 #footer {
    position:absolute;
@@ -61,32 +60,31 @@ body {
 }
 
 .mobile-icon-list {
-  min-height: 132.41px;
+  padding: 0px;
 }
 
 .mobile-icon-detail {
-  line-height: 18px;
-  padding: 10px 0;
+  vertical-align:middle;
 }
 
 .mobile-icon-detail img {
-  /*width: 50px;*/
   height: 70px;
-  max-width: 70px;
+  width: 70px;
   margin-bottom: 5px;
-  position: relative;
-  top: 20%;
+  float:left;
+  margin-right: 20px;
 }
 
 .mobile-icon-detail .name {
   color: #000;
-  height: 37px;
+  height: 12vh;
+  padding-top: 3vh;
   position: relative;
-  bottom: 15%;
-  width: 100%;
-  padding: 0 10% 0 10%;
   text-transform: capitalize;
-  vertical-align: middle;
+  float:left;
+  width: calc(100% - 90px);
+  text-align: left;
+  color: #1d4262;
 }
 
 
@@ -106,6 +104,10 @@ body {
  
 .navbar-header .collapse, .navbar-toggle {
   display: block !important; }
+
+.navbar .navbar-brand {
+  color: #1d4262;
+}
  
 
 .navbar-header {
