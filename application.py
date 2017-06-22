@@ -19,7 +19,11 @@ import os, copy, re, csv, json_decode
 # pip2 install scipy
 # pip2 install statsmodels
 # pip2 install pandas
-
+# eb init -p python2.7 aim
+# eb init
+# eb create flask-env
+# eb open
+# eb terminate flask-env
 
 ##########################
 ##        CONFIG        ##
