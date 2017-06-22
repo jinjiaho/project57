@@ -34,6 +34,8 @@ app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.Config') # default configurations
 app.config.from_pyfile('myConfig1.cfg') # override with instanced configuration (in "/instance"), if any
 # app.config.from_pyfile('amazonRDS.cfg')
+# app.config.from_pyfile('myConfig2.cfg')
+app.config['MYSQL_HOST'] = 'ascott.coxb3venarbl.ap-southeast-1.rds.amazonaws.com'
 
 # Babel init
 babel = Babel(app)
