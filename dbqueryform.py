@@ -11,7 +11,7 @@ application.config.from_pyfile('amazonRDS.cfg')
 # the App Engine WSGI application server.
 
 mysql = MySQL()
-mysql.init_app(appication)
+mysql.init_app(application)
 adminmode = False
 
 #----------get all required choices from database----------
