@@ -57,34 +57,50 @@ def getAllInventory(category):
 	cursor.execute(
 		"SELECT sku, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
-	items = []
-	for item in data:
-		cursor.execute(
-			"SELECT action, qty_moved FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
-		in_out_data = cursor.fetchall()
-		delivered_out = 0
-		received = 0
-		for i in in_out_data:
-			if i[0].encode('ascii') == 'out':
-				delivered_out = delivered_out + (-1*int(i[1]))
-			elif i[0].encode('ascii') == "in":
-				received = received + int(i[1])
-		remaining_quantity = item[2]
-		initial_quantity = remaining_quantity + delivered_out - received
-		items.append(
 
-			{"sku":item[0],
-			"name": item[1],
-			"remaining": item[2],
-			"reorder": item[3],
-			"unit": item[4],
-			"starting": initial_quantity,
-			"received": received,
-			"demand": delivered_out,
-			"picture": item[5].encode('ascii'),
-			"category": item[6].encode('ascii')
-			})
-		
+	# cursor.execute(
+	# 	"SELECT DISTINCT sku FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+	# unique_sku = cursor.fetchall()
+	# print(unique_sku)
+	items = []
+	counter = 0
+	for item in data:
+		if item[0] == counter:
+			pass
+		else:
+			cursor.execute(
+			"SELECT action, qty_moved FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
+			in_out_data = cursor.fetchall()
+			delivered_out = 0
+			received = 0
+			for i in in_out_data:
+				if i[0].encode('ascii') == 'out':
+					delivered_out = delivered_out + (-1*int(i[1]))
+				elif i[0].encode('ascii') == "in":
+					received = received + int(i[1])
+
+			cursor.execute(
+			"SELECT qty_left FROM Ascott_InvMgmt.Items WHERE sku='{}';".format(item[0]))
+			location_qty = cursor.fetchall()
+			remaining_quantity = 0
+			for i in location_qty:
+				remaining_quantity += i[0]
+			initial_quantity = remaining_quantity + delivered_out - received
+			items.append(
+
+				{"sku":item[0],
+				"name": item[1],
+				"remaining": remaining_quantity,
+				"reorder": item[3],
+				"unit": item[4],
+				"starting": initial_quantity,
+				"received": received,
+				"demand": delivered_out,
+				"picture": item[5].encode('ascii'),
+				"category": item[6].encode('ascii')
+				})
+			counter = item[0]
+
 	return items
 
 
@@ -432,7 +448,7 @@ def admin():
 		items = cursor.fetchall()
 		# print (items)
 		flat_items = [item.encode('ascii') for sublist in items for item in sublist]
-		return render_template('v2/admin.html', form=form, form2=form2,form3=form3, users=things, group=group, item_list=flat_items)
+		return render_template('v2/admin.html', user=session['username'], role=session['role'], form=form, form2=form2,form3=form3, users=things, group=group, item_list=flat_items)
 
 	
 
@@ -440,7 +456,7 @@ def admin():
 
 		if request.form['name-form'] =='form':
 			if form.validate() == False:
-				return render_template('admin.html', form=form, form2=form2,form3=form3, users=things, group=group)
+				return render_template('admin.html',user=session['username'], role=session['role'], form=form, form2=form2,form3=form3, users=things, group=group)
 			else:
 				username = form.username.data
 				password = generate_password_hash(form.password.data)
@@ -465,7 +481,7 @@ def admin():
 
 		elif request.form['name-form'] =='form2':
 			if form2.validate() == False:
-				return render_template('admin.html', form=form, form2=form2,form3=form3, users=things, group=group)
+				return render_template('admin.html', user=session['username'], role=session['role'], form=form, form2=form2,form3=form3, users=things, group=group)
 			else: 
 				sku = form2.sku.data
 
@@ -497,7 +513,7 @@ def admin():
 
 		elif request.form['name-form'] =='form3':
 			if form3.validate() == False:
-				return render_template('admin.html', form=form, form2=form2,form3=form3, users=things, group=group)
+				return render_template('admin.html', user=session['username'], role=session['role'], form=form, form2=form2,form3=form3, users=things, group=group)
 			else: 
 				location = form3.location.data
 				description= form3.description.data
@@ -514,7 +530,7 @@ def admin():
 				# cursor.execute("COMMIT")
 				flash("New Location is Added!")
 				
-				return redirect(url_for('admin', lang_code=get_locale()))
+				return redirect(url_for('admin', user=session['username'], role=session['role'], lang_code=get_locale()))
 
 
 
@@ -530,7 +546,7 @@ def dashboard():
 	l = getDailyLogs()
 	# l = getLogs()
 
-	return render_template('dashboard.html', items = i, logs = l)
+	return render_template('dashboard.html', role=session['role'], user=session['username'], items = i, logs = l)
 
 
 
@@ -563,6 +579,8 @@ def inventory():
 	hampers = getAllInventory('Guest Hampers')
 	kitchenware = getAllInventory('Kitchenware')
 	return render_template('v2/inventory.html',
+		user = session['username'],
+		role = session['role'],
 		supplies = supplies,
 		hampers = hampers,
 		kitchenware = kitchenware)
@@ -666,7 +684,7 @@ def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
-@app.route('/<lang_code>/shelves/<tag_id>', methods=['GET'])
+@app.route('/<lang_code>/shelves/<tag_id>', methods=['GET', 'POST'])
 def shelf(tag_id):
 
 	# user authentication
@@ -686,35 +704,55 @@ def shelf(tag_id):
 			"name": item[1],
 			"category": item[2],
 			"picture":item[3]})
-	return render_template('storeroom.html', things=things, 
-		role = session['role'],
-		user = session['username'], 
-		location = tag_id)
-
-@app.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
-def processCart(tag_id):
-	now = datetime.now()
-	form_data = request.form
-	user = session['username']
+	message = None
 	
-	conn = mysql.connect()
-	cursor = conn.cursor()
-	for item, qty in form_data.iteritems():
-		print(item)
-		print(qty)
-		cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
-		# if action == 'out':
-		# 	qty_left = cursor.fetchone()[0]  - qty
-		# 	if (qty_left > 0):
-		# 		# query for stock out
-		# 		print("UPDATE Items SET qty_left="+qty_left+" WHERE qty_left>="+qty+" AND sku="+item+" AND location='"+tag_id+"';")
-		# 		# create log for each item
-		# 		print("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
-		# 	else:
-		# 		flash('Not enough in store!')
-		message = 'feedback'
 
-	return redirect('shelves/'+tag_id, message=message)
+	if request.method == 'POST':
+		now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		form_data = request.form
+		user = session['username']
+		
+		try:
+			conn = mysql.connect()
+			cursor = conn.cursor()
+			message = ''
+			for item, info in form_data.iterlists():
+				print(item)
+				print(info[0]+", "+info[1])
+				cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
+				old_qty = cursor.fetchone()[0]
+				qty_input = int(info[0])
+				if info[1] == 'out':
+					qty_left = old_qty  - qty_input
+					qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
+					if qty_left < 0:
+						message = 'Not enough in store!'
+
+				elif info[1] == 'in':
+					qty_left = old_qty + qty_input
+				else:
+					qty_left = qty_input
+					qty_input = qty_left - old_qty # change the value of qty to the difference 
+				# query for stock out
+				cursor.execute("UPDATE Items SET qty_left="+str(qty_left)+" WHERE qty_left>="+str(0)+" AND sku="+str(item)+" AND location='"+tag_id+"';")
+				# create log for each item
+				cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', 'out', {}, {}, {}, '{}');".format(str(user), now, qty_input, qty_left, item, tag_id))
+				message = 'Success!'
+			
+		except:
+			message = "Unexpected error:" + sys.exc_info()[0]
+
+    	return render_template('storeroom.html', things=things,
+    		role = session['role'],
+    		user = session['username'], 
+    		location = tag_id,
+    		message = message)
+
+# @app.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
+# def processCart(lang_code, tag_id):
+	
+
+# 	return redirect('/'+lang_code+'/shelves/'+tag_id)
 
 @app.route('/logout')
 def logout():
