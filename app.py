@@ -43,34 +43,50 @@ def getAllInventory(category):
 	cursor.execute(
 		"SELECT sku, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
-	items = []
-	for item in data:
-		cursor.execute(
-			"SELECT action, qty_moved FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
-		in_out_data = cursor.fetchall()
-		delivered_out = 0
-		received = 0
-		for i in in_out_data:
-			if i[0].encode('ascii') == 'out':
-				delivered_out = delivered_out + (-1*int(i[1]))
-			elif i[0].encode('ascii') == "in":
-				received = received + int(i[1])
-		remaining_quantity = item[2]
-		initial_quantity = remaining_quantity + delivered_out - received
-		items.append(
 
-			{"sku":item[0],
-			"name": item[1],
-			"remaining": item[2],
-			"reorder": item[3],
-			"unit": item[4],
-			"starting": initial_quantity,
-			"received": received,
-			"demand": delivered_out,
-			"picture": item[5].encode('ascii'),
-			"category": item[6].encode('ascii')
-			})
-		
+	# cursor.execute(
+	# 	"SELECT DISTINCT sku FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+	# unique_sku = cursor.fetchall()
+	# print(unique_sku)
+	items = []
+	counter = 0
+	for item in data:
+		if item[0] == counter:
+			pass
+		else:
+			cursor.execute(
+			"SELECT action, qty_moved FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
+			in_out_data = cursor.fetchall()
+			delivered_out = 0
+			received = 0
+			for i in in_out_data:
+				if i[0].encode('ascii') == 'out':
+					delivered_out = delivered_out + (-1*int(i[1]))
+				elif i[0].encode('ascii') == "in":
+					received = received + int(i[1])
+
+			cursor.execute(
+			"SELECT qty_left FROM Ascott_InvMgmt.Items WHERE sku='{}';".format(item[0]))
+			location_qty = cursor.fetchall()
+			remaining_quantity = 0
+			for i in location_qty:
+				remaining_quantity += i[0]
+			initial_quantity = remaining_quantity + delivered_out - received
+			items.append(
+
+				{"sku":item[0],
+				"name": item[1],
+				"remaining": remaining_quantity,
+				"reorder": item[3],
+				"unit": item[4],
+				"starting": initial_quantity,
+				"received": received,
+				"demand": delivered_out,
+				"picture": item[5].encode('ascii'),
+				"category": item[6].encode('ascii')
+				})
+			counter = item[0]
+
 	return items
 
 
