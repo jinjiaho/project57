@@ -19,7 +19,11 @@ import os, copy, re, csv, json_decode
 # pip2 install scipy
 # pip2 install statsmodels
 # pip2 install pandas
-
+# eb init -p python2.7 aim
+# eb init
+# eb create flask-env
+# eb open
+# eb terminate flask-env
 
 ##########################
 ##        CONFIG        ##
@@ -28,8 +32,10 @@ import os, copy, re, csv, json_decode
 # the App Engine WSGI application server.
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.Config') # default configurations
-#app.config.from_pyfile('myConfig1.cfg') # override with instanced configuration (in "/instance"), if any
-app.config.from_pyfile('amazonRDS.cfg')
+app.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
+# app.config.from_pyfile('myConfig1.cfg')
+# app.config.from_pyfile('myConfig2.cfg')
+
 
 # Babel init
 babel = Babel(app)
@@ -560,23 +566,6 @@ def dashboard():
 
 @app.route('/<lang_code>/inventory')
 def inventory():
-	# conn = mysql.connect()
-	# cursor = conn.cursor()
-
-	# cursor.execute(
-	# 	"SELECT sku, name, qty_left, unit, picture, category FROM Ascott_InvMgmt.Items;")
-	# data = cursor.fetchall()
-	# items = {}
-	# for i in data:
-	# 	if i[5] not in items:
-	# 		items[i[5]] = []
-	# 		print("new category created: "+str(i[5]))
-	# 	items[i[5]].append({'name':i[1],
-	# 		'remaining':i[2],
-	# 		'unit':i[3],
-	# 		'picture':i[4]})
-
-	# print(items)
 
 	# user authentication
 	if not session["logged_in"]:
@@ -640,30 +629,6 @@ def category(category):
 		role = session['role'],
 		user = session['username'])
 
-
-# @app.route('/<lang_code>/review')
-# def review():
-
-# 	# user authentication
-# 	if not session["logged_in"]:
-# 		return redirect(url_for("login", lang_code=session["lang_code"]))
-
-# 	supplies = getAllInventory('Guest Supplies')
-# 	hampers = getAllInventory('Guest Hampers')
-# 	kitchenware = getAllInventory('Kitchenware')
-# 	return render_template('review.html', supplies = supplies,
-# 		hampers = hampers,
-# 		kitchenware = kitchenware, user=session['username'])
-
-# @app.route('/review')
-# def review():
-# 	supplies = getAllInventory('Guest Supplies')
-# 	hampers = getAllInventory('Guest Hampers')
-# 	kitchenware = getAllInventory('Kitchenware')
-# 	return render_template('v2/review.html', supplies = supplies,
-# 		hampers = hampers,
-# 		kitchenware = kitchenware, user=session['username'])
-# >>>>>>> b1fcaf40dc6f258ef881c7d5b27fa57d50f88415
 
 
 @app.route('/<lang_code>/logs')
@@ -776,4 +741,4 @@ def page_not_found(e):
 
 ## testing
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=80)
+	app.run(host='0.0.0.0', port=5000)
