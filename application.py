@@ -32,8 +32,8 @@ import os, copy, re, csv, json_decode
 # the App Engine WSGI application server.
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.Config') # default configurations
-# app.config.from_pyfile('myConfig1.cfg') # override with instanced configuration (in "/instance"), if any
-app.config.from_pyfile('amazonRDS.cfg')
+app.config.from_pyfile('myConfig1.cfg') # override with instanced configuration (in "/instance"), if any
+# app.config.from_pyfile('amazonRDS.cfg')
 
 # Babel init
 babel = Babel(app)
@@ -136,12 +136,20 @@ def getAllLogs():
 	things = []
 	
 	for row in data:
+		cursor.execute(
+			"SELECT name FROM Ascott_InvMgmt.Items WHERE sku  = '{}';".format(row[5]))
+		item_name = cursor.fetchall()
+
+		print(row[0])
+
+
+
 		things.append({"name": row[0].encode('ascii'),
 			"dateTime": row[1],
 			"action":row[2],
 			"move":row[3],
 			"remaining":row[4],
-			"item":row[5].encode('ascii'),
+			"item":item_name[0][0].encode('ascii'),
 			"location":row[6]})
 		# print(things)
 			
