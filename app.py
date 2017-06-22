@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, g
 from flask_babel import Babel
 from flaskext.mysql import MySQL
@@ -8,42 +9,22 @@ import os, copy, re, csv, json_decode
 # from flask.ext.cache import Cache
 
 
-# pip2 install flask
-# pip2 install mysql-python
-# pip2 install mysqlclient
-# pip2 install SQLAlchemy
-# pip2 install flask-babel
-# pip2 install flask-wtf
-# pip2 install flask-mysql
-# pip2 install numpy
-# pip2 install scipy
-# pip2 install statsmodels
-# pip2 install pandas
-# eb init -p python2.7 aim
-# eb init
-# eb create flask-env
-# eb open
-# eb terminate flask-env
-
 ##########################
 ##        CONFIG        ##
 ##########################
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
-application = Flask(__name__, instance_relative_config=True)
-application.config.from_object('config.Config') # default configurations
-# application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
-application.config.from_pyfile('myConfig1.cfg') 
-# application.config.from_pyfile('myConfig2.cfg')
-
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_object('config.DevConfig') # default configurations
+app.config.from_pyfile('myConfig1.cfg') # override with instanced configuration (in "/instance"), if any
 
 # Babel init
-babel = Babel(application)
+babel = Babel(app)
 languages = ('en', 'zh', 'ms', 'ta')
 
 # mysql init
 mysql = MySQL()
-mysql.init_app(application)
+mysql.init_app(app)
 
 # global vars
 adminmode = False
@@ -63,50 +44,34 @@ def getAllInventory(category):
 	cursor.execute(
 		"SELECT sku, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
-
-	# cursor.execute(
-	# 	"SELECT DISTINCT sku FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
-	# unique_sku = cursor.fetchall()
-	# print(unique_sku)
 	items = []
-	counter = 0
 	for item in data:
-		if item[0] == counter:
-			pass
-		else:
-			cursor.execute(
+		cursor.execute(
 			"SELECT action, qty_moved FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
-			in_out_data = cursor.fetchall()
-			delivered_out = 0
-			received = 0
-			for i in in_out_data:
-				if i[0].encode('ascii') == 'out':
-					delivered_out = delivered_out + (-1*int(i[1]))
-				elif i[0].encode('ascii') == "in":
-					received = received + int(i[1])
+		in_out_data = cursor.fetchall()
+		delivered_out = 0
+		received = 0
+		for i in in_out_data:
+			if i[0].encode('ascii') == 'out':
+				delivered_out = delivered_out + (-1*int(i[1]))
+			elif i[0].encode('ascii') == "in":
+				received = received + int(i[1])
+		remaining_quantity = item[2]
+		initial_quantity = remaining_quantity + delivered_out - received
+		items.append(
 
-			cursor.execute(
-			"SELECT qty_left FROM Ascott_InvMgmt.Items WHERE sku='{}';".format(item[0]))
-			location_qty = cursor.fetchall()
-			remaining_quantity = 0
-			for i in location_qty:
-				remaining_quantity += i[0]
-			initial_quantity = remaining_quantity + delivered_out - received
-			items.append(
-
-				{"sku":item[0],
-				"name": item[1],
-				"remaining": remaining_quantity,
-				"reorder": item[3],
-				"unit": item[4],
-				"starting": initial_quantity,
-				"received": received,
-				"demand": delivered_out,
-				"picture": item[5].encode('ascii'),
-				"category": item[6].encode('ascii')
-				})
-			counter = item[0]
-
+			{"sku":item[0],
+			"name": item[1],
+			"remaining": item[2],
+			"reorder": item[3],
+			"unit": item[4],
+			"starting": initial_quantity,
+			"received": received,
+			"demand": delivered_out,
+			"picture": item[5].encode('ascii'),
+			"category": item[6].encode('ascii')
+			})
+		
 	return items
 
 
@@ -138,20 +103,12 @@ def getAllLogs():
 	things = []
 	
 	for row in data:
-		cursor.execute(
-			"SELECT name FROM Ascott_InvMgmt.Items WHERE sku  = '{}';".format(row[5]))
-		item_name = cursor.fetchall()
-
-		print(row[0])
-
-
-
 		things.append({"name": row[0].encode('ascii'),
 			"dateTime": row[1],
 			"action":row[2],
 			"move":row[3],
 			"remaining":row[4],
-			"item":item_name[0][0].encode('ascii'),
+			"item":row[5].encode('ascii'),
 			"location":row[6]})
 		# print(things)
 			
@@ -202,7 +159,7 @@ def getDailyLogs():
 	return things
 
 # POST for getting chart data
-@application.route('/api/getChartData', methods=["POST"])
+@app.route('/api/getChartData', methods=["POST"])
 def getChartData():
 
 	print "content_type: ", request.content_type
@@ -235,7 +192,7 @@ def getChartData():
 		return jsonify(responseData)
 
 # POST for getting chart data
-@application.route('/api/editReorder', methods=["POST"])
+@app.route('/api/editReorder', methods=["POST"])
 def editReorder():
 
 	print "content_type: ", request.content_type
@@ -286,7 +243,7 @@ def filter_role(roles_routes):
 			return redirect(v)
 
 
-@application.template_filter('lang_strip')
+@app.template_filter('lang_strip')
 def lang_strip(s):
     l = re.search(r"(?m)(?<=(en\/)|(zh\/)|(ms\/)|(ta\/)).*$", str(s.encode('ascii')))
     if l:
@@ -298,7 +255,7 @@ def input_handler(qty, user):
 	query = 'UPDATE Items SET qty_left = CASE WHEN action'
 
 
-@application.before_request
+@app.before_request
 def before():
 	# localization setting
 	if request.view_args and 'lang_code' in request.view_args:
@@ -327,7 +284,7 @@ def get_locale():
 ##########################
 
 
-@application.route('/')
+@app.route('/')
 def hello():
 	# user authentication
 	if not session["logged_in"]:
@@ -339,7 +296,7 @@ def hello():
 		elif session['role'] == "attendant":
 			return redirect(url_for("scanner", lang_code=session["lang_code"]))
 
-@application.route('/<lang_code>/login', methods=["GET", "POST"])
+@app.route('/<lang_code>/login', methods=["GET", "POST"])
 def login():
 
 	# create a login form to collect username & password
@@ -404,7 +361,7 @@ def login():
 		return redirect(url_for("hello"))
 
 
-@application.route('/<lang_code>/admin', methods=["GET","POST"])
+@app.route('/<lang_code>/admin', methods=["GET","POST"])
 def admin():
 
 	form = AddUserForm()
@@ -579,8 +536,7 @@ def admin():
 				
 				return redirect(url_for('admin', lang_code=get_locale()))
 
-
-@application.route('/<lang_code>/dashboard')
+@app.route('/<lang_code>/dashboard')
 def dashboard():
 
 	# user authentication
@@ -592,12 +548,29 @@ def dashboard():
 	l = getDailyLogs()
 	# l = getLogs()
 
-	return render_template('dashboard.html', role=session['role'], user=session['username'], items = i, logs = l)
+	return render_template('dashboard.html', items = i, logs = l)
 
 
 
-@application.route('/<lang_code>/inventory')
+@app.route('/<lang_code>/inventory')
 def inventory():
+	# conn = mysql.connect()
+	# cursor = conn.cursor()
+
+	# cursor.execute(
+	# 	"SELECT sku, name, qty_left, unit, picture, category FROM Ascott_InvMgmt.Items;")
+	# data = cursor.fetchall()
+	# items = {}
+	# for i in data:
+	# 	if i[5] not in items:
+	# 		items[i[5]] = []
+	# 		print("new category created: "+str(i[5]))
+	# 	items[i[5]].append({'name':i[1],
+	# 		'remaining':i[2],
+	# 		'unit':i[3],
+	# 		'picture':i[4]})
+
+	# print(items)
 
 	# user authentication
 	if not session["logged_in"]:
@@ -608,13 +581,11 @@ def inventory():
 	hampers = getAllInventory('Guest Hampers')
 	kitchenware = getAllInventory('Kitchenware')
 	return render_template('v2/inventory.html',
-		user = session['username'],
-		role = session['role'],
 		supplies = supplies,
 		hampers = hampers,
 		kitchenware = kitchenware)
 
-@application.route('/<lang_code>/inventory/<int:sku>')
+@app.route('/<lang_code>/inventory/<int:sku>')
 def item(sku):
 
 	# user authentication
@@ -648,7 +619,7 @@ def item(sku):
 	except:
 		return render_template('v2/item.html', item = None)
 
-@application.route('/<lang_code>/review/<category>')
+@app.route('/<lang_code>/review/<category>')
 def category(category):
 
 	# user authentication
@@ -662,8 +633,32 @@ def category(category):
 		user = session['username'])
 
 
+# @app.route('/<lang_code>/review')
+# def review():
 
-@application.route('/<lang_code>/logs')
+# 	# user authentication
+# 	if not session["logged_in"]:
+# 		return redirect(url_for("login", lang_code=session["lang_code"]))
+
+# 	supplies = getAllInventory('Guest Supplies')
+# 	hampers = getAllInventory('Guest Hampers')
+# 	kitchenware = getAllInventory('Kitchenware')
+# 	return render_template('review.html', supplies = supplies,
+# 		hampers = hampers,
+# 		kitchenware = kitchenware, user=session['username'])
+
+# @app.route('/review')
+# def review():
+# 	supplies = getAllInventory('Guest Supplies')
+# 	hampers = getAllInventory('Guest Hampers')
+# 	kitchenware = getAllInventory('Kitchenware')
+# 	return render_template('v2/review.html', supplies = supplies,
+# 		hampers = hampers,
+# 		kitchenware = kitchenware, user=session['username'])
+# >>>>>>> b1fcaf40dc6f258ef881c7d5b27fa57d50f88415
+
+
+@app.route('/<lang_code>/logs')
 def logs():
 
 	# user authentication
@@ -679,7 +674,7 @@ def logs():
 		user = session['username'])
 	# names=names, items=items)
 
-@application.route('/<lang_code>/scan')
+@app.route('/<lang_code>/scan')
 def scanner():
 
 	# user authentication
@@ -689,7 +684,7 @@ def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
-@application.route('/<lang_code>/shelves/<tag_id>', methods=['GET', 'POST'])
+@app.route('/<lang_code>/shelves/<tag_id>', methods=['GET'])
 def shelf(tag_id):
 
 	# user authentication
@@ -709,63 +704,43 @@ def shelf(tag_id):
 			"name": item[1],
 			"category": item[2],
 			"picture":item[3]})
-	message = None
+	return render_template('storeroom.html', things=things, 
+		role = session['role'],
+		user = session['username'], 
+		location = tag_id)
+
+@app.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
+def processCart(tag_id):
+	now = datetime.now()
+	form_data = request.form
+	user = session['username']
 	
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	for item, qty in form_data.iteritems():
+		print(item)
+		print(qty)
+		cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
+		# if action == 'out':
+		# 	qty_left = cursor.fetchone()[0]  - qty
+		# 	if (qty_left > 0):
+		# 		# query for stock out
+		# 		print("UPDATE Items SET qty_left="+qty_left+" WHERE qty_left>="+qty+" AND sku="+item+" AND location='"+tag_id+"';")
+		# 		# create log for each item
+		# 		print("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, name, location) VALUES ({}, {}, 'out', {}, {}, {});".format(user, now, qty, qty_left, item, tag_id))
+		# 	else:
+		# 		flash('Not enough in store!')
+		message = 'feedback'
 
-	if request.method == 'POST':
-		now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-		form_data = request.form
-		user = session['username']
-		
-		try:
-			conn = mysql.connect()
-			cursor = conn.cursor()
-			message = ''
-			for item, info in form_data.iterlists():
-				print(item)
-				print(info[0]+", "+info[1])
-				cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
-				old_qty = cursor.fetchone()[0]
-				qty_input = int(info[0])
-				if info[1] == 'out':
-					qty_left = old_qty  - qty_input
-					qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
-					if qty_left < 0:
-						message = 'Not enough in store!'
+	return redirect('shelves/'+tag_id, message=message)
 
-				elif info[1] == 'in':
-					qty_left = old_qty + qty_input
-				else:
-					qty_left = qty_input
-					qty_input = qty_left - old_qty # change the value of qty to the difference 
-				# query for stock out
-				cursor.execute("UPDATE Items SET qty_left="+str(qty_left)+" WHERE qty_left>="+str(0)+" AND sku="+str(item)+" AND location='"+tag_id+"';")
-				# create log for each item
-				cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', 'out', {}, {}, {}, '{}');".format(str(user), now, qty_input, qty_left, item, tag_id))
-				message = 'Success!'
-			
-		except:
-			message = "Unexpected error:" + sys.exc_info()[0]
-
-    	return render_template('storeroom.html', things=things,
-    		role = session['role'],
-    		user = session['username'], 
-    		location = tag_id,
-    		message = message)
-
-# @application.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
-# def processCart(lang_code, tag_id):
-	
-
-# 	return redirect('/'+lang_code+'/shelves/'+tag_id)
-
-@application.route('/logout')
+@app.route('/logout')
 def logout():
 	session.clear()
 	return redirect(url_for("login", lang_code=get_locale()))
 
 
-@application.errorhandler(404)
+@app.errorhandler(404)
 def page_not_found(e):
 	"""Return a custom 404 error."""
 	return 'Sorry, nothing at this URL.', 404
@@ -773,4 +748,4 @@ def page_not_found(e):
 
 ## testing
 if __name__ == '__main__':
-	application.run()
+	app.run(debug=True, host='0.0.0.0')

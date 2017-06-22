@@ -24,6 +24,13 @@ class CreateNewItem(FlaskForm):
 	unit = SelectField('Unit Size', choices = myDetails('unit'), validators = [DataRequired()]) 
 	submitTwo = SubmitField('Add New Item')
 
+class ExistingItemsLocation(FlaskForm):
+
+	itemname = StringField('Item Name', validators=[DataRequired("Item Name")])
+	location = SelectField('Location of the Item', choices = myLocation('location'), validators = [DataRequired()]) 
+	qtyleft = IntegerField('Available Amount', validators = [DataRequired()])
+	submitFour = SubmitField('Add Location')
+
 class LoginForm(FlaskForm):
 	username = StringField(validators=[DataRequired("Please enter a username")])
 	password = PasswordField(validators=[DataRequired('Please enter a password')])

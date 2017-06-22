@@ -23,9 +23,11 @@
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#summary" aria-controls="home" role="tab" data-toggle="tab">Summary</a></li>
-    <li role="presentation"><a href="#user" aria-controls="user" role="tab" data-toggle="tab">Add New User</a></li>
-    <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">Add New Item</a></li>
-    <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">Group Settings</a></li>
+    <li role="presentation"><a href="#user" aria-controls="user" role="tab" data-toggle="tab">Users</a></li>
+    <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">Items</a></li>
+    <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">Locations</a></li>
+    <li role="presentation"><a href="#existitem" aria-controls="existitem" role="tab" data-toggle="tab">Existing Items</a></li>
+    
 </ul>
 
 <div class="tab-content">
@@ -33,7 +35,7 @@
     <div role="tabpanel" id="summary" class="tab-pane fade in active">
         <h3>HOME</h3>
 
-        <h4>Current Users (possibly to if login and last login)</h4>
+        <h4>Current Users</h4>
 
         <div class="table-responsive">
             <table class="table">
@@ -159,7 +161,7 @@
             {% endwith %}
         </div>
 
-        {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary", onclick="activaTab('tab2');") }}
+        {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
 
 
         </form>
@@ -196,7 +198,7 @@
             {% endif %}
 
             <div id="add-item-name" class="form-group">
-            {{ form2.itemname(class="form-control typeahead", placeholder="Name of Item")}}
+            {{ form2.itemname(class="form-control", placeholder="Name of Item")}}
             </div>
         </div>
 
@@ -368,9 +370,77 @@
         
         {{ form3.submitThree(class="width-35 pull-right btn btn-sm btn-primary") }}
 
+        </form>
 
+    </div>
+
+
+
+    <div role="tabpanel" id="existitem" class="tab-pane fade">
+        <form method="POST" action="/{{g.current_lang}}/admin">
+            {{ form.hidden_tag() }}
+            <input type="hidden"  name="name-form" value='form4'>
+        <h3> Add Existing Items to New Locations</h3>
+        
+
+        <div class="row form-group">
+            {{ form4.itemname.label }}
+            {% if form4.itemname.errors %}
+                {% for error in form4.itemname.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div id="add-item-name" class="form-group">
+            {{ form4.itemname(class="form-control typeahead", placeholder="Name of Existing Item")}}
+            </div>
+        </div>
+        
+        
+        <div class="row form-group">
+            {{ form4.location.label }}
+            {% if form4.location.errors %}
+                {% for error in form4.location.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form4.location(class="form-control")}}
+            </div>
+        </div>
+        
+        
+        <div class="row form-group">
+            {{ form4.qtyleft.label }} 
+            {% if form4.qtyleft.errors %}
+                {% for error in form4.qtyleft.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form4.qtyleft(class="form-control", placeholder="Quantity Available") }}
+            </div>
+        </div>
+        
+
+        <div class="row form-group"> 
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul class="error-message">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+                 </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+            {{ form4.submitFour(class="width-35 pull-right btn btn-sm btn-primary") }}
 
         </form>
+
     </div>
 
 
