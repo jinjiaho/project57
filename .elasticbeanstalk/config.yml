@@ -1,6 +1,6 @@
 branch-defaults:
   master:
-    environment: flask-env
+    environment: null
 global:
   application_name: aim-22.06
   branch: null
