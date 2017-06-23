@@ -30,12 +30,12 @@ import os, copy, re, csv, json_decode
 ##########################
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
+
 application = Flask(__name__, instance_relative_config=True)
 application.config.from_object('config.Config') # default configurations
 # application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
 application.config.from_pyfile('myConfig1.cfg') 
 # application.config.from_pyfile('myConfig2.cfg')
-
 
 # Babel init
 babel = Babel(application)
@@ -709,55 +709,59 @@ def shelf(tag_id):
 			"name": item[1],
 			"category": item[2],
 			"picture":item[3]})
-	message = None
-	
+	message = ''
 
 	if request.method == 'POST':
 		now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		form_data = request.form
 		user = session['username']
-		
+
 		try:
 			conn = mysql.connect()
 			cursor = conn.cursor()
-			message = ''
 			for item, info in form_data.iterlists():
 				print(item)
 				print(info[0]+", "+info[1])
 				cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
+				conn.commit()
 				old_qty = cursor.fetchone()[0]
 				qty_input = int(info[0])
 				if info[1] == 'out':
 					qty_left = old_qty  - qty_input
 					qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
 					if qty_left < 0:
-						message = 'Not enough in store!'
+						flash('Not enough in store!', 'error')
 
 				elif info[1] == 'in':
 					qty_left = old_qty + qty_input
 				else:
 					qty_left = qty_input
 					qty_input = qty_left - old_qty # change the value of qty to the difference 
+				conn = mysql.connect()
+				cursor = conn.cursor()
+				update_items_query = "UPDATE Items SET qty_left="+str(qty_left)+" WHERE sku="+str(item)+" AND location='"+tag_id+"';"
+				# message += update_items_query
 				# query for stock out
-				cursor.execute("UPDATE Items SET qty_left="+str(qty_left)+" WHERE qty_left>="+str(0)+" AND sku="+str(item)+" AND location='"+tag_id+"';")
+				print(update_items_query)
+				cursor.execute(update_items_query)
+				conn.commit()
+				conn = mysql.connect()
+				cursor = conn.cursor()
+				update_logs_query = "INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');".format(user, now, info[1], qty_input, qty_left, item, tag_id)
+				# message += " " + update_logs_query
 				# create log for each item
-				cursor.execute("INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', 'out', {}, {}, {}, '{}');".format(str(user), now, qty_input, qty_left, item, tag_id))
-				message = 'Success!'
-			
+				print(update_logs_query)
+				cursor.execute(update_logs_query)
+				conn.commit()
+			flash('Success!', 'success')
 		except:
-			message = "Unexpected error:" + sys.exc_info()[0]
+			flash('Oops! Something went wrong :(', 'error')
 
     	return render_template('storeroom.html', things=things,
     		role = session['role'],
     		user = session['username'], 
-    		location = tag_id,
-    		message = message)
+    		location = tag_id)
 
-# @application.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
-# def processCart(lang_code, tag_id):
-	
-
-# 	return redirect('/'+lang_code+'/shelves/'+tag_id)
 
 @application.route('/logout')
 def logout():

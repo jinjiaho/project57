@@ -1,10 +1,17 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, g
 from flask_babel import Babel
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
+<<<<<<< HEAD
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation
+=======
+from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 import os, copy, re, csv, json_decode
 # from flask.ext.cache import Cache
 
@@ -365,9 +372,14 @@ def login():
 def admin():
 
 	form = AddUserForm()
+<<<<<<< HEAD
 	form2 =CreateNewItem()
 	form3 =AddNewLocation()
 	form4 =ExistingItemsLocation() 
+=======
+	form2 = CreateNewItem()
+	form3 =AddNewLocation()
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 
 	#--------------users table-------------------------
 	conn = mysql.connect()
@@ -420,7 +432,11 @@ def admin():
 		items = cursor.fetchall()
 		# print (items)
 		flat_items = [item.encode('ascii') for sublist in items for item in sublist]
+<<<<<<< HEAD
 		return render_template('v2/admin.html', form=form, form2=form2,form3=form3, form4=form4, users=things, group=group, item_list=flat_items)
+=======
+		return render_template('v2/admin.html', user=session['username'], role=session['role'], form=form, form2=form2,form3=form3, users=things, group=group, item_list=flat_items)
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 
 	
 
@@ -428,7 +444,11 @@ def admin():
 
 		if request.form['name-form'] =='form':
 			if form.validate() == False:
+<<<<<<< HEAD
 				return render_template('admin.html', form=form, form2=form2,form3=form3, form4=form4, users=things, group=group)
+=======
+				return render_template('admin.html',user=session['username'], role=session['role'], form=form, form2=form2,form3=form3, users=things, group=group)
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 			else:
 				username = form.username.data
 				password = generate_password_hash(form.password.data)
@@ -453,10 +473,19 @@ def admin():
 
 		elif request.form['name-form'] =='form2':
 			if form2.validate() == False:
+<<<<<<< HEAD
 				return render_template('admin.html', form=form, form2=form2,form3=form3,form4=form4, users=things, group=group)
 			else: 
 				sku = form2.sku.data
 
+=======
+				return render_template('admin.html', user=session['username'], role=session['role'], form=form, form2=form2,form3=form3, users=things, group=group)
+			else: 
+				sku = form2.sku.data
+
+				
+
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 				# query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE sku ='{}'".format(sku))
 
 				itemname=form2.itemname.data
@@ -483,7 +512,11 @@ def admin():
 
 		elif request.form['name-form'] =='form3':
 			if form3.validate() == False:
+<<<<<<< HEAD
 				return render_template('admin.html', form=form, form2=form2,form3=form3, form4=form4,users=things, group=group)
+=======
+				return render_template('admin.html', user=session['username'], role=session['role'], form=form, form2=form2,form3=form3, users=things, group=group)
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 			else: 
 				location = form3.location.data
 				description= form3.description.data
@@ -500,6 +533,7 @@ def admin():
 				# cursor.execute("COMMIT")
 				flash("New Location is Added!")
 				
+<<<<<<< HEAD
 				return redirect(url_for('admin', lang_code=get_locale()))
 
 		elif request.form['name-form'] =='form4':
@@ -535,6 +569,11 @@ def admin():
 				flash("Added Item to New Location %s!" %location)
 				
 				return redirect(url_for('admin', lang_code=get_locale()))
+=======
+				return redirect(url_for('admin', user=session['username'], role=session['role'], lang_code=get_locale()))
+
+
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 
 @app.route('/<lang_code>/dashboard')
 def dashboard():
@@ -548,7 +587,11 @@ def dashboard():
 	l = getDailyLogs()
 	# l = getLogs()
 
+<<<<<<< HEAD
 	return render_template('dashboard.html', items = i, logs = l)
+=======
+	return render_template('dashboard.html', role=session['role'], user=session['username'], items = i, logs = l)
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 
 
 
@@ -581,6 +624,11 @@ def inventory():
 	hampers = getAllInventory('Guest Hampers')
 	kitchenware = getAllInventory('Kitchenware')
 	return render_template('v2/inventory.html',
+<<<<<<< HEAD
+=======
+		user = session['username'],
+		role = session['role'],
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 		supplies = supplies,
 		hampers = hampers,
 		kitchenware = kitchenware)
@@ -684,7 +732,11 @@ def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
+<<<<<<< HEAD
 @app.route('/<lang_code>/shelves/<tag_id>', methods=['GET'])
+=======
+@app.route('/<lang_code>/shelves/<tag_id>', methods=['GET', 'POST'])
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 def shelf(tag_id):
 
 	# user authentication
@@ -704,6 +756,7 @@ def shelf(tag_id):
 			"name": item[1],
 			"category": item[2],
 			"picture":item[3]})
+<<<<<<< HEAD
 	return render_template('storeroom.html', things=things, 
 		role = session['role'],
 		user = session['username'], 
@@ -733,6 +786,62 @@ def processCart(tag_id):
 		message = 'feedback'
 
 	return redirect('shelves/'+tag_id, message=message)
+=======
+	message = None
+	
+
+	if request.method == 'POST':
+		now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		form_data = request.form
+		user = session['username']
+		
+		try:
+			conn = mysql.connect()
+			cursor = conn.cursor()
+			message = ''
+			for item, info in form_data.iterlists():
+				print(item)
+				print(info[0]+", "+info[1])
+				cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
+				old_qty = cursor.fetchone()[0]
+				qty_input = int(info[0])
+				if info[1] == 'out':
+					qty_left = old_qty  - qty_input
+					qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
+					if qty_left < 0:
+						message = 'Not enough in store!'
+
+				elif info[1] == 'in':
+					qty_left = old_qty + qty_input
+				else:
+					qty_left = qty_input
+					qty_input = qty_left - old_qty # change the value of qty to the difference 
+				update_items_query = "UPDATE Items SET qty_left="+str(qty_left)+" WHERE qty_left>="+str(0)+" AND sku="+str(item)+" AND location='"+tag_id+"';"
+				message += ", " +update_items_query
+				# query for stock out
+				# cursor.execute(update_items_query)
+				update_logs_query = "INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', 'out', {}, {}, {}, '{}');".format(str(user), now, qty_input, qty_left, item, tag_id)
+				message += ", " + update_logs_query
+				# create log for each item
+				# cursor.execute(update_logs_query)
+			return jsonify(message)
+			
+		except:
+			message += ", ERROR!"
+			return jsonify(message)
+
+    	return render_template('storeroom.html', things=things,
+    		role = session['role'],
+    		user = session['username'], 
+    		location = tag_id,
+    		message = message)
+
+# @app.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
+# def processCart(lang_code, tag_id):
+	
+
+# 	return redirect('/'+lang_code+'/shelves/'+tag_id)
+>>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 
 @app.route('/logout')
 def logout():
