@@ -731,7 +731,7 @@ def shelf(tag_id):
 					qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
 
 					if qty_left < 0:
-						flash('Not enough in store!', 'error')
+						flash('Not enough in store!', 'warning')
 
 				elif info[1] == 'in':
 					qty_left = old_qty + qty_input
