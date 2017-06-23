@@ -3,20 +3,15 @@ from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 
-app = Flask(__name__)
-app.config['DEBUG'] = True
-
-app.secret_key = "development-key"
+application = Flask(__name__, instance_relative_config=True)
+application.config.from_object('config.Config') # default configurations
+application.config.from_pyfile('amazonRDS.cfg')
 
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
 
 mysql = MySQL()
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'classroom'
-app.config['MYSQL_DATABASE_DB'] = 'Ascott_InvMgmt'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
+mysql.init_app(application)
 adminmode = False
 
 #----------get all required choices from database----------

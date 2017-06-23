@@ -1,8 +1,9 @@
 branch-defaults:
   master:
-    environment: flask-env
+    environment: demo-06-23
+    group_suffix: null
 global:
-  application_name: aim-22.06
+  application_name: ascott-inv-mgmt
   branch: null
   default_ec2_keyname: capstone
   default_platform: python2.7

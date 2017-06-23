@@ -19,25 +19,31 @@ import os, copy, re, csv, json_decode
 # pip2 install scipy
 # pip2 install statsmodels
 # pip2 install pandas
-
+# eb init -p python2.7 aim
+# eb init
+# eb create flask-env
+# eb open
+# eb terminate flask-env
 
 ##########################
 ##        CONFIG        ##
 ##########################
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
-app = Flask(__name__, instance_relative_config=True)
-app.config.from_object('config.DevConfig') # default configurations
-# app.config.from_pyfile('myConfig1.cfg') # local database; override with instanced configuration (in "/instance"), if any
-app.config.from_pyfile('amazonRDS.cfg') # Amazon database
+
+application = Flask(__name__, instance_relative_config=True)
+application.config.from_object('config.Config') # default configurations
+application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
+# application.config.from_pyfile('myConfig1.cfg') 
+# application.config.from_pyfile('myConfig2.cfg')
 
 # Babel init
-babel = Babel(app)
+babel = Babel(application)
 languages = ('en', 'zh', 'ms', 'ta')
 
 # mysql init
 mysql = MySQL()
-mysql.init_app(app)
+mysql.init_app(application)
 
 # global vars
 adminmode = False
@@ -132,12 +138,20 @@ def getAllLogs():
 	things = []
 	
 	for row in data:
+		cursor.execute(
+			"SELECT name FROM Ascott_InvMgmt.Items WHERE sku  = '{}';".format(row[5]))
+		item_name = cursor.fetchall()
+
+		print(row[0])
+
+
+
 		things.append({"name": row[0].encode('ascii'),
 			"dateTime": row[1],
 			"action":row[2],
 			"move":row[3],
 			"remaining":row[4],
-			"item":row[5].encode('ascii'),
+			"item":item_name[0][0].encode('ascii'),
 			"location":row[6]})
 		# print(things)
 			
@@ -188,7 +202,7 @@ def getDailyLogs():
 	return things
 
 # POST for getting chart data
-@app.route('/api/getChartData', methods=["POST"])
+@application.route('/api/getChartData', methods=["POST"])
 def getChartData():
 
 	print "content_type: ", request.content_type
@@ -221,7 +235,7 @@ def getChartData():
 		return jsonify(responseData)
 
 # POST for getting chart data
-@app.route('/api/editReorder', methods=["POST"])
+@application.route('/api/editReorder', methods=["POST"])
 def editReorder():
 
 	print "content_type: ", request.content_type
@@ -272,7 +286,7 @@ def filter_role(roles_routes):
 			return redirect(v)
 
 
-@app.template_filter('lang_strip')
+@application.template_filter('lang_strip')
 def lang_strip(s):
     l = re.search(r"(?m)(?<=(en\/)|(zh\/)|(ms\/)|(ta\/)).*$", str(s.encode('ascii')))
     if l:
@@ -284,7 +298,7 @@ def input_handler(qty, user):
 	query = 'UPDATE Items SET qty_left = CASE WHEN action'
 
 
-@app.before_request
+@application.before_request
 def before():
 	# localization setting
 	if request.view_args and 'lang_code' in request.view_args:
@@ -313,7 +327,7 @@ def get_locale():
 ##########################
 
 
-@app.route('/')
+@application.route('/')
 def hello():
 	# user authentication
 	if not session["logged_in"]:
@@ -325,7 +339,7 @@ def hello():
 		elif session['role'] == "attendant":
 			return redirect(url_for("scanner", lang_code=session["lang_code"]))
 
-@app.route('/<lang_code>/login', methods=["GET", "POST"])
+@application.route('/<lang_code>/login', methods=["GET", "POST"])
 def login():
 
 	# create a login form to collect username & password
@@ -390,7 +404,7 @@ def login():
 		return redirect(url_for("hello"))
 
 
-@app.route('/<lang_code>/admin', methods=["GET","POST"])
+@application.route('/<lang_code>/admin', methods=["GET","POST"])
 def admin():
 
 	form = AddUserForm()
@@ -534,7 +548,7 @@ def admin():
 
 
 
-@app.route('/<lang_code>/dashboard')
+@application.route('/<lang_code>/dashboard')
 def dashboard():
 
 	# user authentication
@@ -550,25 +564,8 @@ def dashboard():
 
 
 
-@app.route('/<lang_code>/inventory')
+@application.route('/<lang_code>/inventory')
 def inventory():
-	# conn = mysql.connect()
-	# cursor = conn.cursor()
-
-	# cursor.execute(
-	# 	"SELECT sku, name, qty_left, unit, picture, category FROM Ascott_InvMgmt.Items;")
-	# data = cursor.fetchall()
-	# items = {}
-	# for i in data:
-	# 	if i[5] not in items:
-	# 		items[i[5]] = []
-	# 		print("new category created: "+str(i[5]))
-	# 	items[i[5]].append({'name':i[1],
-	# 		'remaining':i[2],
-	# 		'unit':i[3],
-	# 		'picture':i[4]})
-
-	# print(items)
 
 	# user authentication
 	if not session["logged_in"]:
@@ -585,7 +582,7 @@ def inventory():
 		hampers = hampers,
 		kitchenware = kitchenware)
 
-@app.route('/<lang_code>/inventory/<int:sku>')
+@application.route('/<lang_code>/inventory/<int:sku>')
 def item(sku):
 
 	# user authentication
@@ -619,7 +616,7 @@ def item(sku):
 	except:
 		return render_template('v2/item.html', item = None)
 
-@app.route('/<lang_code>/review/<category>')
+@application.route('/<lang_code>/review/<category>')
 def category(category):
 
 	# user authentication
@@ -633,32 +630,8 @@ def category(category):
 		user = session['username'])
 
 
-# @app.route('/<lang_code>/review')
-# def review():
 
-# 	# user authentication
-# 	if not session["logged_in"]:
-# 		return redirect(url_for("login", lang_code=session["lang_code"]))
-
-# 	supplies = getAllInventory('Guest Supplies')
-# 	hampers = getAllInventory('Guest Hampers')
-# 	kitchenware = getAllInventory('Kitchenware')
-# 	return render_template('review.html', supplies = supplies,
-# 		hampers = hampers,
-# 		kitchenware = kitchenware, user=session['username'])
-
-# @app.route('/review')
-# def review():
-# 	supplies = getAllInventory('Guest Supplies')
-# 	hampers = getAllInventory('Guest Hampers')
-# 	kitchenware = getAllInventory('Kitchenware')
-# 	return render_template('v2/review.html', supplies = supplies,
-# 		hampers = hampers,
-# 		kitchenware = kitchenware, user=session['username'])
-# >>>>>>> b1fcaf40dc6f258ef881c7d5b27fa57d50f88415
-
-
-@app.route('/<lang_code>/logs')
+@application.route('/<lang_code>/logs')
 def logs():
 
 	# user authentication
@@ -674,7 +647,7 @@ def logs():
 		user = session['username'])
 	# names=names, items=items)
 
-@app.route('/<lang_code>/scan')
+@application.route('/<lang_code>/scan')
 def scanner():
 
 	# user authentication
@@ -684,7 +657,7 @@ def scanner():
 	return render_template('scanner.html')
 
 # RA shelf view
-@app.route('/<lang_code>/shelves/<tag_id>', methods=['GET', 'POST'])
+@application.route('/<lang_code>/shelves/<tag_id>', methods=['GET', 'POST'])
 def shelf(tag_id):
 
 	# user authentication
@@ -758,13 +731,13 @@ def shelf(tag_id):
     		location = tag_id)
 
 
-@app.route('/logout')
+@application.route('/logout')
 def logout():
 	session.clear()
 	return redirect(url_for("login", lang_code=get_locale()))
 
 
-@app.errorhandler(404)
+@application.errorhandler(404)
 def page_not_found(e):
 	"""Return a custom 404 error."""
 	return 'Sorry, nothing at this URL.', 404
@@ -772,4 +745,4 @@ def page_not_found(e):
 
 ## testing
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=80)
+	application.run()
