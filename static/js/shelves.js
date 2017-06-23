@@ -40,8 +40,16 @@ function clearCartSubmit() {
 }
 
 function deleteRow(r) {
+  // delete from table form
   var row = r.parentNode.parentNode.rowIndex;
   document.getElementById('cart-table').deleteRow(row);
+
+  // delete from cart
+  var cart = JSON.parse(localStorage.cart);
+  cart.splice(row-1, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  updateCart();
 }
 
 $(function () {
@@ -111,7 +119,7 @@ $(function () {
     }
 
     updateCart();
-    $('#qtyModal').hide();
+    $('#qtyModal').modal('hide');
 
   });
 

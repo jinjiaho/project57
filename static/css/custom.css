@@ -107,8 +107,7 @@ body {
 
 .navbar .navbar-brand {
   color: #1d4262;
-}
- 
+}]
 
 .navbar-header {
   float: none; 
@@ -123,7 +122,6 @@ body {
 }
 
 .alert {
-  min-height: 120px;
   border-radius: 6px !important;
 }
 
@@ -221,7 +219,7 @@ span.cart-group img {
   color: white;
   z-index: 9;
   position: relative;
-  top: -9px;
+  top: -0.7em;
   right: -3px;
   font-size: x-small;
 }
@@ -246,6 +244,7 @@ span.cart-group img {
 
 div.modal .modal-header h4 {
   margin: 0px;
+  color: #1d4262;
 }
 
 .qty-display.form-group label, 

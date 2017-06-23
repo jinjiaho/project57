@@ -8,19 +8,6 @@ import os, copy, re, csv, json_decode
 # from flask.ext.cache import Cache
 
 
-# pip2 install flask
-# pip2 install mysql-python
-# pip2 install mysqlclient
-# pip2 install SQLAlchemy
-# pip2 install flask-babel
-# pip2 install flask-wtf
-# pip2 install flask-mysql
-# pip2 install numpy
-# pip2 install scipy
-# pip2 install statsmodels
-# pip2 install pandas
-
-
 ##########################
 ##        CONFIG        ##
 ##########################
@@ -28,8 +15,7 @@ import os, copy, re, csv, json_decode
 # the App Engine WSGI application server.
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.DevConfig') # default configurations
-# app.config.from_pyfile('myConfig1.cfg') # local database; override with instanced configuration (in "/instance"), if any
-app.config.from_pyfile('amazonRDS.cfg') # Amazon database
+app.config.from_pyfile('myConfig1.cfg') # override with instanced configuration (in "/instance"), if any
 
 # Babel init
 babel = Babel(app)
@@ -57,50 +43,34 @@ def getAllInventory(category):
 	cursor.execute(
 		"SELECT sku, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
-
-	# cursor.execute(
-	# 	"SELECT DISTINCT sku FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
-	# unique_sku = cursor.fetchall()
-	# print(unique_sku)
 	items = []
-	counter = 0
 	for item in data:
-		if item[0] == counter:
-			pass
-		else:
-			cursor.execute(
+		cursor.execute(
 			"SELECT action, qty_moved FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
-			in_out_data = cursor.fetchall()
-			delivered_out = 0
-			received = 0
-			for i in in_out_data:
-				if i[0].encode('ascii') == 'out':
-					delivered_out = delivered_out + (-1*int(i[1]))
-				elif i[0].encode('ascii') == "in":
-					received = received + int(i[1])
+		in_out_data = cursor.fetchall()
+		delivered_out = 0
+		received = 0
+		for i in in_out_data:
+			if i[0].encode('ascii') == 'out':
+				delivered_out = delivered_out + (-1*int(i[1]))
+			elif i[0].encode('ascii') == "in":
+				received = received + int(i[1])
+		remaining_quantity = item[2]
+		initial_quantity = remaining_quantity + delivered_out - received
+		items.append(
 
-			cursor.execute(
-			"SELECT qty_left FROM Ascott_InvMgmt.Items WHERE sku='{}';".format(item[0]))
-			location_qty = cursor.fetchall()
-			remaining_quantity = 0
-			for i in location_qty:
-				remaining_quantity += i[0]
-			initial_quantity = remaining_quantity + delivered_out - received
-			items.append(
-
-				{"sku":item[0],
-				"name": item[1],
-				"remaining": remaining_quantity,
-				"reorder": item[3],
-				"unit": item[4],
-				"starting": initial_quantity,
-				"received": received,
-				"demand": delivered_out,
-				"picture": item[5].encode('ascii'),
-				"category": item[6].encode('ascii')
-				})
-			counter = item[0]
-
+			{"sku":item[0],
+			"name": item[1],
+			"remaining": item[2],
+			"reorder": item[3],
+			"unit": item[4],
+			"starting": initial_quantity,
+			"received": received,
+			"demand": delivered_out,
+			"picture": item[5].encode('ascii'),
+			"category": item[6].encode('ascii')
+			})
+		
 	return items
 
 
@@ -704,59 +674,60 @@ def shelf(tag_id):
 			"name": item[1],
 			"category": item[2],
 			"picture":item[3]})
-	message = ''
+	message = None
+	
 
 	if request.method == 'POST':
 		now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		form_data = request.form
 		user = session['username']
-
+		
 		try:
 			conn = mysql.connect()
 			cursor = conn.cursor()
+			message = ''
 			for item, info in form_data.iterlists():
 				print(item)
 				print(info[0]+", "+info[1])
 				cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
-				conn.commit()
 				old_qty = cursor.fetchone()[0]
 				qty_input = int(info[0])
 				if info[1] == 'out':
 					qty_left = old_qty  - qty_input
 					qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
 					if qty_left < 0:
-						flash('Not enough in store!', 'error')
+						message = 'Not enough in store!'
 
 				elif info[1] == 'in':
 					qty_left = old_qty + qty_input
 				else:
 					qty_left = qty_input
 					qty_input = qty_left - old_qty # change the value of qty to the difference 
-				conn = mysql.connect()
-				cursor = conn.cursor()
-				update_items_query = "UPDATE Items SET qty_left="+str(qty_left)+" WHERE sku="+str(item)+" AND location='"+tag_id+"';"
-				# message += update_items_query
+				update_items_query = "UPDATE Items SET qty_left="+str(qty_left)+" WHERE qty_left>="+str(0)+" AND sku="+str(item)+" AND location='"+tag_id+"';"
+				message += ", " +update_items_query
 				# query for stock out
-				print(update_items_query)
-				cursor.execute(update_items_query)
-				conn.commit()
-				conn = mysql.connect()
-				cursor = conn.cursor()
-				update_logs_query = "INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');".format(user, now, info[1], qty_input, qty_left, item, tag_id)
-				# message += " " + update_logs_query
+				# cursor.execute(update_items_query)
+				update_logs_query = "INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', 'out', {}, {}, {}, '{}');".format(str(user), now, qty_input, qty_left, item, tag_id)
+				message += ", " + update_logs_query
 				# create log for each item
-				print(update_logs_query)
-				cursor.execute(update_logs_query)
-				conn.commit()
-			flash('Success!', 'success')
+				# cursor.execute(update_logs_query)
+			return jsonify(message)
+			
 		except:
-			flash('Oops! Something went wrong :(', 'error')
+			message += ", ERROR!"
+			return jsonify(message)
 
     	return render_template('storeroom.html', things=things,
     		role = session['role'],
     		user = session['username'], 
-    		location = tag_id)
+    		location = tag_id,
+    		message = message)
 
+# @app.route('/<lang_code>/shelves/<tag_id>/cart', methods=['POST'])
+# def processCart(lang_code, tag_id):
+	
+
+# 	return redirect('/'+lang_code+'/shelves/'+tag_id)
 
 @app.route('/logout')
 def logout():
@@ -772,4 +743,4 @@ def page_not_found(e):
 
 ## testing
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=80)
+	app.run(debug=True, host='0.0.0.0')
