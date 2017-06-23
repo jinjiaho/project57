@@ -729,6 +729,7 @@ def shelf(tag_id):
 				if info[1] == 'out':
 					qty_left = old_qty  - qty_input
 					qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
+
 					if qty_left < 0:
 						flash('Not enough in store!', 'error')
 
@@ -755,7 +756,7 @@ def shelf(tag_id):
 				conn.commit()
 			flash('Success!', 'success')
 		except:
-			flash('Oops! Something went wrong :(', 'error')
+			flash('Oops! Something went wrong :(', 'danger')
 
     	return render_template('storeroom.html', things=things,
     		role = session['role'],

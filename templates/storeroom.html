@@ -26,6 +26,7 @@ a:focus {
 
 .card {
     padding: 0;
+    margin: 10px;
 }
 
 </style>
@@ -35,10 +36,10 @@ a:focus {
             <div class="col-md-12">
                 {% for item in things %}
                 <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}">
-                    <div class="card col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                    <div class="card col-lg-3 col-md-5 col-sm-6 col-xs-12">
                         <div class="content all-icons">
                             <div class="row">
-                                <div class="mobile-icon-list col-lg-2 col-md-3 col-sm-6 col-xs-12" align='center'>
+                                <div class="mobile-icon-list col-lg-12 col-md-12 col-sm-12 col-xs-12" align='center'>
                                     <div class="mobile-icon-detail">
                                         <img src="/static/img/items/{{item.category}}/{{item.picture}}"/>
                                         <div class="name">{{item.name}}</div>
