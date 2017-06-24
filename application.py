@@ -607,12 +607,22 @@ def inventory():
 	supplies = getAllInventory('Guest Supplies')
 	hampers = getAllInventory('Guest Hampers')
 	kitchenware = getAllInventory('Kitchenware')
+
+	location_query = "SELECT DISTINCT location FROM Items GROUP BY location DESC;"
+	cursor = mysql.connect().cursor()
+	cursor.execute(location_query)
+	locations = cursor.fetchall()
+	shelves = []
+	for i in locations:
+		print type(i[0])
+		shelves.append(i[0].encode('ascii'))
 	return render_template('v2/inventory.html',
 		user = session['username'],
 		role = session['role'],
 		supplies = supplies,
 		hampers = hampers,
-		kitchenware = kitchenware)
+		kitchenware = kitchenware,
+		shelves = shelves)
 
 @application.route('/<lang_code>/inventory/<int:sku>')
 def item(sku):
@@ -620,8 +630,6 @@ def item(sku):
 	# user authentication
 	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
-
-	
 	
 	name = item
 	cursor = mysql.connect().cursor()
