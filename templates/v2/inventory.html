@@ -86,6 +86,22 @@ a.thumbnail > img {
   /*text-align:center;*/
   margin-top: 10px;
 }
+
+.section {
+  padding-bottom: 2em;
+}
+
+/* styling for the list of locations */
+#location-list button {
+  margin: 5px 10px; /* space out the buttons */
+  background-color: #f5f5f5; /* match accordion colors */
+  color: #337ab7; /* match accordion colors */
+}
+
+#location-list a:hover {
+  text-decoration: none; /* Removes a random dash that appears */
+}
+
 </style>
 
 <div class="container">
@@ -108,100 +124,117 @@ a.thumbnail > img {
 </div><hr>
 
 
-
-
 <!-- 2nd row: Inventory list -->
-<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-  <div class="panel panel-default">
-    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-supplies" aria-expanded="true" aria-controls="collapse-supplies">
-        <div class="panel-heading text-center" role="tab" id="heading-supplies" style="background-color:#f5f5f5;">
-          <h4 class="panel-title">
-              {{_('Guest Supplies')}}
-          </h4>
-        </div>
-    </a>
-    <div id="collapse-supplies" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-supplies">
-      <div class="panel-body">
-        <div class="row" style="margin-left:0; margin-right:0">
-          <div id="overview-item-outer">
-          {% for i in supplies %}
-          <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
-            <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
-              <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
-                <div class="overview-item-img" align='center'>
-                  <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
-                </div>
-                <div class="alert-group pull-right">
-                  <div class="overview-item-label">{% if i.reorder > 0 %}<i class="glyphicon glyphicon-ok text-success"></i>{% endif %}{% if i.reorder == 0 %}<i class="glyphicon glyphicon-remove text-danger"></i>{% endif %} {{i.name}}</div>
-                  <div class="overview-item-number">{{i.remaining}}</div>
-                </div>
-              </div>
+  <div class="section">
+    <h4>Browse by Category</h4>
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-default">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-supplies" aria-expanded="true" aria-controls="collapse-supplies">
+            <div class="panel-heading text-center" role="tab" id="heading-supplies" style="background-color:#f5f5f5;">
+              <h4 class="panel-title">
+                  {{_('Guest Supplies')}}
+              </h4>
             </div>
-          </a>
-          {% endfor %}
-          </div></div>
+        </a>
+        <div id="collapse-supplies" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-supplies">
+          <div class="panel-body">
+            <div class="row" style="margin-left:0; margin-right:0">
+              <div id="overview-item-outer">
+              {% for i in supplies %}
+              <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+                <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
+                  <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
+                    <div class="overview-item-img" align='center'>
+                      <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
+                    </div>
+                    <div class="alert-group pull-right">
+                      <div class="overview-item-label">{% if i.reorder > 0 %}<i class="glyphicon glyphicon-ok text-success"></i>{% endif %}{% if i.reorder == 0 %}<i class="glyphicon glyphicon-remove text-danger"></i>{% endif %} {{i.name}}</div>
+                      <div class="overview-item-number">{{i.remaining}}</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+              {% endfor %}
+              </div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-hampers" aria-expanded="true" aria-controls="collapse-hampers">
+            <div class="panel-heading text-center" role="tab" id="heading-hampers" style="background-color:#f5f5f5;">
+              <h4 class="panel-title">
+                  {{_('Guest Hampers')}}
+              </h4>
+            </div>
+        </a>
+        <div id="collapse-hampers" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-hampers">
+          <div class="panel-body">
+            <div class="row" style="margin-left:0; margin-right:0">
+              <div id="overview-item-outer">
+              {% for i in hampers %}
+              <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+                <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
+                  <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
+                    <div class="overview-item-img" align='center'>
+                      <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
+                    </div>
+                    <div class="alert-group pull-right">
+                      <div class="overview-item-label">{% if i.reorder > 0 %}<i class="glyphicon glyphicon-ok text-success"></i>{% endif %}{% if i.reorder == 0 %}<i class="glyphicon glyphicon-remove text-danger"></i>{% endif %} {{i.name}}</div>
+                      <div class="overview-item-number">{{i.remaining}}</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+              {% endfor %}
+              </div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-kitchenware" aria-expanded="true" aria-controls="collapse-kitchenware">
+            <div class="panel-heading text-center" role="tab" id="heading-kitchenware" style="background-color:#f5f5f5;">
+              <h4 class="panel-title">
+                  {{_('Kitchenware')}}
+              </h4>
+            </div>
+        </a>
+        <div id="collapse-kitchenware" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-kitchenware">
+          <div class="panel-body">
+            <div class="row" style="margin-left:0; margin-right:0">
+              <div id="overview-item-outer">
+              {% for i in kitchenware %}
+              <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+                <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
+                  <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
+                    <div class="overview-item-img" align='center'>
+                      <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
+                    </div>
+                    <div class="alert-group pull-right">
+                      <div class="overview-item-label">{% if i.reorder > 0 %}<i class="glyphicon glyphicon-ok text-success"></i>{% endif %}{% if i.reorder == 0 %}<i class="glyphicon glyphicon-remove text-danger"></i>{% endif %} {{i.name}}</div>
+                      <div class="overview-item-number">{{i.remaining}}</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+              {% endfor %}
+              </div></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="panel panel-default">
-    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-hampers" aria-expanded="true" aria-controls="collapse-hampers">
-        <div class="panel-heading text-center" role="tab" id="heading-hampers" style="background-color:#f5f5f5;">
-          <h4 class="panel-title">
-              {{_('Guest Hampers')}}
-          </h4>
-        </div>
-    </a>
-    <div id="collapse-hampers" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-hampers">
-      <div class="panel-body">
-        <div class="row" style="margin-left:0; margin-right:0">
-          <div id="overview-item-outer">
-          {% for i in hampers %}
-          <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
-            <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
-              <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
-                <div class="overview-item-img" align='center'>
-                  <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
-                </div>
-                <div class="alert-group pull-right">
-                  <div class="overview-item-label">{% if i.reorder > 0 %}<i class="glyphicon glyphicon-ok text-success"></i>{% endif %}{% if i.reorder == 0 %}<i class="glyphicon glyphicon-remove text-danger"></i>{% endif %} {{i.name}}</div>
-                  <div class="overview-item-number">{{i.remaining}}</div>
-                </div>
-              </div>
-            </div>
-          </a>
+
+  <div class="section">
+    <h4>Browse by Shelf</h4>
+    <div class="content">
+      <div class='row'>
+        <div id="location-list">
+          {% for s in shelves %}
+            <a href="/{{g.current_lang}}/shelves/{{s}}">
+              <button class="btn btn-default">{{s}}</button>
+            </a>
           {% endfor %}
-          </div></div>
-      </div>
-    </div>
-  </div>
-  <div class="panel panel-default">
-    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-kitchenware" aria-expanded="true" aria-controls="collapse-kitchenware">
-        <div class="panel-heading text-center" role="tab" id="heading-kitchenware" style="background-color:#f5f5f5;">
-          <h4 class="panel-title">
-              {{_('Kitchenware')}}
-          </h4>
         </div>
-    </a>
-    <div id="collapse-kitchenware" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-kitchenware">
-      <div class="panel-body">
-        <div class="row" style="margin-left:0; margin-right:0">
-          <div id="overview-item-outer">
-          {% for i in kitchenware %}
-          <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
-            <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
-              <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
-                <div class="overview-item-img" align='center'>
-                  <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
-                </div>
-                <div class="alert-group pull-right">
-                  <div class="overview-item-label">{% if i.reorder > 0 %}<i class="glyphicon glyphicon-ok text-success"></i>{% endif %}{% if i.reorder == 0 %}<i class="glyphicon glyphicon-remove text-danger"></i>{% endif %} {{i.name}}</div>
-                  <div class="overview-item-number">{{i.remaining}}</div>
-                </div>
-              </div>
-            </div>
-          </a>
-          {% endfor %}
-          </div></div>
       </div>
     </div>
   </div>
