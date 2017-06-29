@@ -430,25 +430,23 @@ def admin():
 
 	cursor.execute("SELECT DISTINCT location FROM Ascott_InvMgmt.TagItems;")
 
-	data1 =  #displays all unique NFC id tags.
+	data1 = cursor.fetchall() #displays all unique NFC id tags.
 	
 	NFCs=[]
 	group={}
 	items=[]
 	
 
-	for idNFC in data2:
+	for idNFC in data1:
 		NFCs.append(idNFC[0].encode('ascii'))
 	
 	for i in NFCs:
 		
-		val = i #details of NFC location 
-
 		#fetch all item names pertaining to the tag.
-		cursor.execute("SELECT name, iid FROM Ascott_InvMgmt.view_item_locations WHERE location = '{}';".format(val))
+		cursor.execute("SELECT name, iid FROM Ascott_InvMgmt.view_item_locations WHERE location = '{}';".format(i))
 		data3=cursor.fetchall()
 		
-		group[val] = data3
+		group[i] = data3
 
 
 	if request.method =="GET":
@@ -534,7 +532,7 @@ def admin():
 				conn = mysql.connect()
 				cursor = conn.cursor()
 
-				query = "INSERT INTO Items VALUES ('{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(iid, itemname, reorderpt, batchqty, category, picture, unit, price)
+				query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(itemname, reorderpt, batchqty, category, picture, unit, price)
 	
 				cursor.execute(query)
 				# cursor.execute("COMMIT")
@@ -603,7 +601,7 @@ def admin():
 				# listing.insert(3,qtyleft)
 	
 				# TODO: string parameterisation
-				query = "INSERT INTO Items VALUES ('{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(listing[0],listing[1],listing[2],listing[3],listing[4],listing[5],listing[6],listing[7])
+				query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(listing[1],listing[2],listing[3],listing[4],listing[5],listing[6],listing[7])
 	
 				cursor.execute(query)
 				flash("Added Item to Location %s!" %location)

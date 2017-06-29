@@ -14,7 +14,7 @@ class AddUserForm(FlaskForm):
 
 class CreateNewItem(FlaskForm):
 	sku = StringField('SKU Number', validators = [DataRequired()])
-	itemname = StringField('Item Name', validators=[DataRequired("Please enter the name of the newcomer.")])
+	itemname = StringField('Item Name', validators=[DataRequired("Please enter the name of the new item.")])
 	location = SelectField('Location of the Item', choices = myLocation('location'), validators = [DataRequired()]) 
 	qtyleft = IntegerField('Available Amount', validators = [DataRequired()])
 	reorderpt = IntegerField('Reorder point', validators = [DataRequired()])
