@@ -102,7 +102,7 @@ a.thumbnail > img {
 <div class="row" style="margin-left:0; margin-right:0">
 <div id="overview-item-outer">
 {% for i in items %}
-<a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+<a href="/{{g.current_lang}}/inventory/{{i.iid}}">
   <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
     <div class="overview-item-group alert {% if i.qty_left > i.reorder_pt and i.qty_left <= 1.2*i.reorder_pt %}alert-warning{% endif %}{% if i.qty_left <= i.reorder_pt%}alert-danger{% endif %}">
       <div class="overview-item-img" align='center'>

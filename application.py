@@ -61,13 +61,13 @@ def getAllInventory(category):
 	cursor = conn.cursor()
 
 	cursor.execute(
-		"SELECT sku, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+		"SELECT iid, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.view_item_locations WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
 
 	# cursor.execute(
-	# 	"SELECT DISTINCT sku FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
-	# unique_sku = cursor.fetchall()
-	# print(unique_sku)
+	# 	"SELECT DISTINCT iid FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
+	# unique_iid = cursor.fetchall()
+	# print(unique_iid)
 	items = []
 	counter = 0
 	for item in data:
@@ -86,7 +86,7 @@ def getAllInventory(category):
 					received = received + int(i[1])
 
 			cursor.execute(
-			"SELECT qty_left FROM Ascott_InvMgmt.Items WHERE sku='{}';".format(item[0]))
+			"SELECT qty_left FROM Ascott_InvMgmt.view_item_locations WHERE iid='{}';".format(item[0]))
 			location_qty = cursor.fetchall()
 			remaining_quantity = 0
 			for i in location_qty:
@@ -94,7 +94,7 @@ def getAllInventory(category):
 			initial_quantity = remaining_quantity + delivered_out - received
 			items.append(
 
-				{"sku":item[0],
+				{"iid":item[0],
 				"name": item[1],
 				"remaining": remaining_quantity,
 				"reorder": item[3],
@@ -115,7 +115,7 @@ def getFromLevels(location):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
-	cursor.execute("SELECT name, category, location FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(location))
+	cursor.execute("SELECT name, category, location FROM Ascott_InvMgmt.view_item_locations WHERE location = '{}';".format(location))
 
 	data=cursor.fetchall()
 	things = []
@@ -139,7 +139,7 @@ def getAllLogs():
 	
 	for row in data:
 		cursor.execute(
-			"SELECT name FROM Ascott_InvMgmt.Items WHERE sku  = '{}';".format(row[5]))
+			"SELECT name FROM Ascott_InvMgmt.Items WHERE iid  = '{}';".format(row[5]))
 		item_name = cursor.fetchall()
 
 		print(row[0])
@@ -163,7 +163,7 @@ def getInventoryLow():
 
 	THRESHOLD = 1.2
 	cursor = mysql.connect().cursor()
-	cursor.execute("""SELECT sku, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.Items
+	cursor.execute("""SELECT iid, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.view_item_locations
 		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt AND
 		qty_left > 0
 		ORDER BY name ASC;""")
@@ -171,7 +171,7 @@ def getInventoryLow():
 
 	r = []
 	for i in data:
-		r.append({"sku": i[0],
+		r.append({"iid": i[0],
 			"name": i[1].encode('ascii'),
 			"qty_left": i[2],
 			"reorder_pt": i[3],
@@ -219,7 +219,7 @@ def getChartData():
 		cursor = conn.cursor()
 
 		# TODO: string parameterisation
-		query = "SELECT sku FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(request.json)
+		query = "SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(request.json)
 
 		cursor.execute(query)
 		idItem = cursor.fetchone()[0]
@@ -259,7 +259,7 @@ def editReorder():
 		cursor = conn.cursor()
 
 		cursor.execute(
-			"UPDATE Ascott_InvMgmt.Items SET reorder_pt=%s WHERE (name=%s AND sku > 0);", 
+			"UPDATE Ascott_InvMgmt.Items SET reorder_pt=%s WHERE (name=%s AND iid > 0);", 
 			(new_reorder, name))
 		conn.commit()
 		# idItem = cursor.fetchone()
@@ -428,10 +428,9 @@ def admin():
 
 #-------------NFCID----------------------------------
 
-	cursor.execute("SELECT location FROM Ascott_InvMgmt.Items;")
+	cursor.execute("SELECT DISTINCT location FROM Ascott_InvMgmt.TagItems;")
 
-	data1 = cursor.fetchall()
-	data2 = list(set(list(data1))) #displays all unique NFC id tags.
+	data1 =  #displays all unique NFC id tags.
 	
 	NFCs=[]
 	group={}
@@ -439,15 +438,14 @@ def admin():
 	
 
 	for idNFC in data2:
-		NFCs.append(
-			{"NFC": idNFC[0].encode('ascii')})
+		NFCs.append(idNFC[0].encode('ascii'))
 	
 	for i in NFCs:
-		 
-		val = i['NFC'] #details of NFC location 
+		
+		val = i #details of NFC location 
 
 		#fetch all item names pertaining to the tag.
-		cursor.execute("SELECT name, sku FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(val))
+		cursor.execute("SELECT name, iid FROM Ascott_InvMgmt.view_item_locations WHERE location = '{}';".format(val))
 		data3=cursor.fetchall()
 		
 		group[val] = data3
@@ -463,15 +461,27 @@ def admin():
 		items = cursor.fetchall()
 		# print (items)
 		flat_items = [item.encode('ascii') for sublist in items for item in sublist]
-		return render_template('v2/admin.html', form=form, form2=form2,form3=form3, form4=form4, users=things, group=group, item_list=flat_items)
+		return render_template('v2/admin.html', 
+			form=form, 
+			form2=form2,
+			form3=form3, 
+			form4=form4, 
+			users=things, 
+			group=group, 
+			item_list=flat_items)
 
-	
 
 	elif request.method == "POST":
 
 		if request.form['name-form'] =='form':
 			if form.validate() == False:
-				return render_template('admin.html', form=form, form2=form2,form3=form3, form4=form4, users=things, group=group)
+				return render_template('admin.html', 
+					form=form, 
+					form2=form2,
+					form3=form3, 
+					form4=form4, 
+					users=things, 
+					group=group)
 			else:
 				username = form.username.data
 				password = generate_password_hash(form.password.data)
@@ -491,33 +501,40 @@ def admin():
 
 				cursor.execute(query)
 				# cursor.execute("COMMIT")
-				flash("User is added!")
+				flash("User has been added!")
 				return redirect(url_for('admin', lang_code=get_locale()))
 
 		elif request.form['name-form'] =='form2':
 			if form2.validate() == False:
-				return render_template('admin.html', form=form, form2=form2,form3=form3,form4=form4, users=things, group=group)
+				return render_template('admin.html', 
+					form=form, 
+					form2=form2,
+					form3=form3,
+					form4=form4, 
+					users=things, 
+					group=group)
 			else: 
-				sku = form2.sku.data
+				iid = form2.iid.data
 
-				# query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE sku ='{}'".format(sku))
+				# query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE iid ='{}'".format(iid))
 
-				itemname=form2.itemname.data
-				location=form2.location.data
-				qtyleft=form2.qtyleft.data
-				reorderpt=form2.reorderpt.data
-				batchqty=form2.batchqty.data
-				category=form2.category.data
-				picture=form2.picture.data
-				unit=form2.unit.data
+				itemname = form2.itemname.data
+				# location = form2.location.data
+				# qtyleft = form2.qtyleft.data
+				reorderpt = form2.reorderpt.data
+				batchqty = form2.batchqty.data
+				category = form2.category.data
+				picture = form2.picture.data
+				unit = form2.unit.data
+				price = 0.0000 # TODO: CREATE FORM FIELD FOR PRICE
 
-				newitem=[sku,itemname,location,qtyleft,reorderpt,batchqty,category,picture,unit]
+				# newitem = [iid, itemname, reorderpt, batchqty, category, picture, unit]
 
+				# TODO: string parameterisation
 				conn = mysql.connect()
 				cursor = conn.cursor()
 
-				# TODO: string parameterisation
-				query = "INSERT INTO Items VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(newitem[0],newitem[1],newitem[2],newitem[3],newitem[4],newitem[5],newitem[6],newitem[7],newitem[8])
+				query = "INSERT INTO Items VALUES ('{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(iid, itemname, reorderpt, batchqty, category, picture, unit, price)
 	
 				cursor.execute(query)
 				# cursor.execute("COMMIT")
@@ -526,7 +543,13 @@ def admin():
 
 		elif request.form['name-form'] =='form3':
 			if form3.validate() == False:
-				return render_template('admin.html', form=form, form2=form2,form3=form3, form4=form4,users=things, group=group)
+				return render_template('admin.html', 
+					form=form, 
+					form2=form2,
+					form3=form3, 
+					form4=form4,
+					users=things, 
+					group=group)
 			else: 
 				location = form3.location.data
 				description= form3.description.data
@@ -547,18 +570,25 @@ def admin():
 
 		elif request.form['name-form'] =='form4':
 			if form4.validate() == False:
-				return render_template('admin.html', form=form, form2=form2,form3=form3, form4=form4,users=things, group=group)
+				return render_template('admin.html', 
+					form=form, 
+					form2=form2,
+					form3=form3, 
+					form4=form4,
+					users=things, 
+					group=group)
 			else: 
 				itemname = form4.itemname.data
-				qtyleft= form4.qtyleft.data
-				location=form4.location.data
+				# qtyleft= form4.qtyleft.data
+				# location=form4.location.data
+				price = 0.0000
 
 				newEntries = [itemname,qtyleft,location]
 				
 				conn = mysql.connect()
 				cursor = conn.cursor()
 
-				cursor.execute("SELECT sku,reorder_pt,batch_qty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
+				cursor.execute("SELECT iid,reorder_pt,batch_qty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
 				
 				info = cursor.fetchall()
 				
@@ -568,14 +598,15 @@ def admin():
 						listing.append(j)
 				
 				listing.insert(1,itemname)
-				listing.insert(2,location)
-				listing.insert(3,qtyleft)
+				listing.append(price)
+				# listing.insert(2,location)
+				# listing.insert(3,qtyleft)
 	
 				# TODO: string parameterisation
-				query = "INSERT INTO Items VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(listing[0],listing[1],listing[2],listing[3],listing[4],listing[5],listing[6],listing[7],listing[8])
+				query = "INSERT INTO Items VALUES ('{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(listing[0],listing[1],listing[2],listing[3],listing[4],listing[5],listing[6],listing[7])
 	
 				cursor.execute(query)
-				flash("Added Item to New Location %s!" %location)
+				flash("Added Item to Location %s!" %location)
 				
 				return redirect(url_for('admin', lang_code=get_locale()))
 
@@ -608,7 +639,8 @@ def inventory():
 	hampers = getAllInventory('Guest Hampers')
 	kitchenware = getAllInventory('Kitchenware')
 
-	location_query = "SELECT DISTINCT location FROM Items GROUP BY location DESC;"
+	# get list of all locations to display
+	location_query = "SELECT DISTINCT location FROM view_item_locations GROUP BY location DESC;"
 	cursor = mysql.connect().cursor()
 	cursor.execute(location_query)
 	locations = cursor.fetchall()
@@ -616,6 +648,7 @@ def inventory():
 	for i in locations:
 		print type(i[0])
 		shelves.append(i[0].encode('ascii'))
+
 	return render_template('v2/inventory.html',
 		user = session['username'],
 		role = session['role'],
@@ -624,8 +657,8 @@ def inventory():
 		kitchenware = kitchenware,
 		shelves = shelves)
 
-@application.route('/<lang_code>/inventory/<int:sku>')
-def item(sku):
+@application.route('/<lang_code>/inventory/<int:iid>')
+def item(iid):
 
 	# user authentication
 	if not session["logged_in"]:
@@ -633,7 +666,7 @@ def item(sku):
 	
 	name = item
 	cursor = mysql.connect().cursor()
-	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit FROM Ascott_InvMgmt.Items WHERE sku = '{}';".format(sku)
+	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit FROM Ascott_InvMgmt.view_item_locations WHERE iid = '{}';".format(iid)
 	cursor.execute(query)
 	data = cursor.fetchall()
 	# d = [[s.encode('ascii') for s in list] for list in data]
@@ -665,7 +698,9 @@ def category(category):
 
 	category = category
 	itemtype = getAllInventory(category)
-	return render_template('v2/category.html', category=category, itemtype=itemtype, 
+	return render_template('v2/category.html', 
+		category=category, 
+		itemtype=itemtype, 
 		role = session['role'],
 		user = session['username'])
 
@@ -707,13 +742,13 @@ def shelf(tag_id):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
-	cursor.execute("SELECT sku, name, category, picture FROM Items WHERE location = '{}';".format(tag_id))
+	cursor.execute("SELECT iid, name, category, picture FROM view_item_location WHERE location = '{}';".format(tag_id))
 
 	data=cursor.fetchall()
 	things = []
 	for item in data:
 		things.append(
-			{"sku":item[0],
+			{"iid":item[0],
 			"name": item[1],
 			"category": item[2],
 			"picture":item[3]})
@@ -730,7 +765,7 @@ def shelf(tag_id):
 			for item, info in form_data.iterlists():
 				print(item)
 				print(info[0]+", "+info[1])
-				cursor.execute("SELECT qty_left FROM Items WHERE sku="+item+" AND location='"+tag_id+"';")
+				cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid="+item+" AND location='"+tag_id+"';")
 				conn.commit()
 				old_qty = cursor.fetchone()[0]
 				qty_input = int(info[0])
@@ -748,7 +783,7 @@ def shelf(tag_id):
 					qty_input = qty_left - old_qty # change the value of qty to the difference 
 				conn = mysql.connect()
 				cursor = conn.cursor()
-				update_items_query = "UPDATE Items SET qty_left="+str(qty_left)+" WHERE sku="+str(item)+" AND location='"+tag_id+"';"
+				update_items_query = "UPDATE TagItems SET qty_left="+str(qty_left)+" WHERE iid="+str(item)+" AND location='"+tag_id+"';"
 				# message += update_items_query
 				# query for stock out
 				print(update_items_query)

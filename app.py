@@ -1,17 +1,9 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, g
 from flask_babel import Babel
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
-<<<<<<< HEAD
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation
-=======
-from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation
->>>>>>> 03a140e879ee07fafa18af83e6208580520a67ef
 import os, copy, re, csv, json_decode
 # from flask.ext.cache import Cache
 
@@ -43,19 +35,38 @@ role = ""
 
 # TODO: encapsulate all methods in separate classes and .py files
 
+# For queries that return data.
+def dbSelect(query):
+	try: 
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		cursor.execute(query)
+		return cursor.fetchall()
+	except Exception as e:
+		return render_template("500.html", error = str(e))
+
+
+# For INSERT, UPDATE, etc. functions that do not return data.
+def dbUpdate(query):
+	try: 
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		cursor.execute(query)
+		conn.commit()
+	except Exception as e:
+		return render_template("500.html", error = str(e))
+
+
+
 # Returns all the items based on category and amount in or out within the last month for each item
 def getAllInventory(category):
-	conn = mysql.connect()
-	cursor = conn.cursor()
-
-	cursor.execute(
+	data = dbSelect(
 		"SELECT iid, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
-	data = cursor.fetchall()
 	items = []
 	for item in data:
-		cursor.execute(
+		in_out_data = dbSelect(
 			"SELECT action, qty_moved FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now()) AND item='{}';".format(item[0]))
-		in_out_data = cursor.fetchall()
+
 		delivered_out = 0
 		received = 0
 		for i in in_out_data:
@@ -84,12 +95,8 @@ def getAllInventory(category):
 
 # Returns all the items based on location. KIV for possible supervisor view filtering.
 def getFromLevels(location):
-	conn = mysql.connect()
-	cursor = conn.cursor()
+	data = dbSelect("SELECT name, category, location FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(location))
 
-	cursor.execute("SELECT name, category, location FROM Ascott_InvMgmt.Items WHERE location = '{}';".format(location))
-
-	data=cursor.fetchall()
 	things = []
 	for item in data:
 		things.append(
@@ -102,11 +109,9 @@ def getFromLevels(location):
 
 # Returns the logs that occurred within the current month.
 def getAllLogs():
-	conn = mysql.connect()
-	cursor = conn.cursor()
-	cursor.execute(
+	data = dbSelect(
 		"SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now());")
-	data=cursor.fetchall()
+
 	things = []
 	
 	for row in data:
@@ -126,12 +131,10 @@ def getAllLogs():
 def getInventoryLow():
 
 	THRESHOLD = 1.2
-	cursor = mysql.connect().cursor()
-	cursor.execute("""SELECT iid, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.Items
+	data = dbSelect("""SELECT iid, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.Items
 		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt AND
 		qty_left > 0
 		ORDER BY name ASC;""")
-	data = cursor.fetchall()
 
 	r = []
 	for i in data:
@@ -146,11 +149,9 @@ def getInventoryLow():
 
 def getDailyLogs():
 
-	conn = mysql.connect()
-	cursor = conn.cursor()
-	cursor.execute(
+	data = dbSelect(
 		"SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE day(date_time) = day(now());")
-	data=cursor.fetchall()
+
 	things = []
 	
 	for row in data:
@@ -179,22 +180,15 @@ def getChartData():
 	    print "Bad json format"
 	    page_not_found(400)
 	else:
-		conn = mysql.connect()
-		cursor = conn.cursor()
 
 		# TODO: string parameterisation
-		query = "SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(request.json)
-
-		cursor.execute(query)
-		idItem = cursor.fetchone()[0]
-		# print(idItem)
+		data = dbSelect("SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(request.json))[0]
+		idItem = data[0][0]
 
 		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
-		query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
 		# TODO: string parameterisation
 		# query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
-		cursor.execute(query)
-		responseData = cursor.fetchall()
+		responseData = dbSelect("SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1")
 
 		return jsonify(responseData)
 
@@ -219,13 +213,9 @@ def editReorder():
 	    print "Bad json format"
 	    page_not_found(400)
 	else:
-		conn = mysql.connect()
-		cursor = conn.cursor()
-
-		cursor.execute(
+		dbUpdate(
 			"UPDATE Ascott_InvMgmt.Items SET reorder_pt=%s WHERE (name=%s AND iid > 0);", 
 			(new_reorder, name))
-		conn.commit()
 		# idItem = cursor.fetchone()
 
 		# # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
@@ -318,12 +308,11 @@ def login():
 			password = form.password.data
 			remember = form.remember.data
 		
-			cursor = mysql.connect().cursor()
-			cursor.execute("SELECT username, password, role, name FROM User WHERE username= '" + username + "';")
+			data = dbSelect("SELECT username, password, role, name FROM User WHERE username= '" + username + "';")[0]
 
 			# check if user and pass data is correct by executing the db
 			# data is stored as a tuple
-			data = cursor.fetchone()
+			# data = cursor.fetchone()
 			
 			if data is None: 
 				# username does not match records
@@ -377,12 +366,8 @@ def admin():
 	form4 =ExistingItemsLocation() 
 
 	#--------------users table-------------------------
-	conn = mysql.connect()
-	cursor = conn.cursor()
+	data = dbSelect("SELECT role, name FROM Ascott_InvMgmt.User;")
 
-	cursor.execute("SELECT role, name FROM Ascott_InvMgmt.User;")
-
-	data = cursor.fetchall()
 	# print(data)
 	things = []
 	for item in data:
@@ -392,9 +377,7 @@ def admin():
 
 #-------------NFCID----------------------------------
 
-	cursor.execute("SELECT DISTINCT location FROM Ascott_InvMgmt.TagItems;")
-
-	data1 = cursor.fetchall() #displays all unique NFC id tags.
+	data1 = dbSelect("SELECT DISTINCT location FROM Ascott_InvMgmt.TagItems;") # displays all unique NFC id tags.
 	
 	NFCs=[] # Array of unique NFC tags
 	group={}
@@ -809,7 +792,7 @@ def logout():
 @app.errorhandler(404)
 def page_not_found(e):
 	"""Return a custom 404 error."""
-	return 'Sorry, nothing at this URL.', 404
+	return render_template("404.html"), 404
 
 
 ## testing
