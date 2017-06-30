@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% extends "v2/base.html" %}
 {% block content %}
 
 <style>
-.active{
+/*.active{
     padding-left: 20px;
 }
 
@@ -13,58 +13,29 @@
 .error-message {
     margin: 10px;
     color: #db4437;
-}
+}*/
 </style>
 
 
 <body>
 
-
-<ul class="nav nav-tabs">
-  <li class="active"><a data-toggle="tab" href="#tab1">Home</a></li>
-  <li><a data-toggle="tab" href="#tab2">Create New User</a></li>
-  <li><a data-toggle="tab" href="#tab3">Add New Item</a></li>
-  <li><a data-toggle="tab" href="#tab4">Group Items</a></li>
+<div class="container">
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#summary" aria-controls="home" role="tab" data-toggle="tab">Summary</a></li>
+    <li role="presentation"><a href="#user" aria-controls="user" role="tab" data-toggle="tab">Users</a></li>
+    <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">Items</a></li>
+    <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">Locations</a></li>
+    <li role="presentation"><a href="#existitem" aria-controls="existitem" role="tab" data-toggle="tab">Existing Items</a></li>
+    
 </ul>
-
-<script type="text/javascript">
-
-// $('a[href="' + location.hash + '"]').trigger('click');
-
-
-// $(document).ready(function(){ 
-//     var x = location.hash;   
-//     activaTab('x');
-// });
-
-// function activaTab(tabId){
-//     $('.nav-tabs a[href="#' + tabId + '"]').tab('show');
-// };
-
-// function getData() {
-//     $.ajax({
-//         type: "POST",
-//         url: "/admin",
-//         data: JSON.stringify($("#itemname").val()),
-//         dataType: "json",    
-//         success: function(response, status, jqXHR) {
-//             console.log("Success!");
-//         }
-//     });
-// }
-
-// getData();
-
-
-
-</script>
 
 <div class="tab-content">
   
-    <div id="tab1" class="tab-pane fade in active">
+    <div role="tabpanel" id="summary" class="tab-pane fade in active">
         <h3>HOME</h3>
 
-        <h4>Current Users (possibly to if login and last login)</h4>
+        <h4>Current Users</h4>
 
         <div class="table-responsive">
             <table class="table">
@@ -80,7 +51,7 @@
                     <td>{{ user.name }}</td>
                     <td>{{ user.role }}</td>
                     
-                <tr>
+                </tr>
                 {% endfor %}
                 </tbody>
 
@@ -99,7 +70,7 @@
             <ul class="list-group">
 
                 {% for i in values %}
-                    <li class="list-group-item"><a href="/inventory"> {{ i[0].encode('ascii') }} </a></li>
+                    <li class="list-group-item"><a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }} </a></li>
 
                 {% endfor %}                
         
@@ -116,7 +87,7 @@
     
     
 <!-- ******************* NEW USER TAB *****************************-->  
-    <div id="tab2" class="tab-pane fade" >
+    <div role="tabpanel" id="user" class="tab-pane fade">
 
         <h3>Create A New User</h3>
         <form method="POST" action="/{{g.current_lang}}/admin" >
@@ -190,7 +161,7 @@
             {% endwith %}
         </div>
 
-        {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary", onclick="activaTab('tab2');") }}
+        {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
 
 
         </form>
@@ -198,7 +169,7 @@
     </div>
 
 <!--#........................TAB3.............................  -->
-    <div id="tab3" class="tab-pane fade">
+    <div role="tabpanel" id="item" class="tab-pane fade">
         <h3>Add A New Item</h3>
         <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
@@ -226,8 +197,8 @@
                 {% endfor %}
             {% endif %}
 
-            <div class="form-group">
-            {{ form2.itemname(class="form-control typeahead", placeholder="Name of Item")}}
+            <div id="add-item-name" class="form-group">
+            {{ form2.itemname(class="form-control", placeholder="Name of Item")}}
             </div>
         </div>
 
@@ -357,7 +328,7 @@
     </div>
 
 
-    <div id="tab4" class="tab-pane fade">
+    <div role="tabpanel" id="group" class="tab-pane fade">
         <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form3' >
@@ -399,11 +370,81 @@
         
         {{ form3.submitThree(class="width-35 pull-right btn btn-sm btn-primary") }}
 
-
-
         </form>
+
     </div>
 
+
+
+    <div role="tabpanel" id="existitem" class="tab-pane fade">
+        <form method="POST" action="/{{g.current_lang}}/admin">
+            {{ form.hidden_tag() }}
+            <input type="hidden"  name="name-form" value='form4'>
+        <h3> Add Existing Items to New Locations</h3>
+        
+
+        <div class="row form-group">
+            {{ form4.itemname.label }}
+            {% if form4.itemname.errors %}
+                {% for error in form4.itemname.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div id="add-item-name" class="form-group">
+            {{ form4.itemname(class="form-control typeahead", placeholder="Name of Existing Item")}}
+            </div>
+        </div>
+        
+        
+        <div class="row form-group">
+            {{ form4.location.label }}
+            {% if form4.location.errors %}
+                {% for error in form4.location.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form4.location(class="form-control")}}
+            </div>
+        </div>
+        
+        
+        <div class="row form-group">
+            {{ form4.qtyleft.label }} 
+            {% if form4.qtyleft.errors %}
+                {% for error in form4.qtyleft.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form4.qtyleft(class="form-control", placeholder="Quantity Available") }}
+            </div>
+        </div>
+        
+
+        <div class="row form-group"> 
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul class="error-message">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+                 </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+            {{ form4.submitFour(class="width-35 pull-right btn btn-sm btn-primary") }}
+
+        </form>
+
+    </div>
+
+
+</div>
 
 </div>
 
@@ -432,7 +473,7 @@ var substringMatcher = function(strs) {
 
 var all_items = {{ item_list|safe }};
 
-$('.typeahead').typeahead({
+$('#add-item-name .typeahead').typeahead({
   hint: true,
   highlight: true,
   minLength: 1
@@ -441,6 +482,7 @@ $('.typeahead').typeahead({
   name: 'all_items',
   source: substringMatcher(all_items)
 });
+
 </script>
 
 

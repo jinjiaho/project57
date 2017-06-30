@@ -141,7 +141,7 @@ a.thumbnail > img {
             <div class="row" style="margin-left:0; margin-right:0">
               <div id="overview-item-outer">
               {% for i in supplies %}
-              <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+              <a href="/{{g.current_lang}}/inventory/{{i.iid}}">
                 <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
                   <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
                     <div class="overview-item-img" align='center'>
@@ -172,7 +172,7 @@ a.thumbnail > img {
             <div class="row" style="margin-left:0; margin-right:0">
               <div id="overview-item-outer">
               {% for i in hampers %}
-              <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+              <a href="/{{g.current_lang}}/inventory/{{i.iid}}">
                 <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
                   <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
                     <div class="overview-item-img" align='center'>
@@ -203,7 +203,7 @@ a.thumbnail > img {
             <div class="row" style="margin-left:0; margin-right:0">
               <div id="overview-item-outer">
               {% for i in kitchenware %}
-              <a href="/{{g.current_lang}}/inventory/{{i.sku}}">
+              <a href="/{{g.current_lang}}/inventory/{{i.iid}}">
                 <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
                   <div class="overview-item-group alert {% if i.remaining > i.reorder and i.remaining <= 1.2*i.reorder %}alert-warning{% endif %}{% if i.remaining <= i.reorder %}alert-danger{% endif %}{% if i.remaining > 1.2*i.reorder %}alert-ok{% endif %}">
                     <div class="overview-item-img" align='center'>

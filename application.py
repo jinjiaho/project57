@@ -32,9 +32,9 @@ import os, copy, re, csv, json_decode
 # the App Engine WSGI application server.
 
 application = Flask(__name__, instance_relative_config=True)
-application.config.from_object('config.Config') # default configurations
-# application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
-application.config.from_pyfile('myConfig1.cfg') 
+application.config.from_object('config.DevConfig') # default configurations
+application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
+# application.config.from_pyfile('myConfig1.cfg') 
 # application.config.from_pyfile('myConfig2.cfg')
 
 # Babel init
@@ -162,7 +162,8 @@ def getAllLogs():
 def getInventoryLow():
 
 	THRESHOLD = 1.2
-	cursor = mysql.connect().cursor()
+	conn = mysql.connect()
+	cursor = conn.cursor()
 	cursor.execute("""SELECT iid, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.view_item_locations
 		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt AND
 		qty_left > 0
@@ -459,7 +460,7 @@ def admin():
 		items = cursor.fetchall()
 		# print (items)
 		flat_items = [item.encode('ascii') for sublist in items for item in sublist]
-		return render_template('v2/admin.html', 
+		return render_template('admin.html', 
 			form=form, 
 			form2=form2,
 			form3=form3, 
@@ -647,7 +648,7 @@ def inventory():
 		print type(i[0])
 		shelves.append(i[0].encode('ascii'))
 
-	return render_template('v2/inventory.html',
+	return render_template('inventory.html',
 		user = session['username'],
 		role = session['role'],
 		supplies = supplies,
@@ -683,9 +684,9 @@ def item(iid):
 	# print d
 	print r
 	try:
-		return render_template('v2/item.html', item = r)
+		return render_template('item.html', item = r)
 	except:
-		return render_template('v2/item.html', item = None)
+		return render_template('item.html', item = None)
 
 @application.route('/<lang_code>/review/<category>')
 def category(category):
@@ -696,7 +697,7 @@ def category(category):
 
 	category = category
 	itemtype = getAllInventory(category)
-	return render_template('v2/category.html', 
+	return render_template('category.html', 
 		category=category, 
 		itemtype=itemtype, 
 		role = session['role'],
@@ -714,7 +715,7 @@ def logs():
 	logs=getAllLogs()
 	# names=getUniqueNames()
 	# items=getUniqueItems()
-	return render_template('v2/logs.html',
+	return render_template('logs.html',
 		logs=logs, 
 		role = session['role'],
 		user = session['username'])
@@ -740,7 +741,7 @@ def shelf(tag_id):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
-	cursor.execute("SELECT iid, name, category, picture FROM view_item_location WHERE location = '{}';".format(tag_id))
+	cursor.execute("SELECT iid, name, category, picture FROM view_item_locations WHERE location = '{}';".format(tag_id))
 
 	data=cursor.fetchall()
 	things = []
