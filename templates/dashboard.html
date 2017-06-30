@@ -1,4 +1,4 @@
-{% extends "v2/base.html" %}
+{% extends "base2.html" %}
 
 {% block content %}
 <style>
@@ -133,26 +133,22 @@ a.thumbnail > img {
 <!-- Table of transactions -->
 <div class="col-md-12" style="margin-bottom:30px;"><table id="recent">
     <thead>
-        <th>Name</th>
+        <th>Timestamp</th>
+        <th>User</th>
         <th>Item</th>
-        <th>Qty</th>
         <th>In/Out</th>
-        <th>Date-Time</th>
-        <th>Qty Left</th>
+        <th>Quantity change</th>
+        <th>Remaining</th>
     </thead>
     <tbody>
-    {% for log in l %}
-        <tr>
-                                <td>{{log.name}}</td>
-                                <td>{{log.item}}</td>
-                                <td>{{log.category}}</td>
-                                <td>{{log.action}}</td>
-                                <td>{{log.move}}</td>
-                                <td>{{log.remaining}}</td>
-                                <td>{{log.dateTime}}</td>
-                                <td>{{log.location}}</td>
-        </tr>
-    {% endfor %}
+    {% for log in l %}<tr>
+      <td>{{log.dateTime}}</td>
+      <td>{{log.name}}</td>
+      <td>{{log.item}}</td>
+      <td>{{log.action}}</td>
+      <td>{{log.move}}</td>
+      <td>{{log.remaining}}</td>
+    </tr>{% endfor %}
     </tbody>
 </table></div>
 
@@ -165,7 +161,7 @@ $(document).ready(function() {
 
     // initialise log table
     $("#recent").tablesorter({
-        sortList: [[4,1]],
+        sortList: [[0,1]],
         showProcessing: true,
         widgets: ["filter"]
     });

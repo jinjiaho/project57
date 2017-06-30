@@ -61,7 +61,7 @@ body {
 							{{_('Logged in as')}}  <b>{{session['name']}}</b> <b class="caret"></b>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href='/logout' onclick='changeRefreshInterval(0);'>{{_('Logout')}}</a></li>
+							<li><a href='/{{g.current_lang}}/logout' onclick='changeRefreshInterval(0);'>{{_('Logout')}}</a></li>
 		 					<li role="seperator" class="divider"></li>
 							<li><a href='/en/{{request.path | lang_strip}}'>English</a></li>
 							<li><a href='/zh/{{request.path | lang_strip}}'>中文</a></li>
