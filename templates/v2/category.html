@@ -92,7 +92,7 @@ setInterval("getthedate()",1000)
     var header1 = ["Monthly Review of {{category}}","","","","Month: "+month,"Year:"+year]
     var header2 = ["Property: Ascott Raffles Place Singapore"]//Property is hard coded for now
     var header3 = ["","","","","",""];
-    var header4 = ["Name","Unit","Initial quantity","In","Out","Remaining quantity"];
+    var header4 = ["Name","Unit","Unit Price","Initial quantity","In","Value(In)","Out","Value(Out)","Remaining quantity"];
     csv.push(header1.join(","));
     csv.push(header2);
     csv.push(header3.join(","));
@@ -199,19 +199,25 @@ $(document).ready(function() {
                         <thead>
                             <th data-placeholder="Search">Name</th>
                             <th data-filter="false">Unit</th>
+                            <th data-filter="false">Unit Price</th>
                             <th data-filter="false">Initial Quantity</th>
                             <th data-filter="false">In</th>
+                            <th data-filter="false">Value (In)</th>
                             <th data-filter="false">Out</th>
+                            <th data-filter="false">Value (Out)</th>
                             <th data-filter="false">Remaining Quantity</th>
                         </thead>
                         <tbody>
                         {% for item in itemtype %}
-                            <tr class="clickable-row" data-href="/{{g.current_lang}}/inventory/{{item.sku}}">
+                            <tr class="clickable-row" data-href="/{{g.current_lang}}/inventory/{{item.iid}}">
                                 <td>{{item.name}}</td>
                                 <td>{{item.unit}}</td>
+                                <td>${{item.price}}</td>
                                 <td>{{item.starting}}</td>
                                 <td>{{item.recieved}}</td>
+                                <td>${{item.value_in}}</td>
                                 <td>{{item.demand}}</td>
+                                <td>${{item.value_out}}</td>
                                 <td>{{item.remaining}}</td>
                             </tr>
                         {% endfor %}
