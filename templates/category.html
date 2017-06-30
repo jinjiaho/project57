@@ -1,15 +1,14 @@
-{% extends "v2/base.html" %}
-
+{% extends "base2.html" %}
 {% block content %}
 <style>
-    .card .content {
+   /* .card .content {
         padding:0;
     }
     .container-fluid .date { float:right }
 
     .tablesorter .tablesorter-filter-row .disabled { 
     display: none;
-}
+}*/
 </style>
 <script type="text/javascript">
 
@@ -42,7 +41,7 @@ minutes="0"+minutes
 if (seconds<=9)
 seconds="0"+seconds
 //change font size here
-var cdate="<small><font color='000000' face='Arial'><b>"+dayarray[day]+", "+montharray[month]+" "+daym+", "+year+" "+hours+":"+minutes+":"+seconds+" "+dn
+var cdate="<small><font color='000000'><b>"+dayarray[day]+", "+montharray[month]+" "+daym+", "+year+" "+hours+":"+minutes+":"+seconds+" "+dn
 +"</b></font></small>"
 if (document.all)
 document.all.clock.innerHTML=cdate
@@ -93,8 +92,7 @@ setInterval("getthedate()",1000)
     var header1 = ["Monthly Review of {{category}}","","","","Month: "+month,"Year:"+year]
     var header2 = ["Property: Ascott Raffles Place Singapore"]//Property is hard coded for now
     var header3 = ["","","","","",""];
-    var header4 = ["Name","Unit","Initial quantity","In","Out","Remaining quantity"];
-    csv.push(header1.join(","));
+    var header4 = ["Name","Unit","Unit Price","Initial quantity","In","Value(In)","Out","Value(Out)","Remaining quantity"];    csv.push(header1.join(","));
     csv.push(header2);
     csv.push(header3.join(","));
     csv.push(header4.join(","));
@@ -120,7 +118,6 @@ jQuery(document).ready(function($) {
 $(document).ready(function() { 
     $("#review").tablesorter({
         sortList: [[4,1]],
-        theme:'red',
         showProcessing: true,
         widgets: ["filter"],
         widgetOptions : {
@@ -152,7 +149,7 @@ $(document).ready(function() {
 
       // Set this option to true to use the filter to find text from the start of the column
       // So typing in "a" will find "albert" but not "frank", both have a's; default is false
-      filter_startsWith  : true,
+      filter_startsWith  : false,
 
       // filter_formatter : {
       //   6 : function($cell, indx){
@@ -171,11 +168,25 @@ $(document).ready(function() {
 });
 
 </script>
-<div class="container-fluid">
-<span>Property: Ascott Raffles Place Singapore</span>
+<div class="container">
 <span align="right" id="clock" class="date"></span>
-    <div class="row">
 
+
+<!-- 1st header: Low inventory -->
+<div class="row">
+<div class="col-xs-7">
+    <h3 style="margin-bottom:0px;">{{_(category)}}</h3>
+</div>
+<div class="col-xs-5">
+    <div class="pull-right" style="margin-top:25px;">
+      <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+      <span align="right" id="clock" class="date"></span>
+      <body onLoad="goforit()">
+    </div><!-- /input-group -->
+</div>
+</div><hr>
+
+<div class="row">
         <div class="col-md-12">
             <div class="card card-plain">
                <!--  <div class="header">
@@ -185,21 +196,27 @@ $(document).ready(function() {
                 <div class="content table-responsive table-full-width" style="margin-top: 20px;">
                     <table id="review" class="table table-hover">
                         <thead>
-                            <th>Name</th>
-                            <th class="filter-false sorter-false">Unit</th>
-                            <th class="filter-false sorter-false">Initial Quantity</th>
-                            <th class="filter-false sorter-false">In</th>
-                            <th class="filter-false sorter-false">Out</th>
-                            <th class="filter-false sorter-false">Remaining Quantity</th>
+                            <th data-placeholder="Search">Name</th>
+                            <th data-filter="false">Unit</th>
+                            <th data-filter="false">Unit Price</th>
+                            <th data-filter="false">Initial Quantity</th>
+                            <th data-filter="false">In</th>
+                            <th data-filter="false">Value (In)</th>
+                            <th data-filter="false">Out</th>
+                            <th data-filter="false">Value (Out)</th>
+                            <th data-filter="false">Remaining Quantity</th>
                         </thead>
                         <tbody>
                         {% for item in itemtype %}
-                            <tr class="clickable-row" data-href="/inventory/{{item.sku}}">
+                            <tr class="clickable-row" data-href="/{{g.current_lang}}/inventory/{{item.iid}}">
                                 <td>{{item.name}}</td>
                                 <td>{{item.unit}}</td>
+                                <td>${{item.price}}</td>
                                 <td>{{item.starting}}</td>
                                 <td>{{item.recieved}}</td>
+                                <td>${{item.value_in}}</td>
                                 <td>{{item.demand}}</td>
+                                <td>${{item.value_out}}</td>
                                 <td>{{item.remaining}}</td>
                             </tr>
                         {% endfor %}
@@ -211,11 +228,12 @@ $(document).ready(function() {
         </div>
     </div>
     <div class="row" style="padding-bottom:30px;">
-        <div class="col-xs-12" align="center">
-            <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+<!--         <div class="col-xs-12" align="center">
+            <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button> -->
             <body onLoad="goforit()">
         </div>
 
     </div>
 </div>
 {% endblock %}
+

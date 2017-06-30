@@ -1,17 +1,4 @@
-{% extends "base.html" %}
-
-{% block title %}
-<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
-    <span class="sr-only">Toggle navigation</span>
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-</button>
-<a class="navbar-brand" href="#">Logs in current month</a>
-
-
-{% endblock %}
-
+{% extends "base2.html" %}
 {% block content %}
 <style type="text/css">
 {
@@ -160,55 +147,9 @@
     box-shadow: inset 0 4px 9px rgba(0,0,0,.24);
 }
 
-.container-fluid .date { float:right }
 </style>
 
 <script>
-
-var dayarray=new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
-var montharray=new Array("January","February","March","April","May","June","July","August","September","October","November","December")
-
-function getthedate(){
-var mydate=new Date()
-var year=mydate.getYear()
-if (year < 1000)
-year+=1900
-var day=mydate.getDay()
-var month=mydate.getMonth()
-var daym=mydate.getDate()
-if (daym<10)
-daym="0"+daym
-var hours=mydate.getHours()
-var minutes=mydate.getMinutes()
-var seconds=mydate.getSeconds()
-var dn="AM"
-if (hours>=12)
-dn="PM"
-if (hours>12){
-hours=hours-12
-}
-if (hours==0)
-hours=12
-if (minutes<=9)
-minutes="0"+minutes
-if (seconds<=9)
-seconds="0"+seconds
-//change font size here
-var cdate="<small><font color='000000' face='Arial'><b>"+dayarray[day]+", "+montharray[month]+" "+daym+", "+year+" "+hours+":"+minutes+":"+seconds+" "+dn
-+"</b></font></small>"
-if (document.all)
-document.all.clock.innerHTML=cdate
-else if (document.getElementById)
-document.getElementById("clock").innerHTML=cdate
-else
-document.write(cdate)
-}
-if (!document.all&&!document.getElementById)
-getthedate()
-function goforit(){
-if (document.all||document.getElementById)
-setInterval("getthedate()",1000)
-}
     
     function downloadCSV(csv, filename) {
 
@@ -271,12 +212,6 @@ $(document).ready(function() {
         // theme:'blue',
         showProcessing: true,
         widgets: ["filter"],
-        // headers:{
-        //     '.Quantity change','.Quantity remaining','.Location':{
-        //         sorter: false
-        //     }
-
-        // },
         widgetOptions : {
 
       // extra css class applied to the table row containing the filters & the inputs within that row
@@ -311,8 +246,8 @@ $(document).ready(function() {
       filter_formatter : {
         6 : function($cell, indx){
           return $.tablesorter.filterFormatter.uiDatepicker( $cell, indx, {
-            from : '01/01/1999', // default from date
-            to   : '01/01/2022',  // default to date
+            // from : '01/01/1999', // default from date
+            // to   : '01/01/2022',  // default to date
             changeMonth: true,
             changeYear : true
           });
@@ -326,10 +261,9 @@ $(document).ready(function() {
 
 </script>
 
-<div class="container-fluid">
+<div class="container">
 <span>Property: Ascott Raffles Place Singapore</span>
 <span align="right" id="clock" class="date"></span>
-
     <div class="row">
 		<div class="col-md-12">
 		    <div class="card card-plain">
@@ -345,10 +279,10 @@ $(document).ready(function() {
                             <th class="filter-select filter-onlyAvail" data-placeholder="All">Item</th>
                             <th class="filter-select filter-onlyAvail" data-placeholder="All">Category</th>
                             <th class="filter-select" data-placeholder="All">In/Out</th>
-                            <th class="filter-false sorter-false">Quantity change</th>
-                            <th class="filter-false sorter-false">Quantity remaining</th>
+                            <th data-filter="false">Quantity change</th>
+                            <th data-filter="false">Quantity remaining</th>
                             <th>Date-Time</th>
-                            <th class="filter-false sorter-false">Location</th>
+                            <th data-filter="false">Location</th>
                             </tr>
                         </thead>
                         <tbody id="myTable">
@@ -380,12 +314,9 @@ $(document).ready(function() {
             <li><a href="#">4</a></li>
             <li><a href="#">5</a></li>
         </ul> 
-			<button onclick= "exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+			<button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
             <body onLoad="goforit()">
 		</div>
-    </div>
-</div>
-
 
 
 {% endblock %}

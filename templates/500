@@ -1,7 +1,0 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-<p>O dear, we have an error: {{ error }}</p>
-
-{% endblock %}

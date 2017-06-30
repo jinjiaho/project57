@@ -32,8 +32,8 @@ import os, copy, re, csv, json_decode
 # the App Engine WSGI application server.
 
 application = Flask(__name__, instance_relative_config=True)
-application.config.from_object('config.Config') # default configurations
-# application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
+application.config.from_object('config.DevConfig') # default configurations
+#application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
 application.config.from_pyfile('myConfig1.cfg') 
 # application.config.from_pyfile('myConfig2.cfg')
 
@@ -48,6 +48,7 @@ mysql.init_app(application)
 # global vars
 adminmode = False
 role = ""
+THRESHOLD = 1.2
 
 ###########################
 ##        METHODS        ##
@@ -168,8 +169,8 @@ def getAllLogs():
 # Returns inventory items that are below threshold levels
 def getInventoryLow():
 
-	THRESHOLD = 1.2
-	cursor = mysql.connect().cursor()
+	conn = mysql.connect()
+	cursor = conn.cursor()
 	cursor.execute("""SELECT iid, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.view_item_locations
 		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt AND
 		qty_left > 0
@@ -466,7 +467,7 @@ def admin():
 		items = cursor.fetchall()
 		# print (items)
 		flat_items = [item.encode('ascii') for sublist in items for item in sublist]
-		return render_template('v2/admin.html', 
+		return render_template('admin.html', 
 			form=form, 
 			form2=form2,
 			form3=form3, 
@@ -620,8 +621,7 @@ def admin():
 def dashboard():
 
 	# user authentication
-	logged_in = auth()
-	if not logged_in:
+	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=get_locale()))
 
 	i = getInventoryLow()
@@ -654,7 +654,7 @@ def inventory():
 		print type(i[0])
 		shelves.append(i[0].encode('ascii'))
 
-	return render_template('v2/inventory.html',
+	return render_template('inventory.html',
 		user = session['username'],
 		role = session['role'],
 		supplies = supplies,
@@ -706,9 +706,10 @@ def item(iid):
 				"date_effective": item[1]})
 
 	try:
-		return render_template('v2/item.html', item = r, pricechanges = pricechanges)
+		return render_template('item.html', item = r, pricechanges = pricechanges)
 	except:
-		return render_template('v2/item.html', item = None, pricechanges = None)
+		return render_template('item.html', item = None, pricechanges = None)
+
 
 @application.route('/<lang_code>/review/<category>')
 def category(category):
@@ -719,7 +720,7 @@ def category(category):
 
 	category = category
 	itemtype = getAllInventory(category)
-	return render_template('v2/category.html', 
+	return render_template('category.html', 
 		category=category, 
 		itemtype=itemtype, 
 		role = session['role'],
@@ -737,7 +738,7 @@ def logs():
 	logs=getAllLogs()
 	# names=getUniqueNames()
 	# items=getUniqueItems()
-	return render_template('v2/logs.html',
+	return render_template('logs.html',
 		logs=logs, 
 		role = session['role'],
 		user = session['username'])
@@ -828,18 +829,22 @@ def shelf(tag_id):
     		location = tag_id)
 
 
-@application.route('/logout')
+@application.route('/<lang_code>/logout')
 def logout():
+	l = get_locale()[:]
+	print("language", l)
 	session.clear()
-	return redirect(url_for("login", lang_code=get_locale()))
+	print("language", l)
+	return redirect(url_for("login", lang_code=l))
 
 
 @application.errorhandler(404)
 def page_not_found(e):
-	"""Return a custom 404 error."""
-	return 'Sorry, nothing at this URL.', 404
+	return render_template('error/404.html'), 404
 
+@application.errorhandler(500)
+def internal_server_error(e):
+	return render_template('error/500.html'), 500
 
-## testing
 if __name__ == '__main__':
 	application.run()
