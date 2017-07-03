@@ -26,18 +26,18 @@ DROP TABLE IF EXISTS `Permissions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Permissions` (
-  `role` CHAR(50) PRIMARY KEY NOT NULL,
+  `role` CHAR(50) NOT NULL,
   `in` BOOLEAN NOT NULL,
-  `check` BOOLEAN NOT NULL,
-  `stats` BOOLEAN NOT NULL,
+  `admin` BOOLEAN NOT NULL,
   PRIMARY KEY (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `Permissions` WRITE;
 /*!40000 ALTER TABLE `Permissions` DISABLE KEYS */;
-INSERT INTO Permissions VALUES ('supervisor', 'true', 'true', 'true');
-INSERT INTO Permissions VALUES ('attendant', 'false', 'false', 'false');
+INSERT INTO Permissions VALUES ('supervisor', 'true', 'true');
+INSERT INTO Permissions VALUES ('runner', 'true', 'false');
+INSERT INTO Permissions VALUES ('attendant', 'false', 'false');
 /*!40000 ALTER TABLE `Permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
