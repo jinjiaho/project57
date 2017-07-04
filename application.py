@@ -712,7 +712,7 @@ def item(iid):
 			cursor.execute(update_logs_query)
 			conn.commit()
 
-			flash('Success!', 'success')
+			flash('Stock updated!', 'success')
 		except:
 			flash('Oops! Something went wrong :(', 'danger')
 
