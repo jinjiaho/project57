@@ -1,8 +1,13 @@
-html,
-body {
+html {
    margin:0;
    padding:0;
    height:100%;
+}
+
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
 }
 
 #container {
@@ -37,13 +42,17 @@ body {
 
 .modal {
    position: fixed;
-   z-index: 20;
+   z-index: 99999;
    display: none;
    top: 0;
    left:0;
    width: 100% !important;
    height: 100% !important;
    background: rgba(0,0,0,0.5);
+}
+
+.modal-dialog {
+  margin: 12vh auto;
 }
 
 .modal .qty-display {
@@ -90,6 +99,10 @@ body {
 
 .sidebar-wrapper .nav {
   list-style: none;
+}
+
+.navbar.navbar-default {
+  position: absolute;
 }
 
 .navbar .container-fluid {
@@ -238,7 +251,7 @@ span.cart-group img {
 }
 
 .btn-success {
-  border-color: #4a960a;
+  border: #4a960a;
   color: #204c00;
 }
 

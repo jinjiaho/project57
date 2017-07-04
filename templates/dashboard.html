@@ -121,7 +121,7 @@ a.thumbnail > img {
 <!-- 2nd header: Today's transactions -->
 <div class="row">
 <div class="col-xs-7">
-    <h3 style="margin-bottom:0px;">{{_("Today's transactions")}}</h3>
+    <h3 style="margin-bottom:0px;">{{_("Latest Stock Movement")}}</h3>
 </div>
 <div class="col-xs-5">
     <div class="pull-right" style="margin-top:25px;">
@@ -133,12 +133,12 @@ a.thumbnail > img {
 <!-- Table of transactions -->
 <div class="col-md-12" style="margin-bottom:30px;"><table id="recent">
     <thead>
-        <th>Timestamp</th>
-        <th>User</th>
-        <th>Item</th>
-        <th>In/Out</th>
-        <th>Quantity change</th>
-        <th>Remaining</th>
+        <th>{{_('Timestamp')}}</th>
+        <th>{{_('Username')}}</th>
+        <th>{{_('Item')}}</th>
+        <th>{{_('In/Out')}}</th>
+        <th>{{_('Change')}}</th>
+        <th>{{_('Remaining')}}</th>
     </thead>
     <tbody>
     {% for log in l %}<tr>

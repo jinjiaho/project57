@@ -23,7 +23,7 @@ USE `Ascott_InvMgmt`;
 --
 
 DROP TABLE IF EXISTS `Permissions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET @saved_cs_client = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Permissions` (
   `role` CHAR(50) NOT NULL,
@@ -34,11 +34,9 @@ CREATE TABLE `Permissions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `Permissions` WRITE;
-/*!40000 ALTER TABLE `Permissions` DISABLE KEYS */;
-INSERT INTO Permissions VALUES ('supervisor', 'true', 'true');
-INSERT INTO Permissions VALUES ('runner', 'true', 'false');
-INSERT INTO Permissions VALUES ('attendant', 'false', 'false');
-/*!40000 ALTER TABLE `Permissions` ENABLE KEYS */;
+INSERT INTO Permissions VALUES ('supervisor', 0, 0);
+INSERT INTO Permissions VALUES ('runner', 0, 1);
+INSERT INTO Permissions VALUES ('attendant', 0, 0);
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
