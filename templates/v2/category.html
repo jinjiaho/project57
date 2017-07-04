@@ -1,4 +1,4 @@
-{% extends "base2.html" %}
+{% extends "v2/base.html" %}
 {% block content %}
 <style>
    /* .card .content {
@@ -92,7 +92,8 @@ setInterval("getthedate()",1000)
     var header1 = ["Monthly Review of {{category}}","","","","Month: "+month,"Year:"+year]
     var header2 = ["Property: Ascott Raffles Place Singapore"]//Property is hard coded for now
     var header3 = ["","","","","",""];
-    var header4 = ["Name","Unit","Unit Price","Initial quantity","In","Value(In)","Out","Value(Out)","Remaining quantity"];    csv.push(header1.join(","));
+    var header4 = ["Name","Unit","Unit Price","Initial quantity","In","Value(In)","Out","Value(Out)","Remaining quantity"];
+    csv.push(header1.join(","));
     csv.push(header2);
     csv.push(header3.join(","));
     csv.push(header4.join(","));
@@ -179,7 +180,7 @@ $(document).ready(function() {
 </div>
 <div class="col-xs-5">
     <div class="pull-right" style="margin-top:25px;">
-      <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">{{_('Export')}}</button>
+      <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
       <span align="right" id="clock" class="date"></span>
       <body onLoad="goforit()">
     </div><!-- /input-group -->
@@ -196,17 +197,15 @@ $(document).ready(function() {
                 <div class="content table-responsive table-full-width" style="margin-top: 20px;">
                     <table id="review" class="table table-hover">
                         <thead>
-
-                            <th data-placeholder="Search">{{_('Name')}}</th>
-                            <th data-filter="false">{{_('Unit')}}</th>
-                            <th data-filter="false">{{_('Unit Price')}}</th>
-                            <th data-filter="false">{{_('Opening Stock')}}</th>
-                            <th data-filter="false">{{_('Received In')}}</th>
-                            <th data-filter="false">{{_('Value (In)')}}</th>
-                            <th data-filter="false">{{_('Delivered Out')}}</th>
-                            <th data-filter="false">{{_('Value (Out)')}}</th>
-                            <th data-filter="false">{{_('Closing Stock')}}</th>
-
+                            <th data-placeholder="Search">Name</th>
+                            <th data-filter="false">Unit</th>
+                            <th data-filter="false">Unit Price</th>
+                            <th data-filter="false">Initial Quantity</th>
+                            <th data-filter="false">In</th>
+                            <th data-filter="false">Value (In)</th>
+                            <th data-filter="false">Out</th>
+                            <th data-filter="false">Value (Out)</th>
+                            <th data-filter="false">Remaining Quantity</th>
                         </thead>
                         <tbody>
                         {% for item in itemtype %}

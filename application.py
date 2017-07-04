@@ -32,9 +32,9 @@ import os, copy, re, csv, json_decode
 # the App Engine WSGI application server.
 
 application = Flask(__name__, instance_relative_config=True)
-application.config.from_object('config.Config') # default configurations
-# application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
-application.config.from_pyfile('myConfig1.cfg')
+# application.config.from_object('config.DevConfig') # default configurations
+application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
+# application.config.from_pyfile('myConfig1.cfg')
 # application.config.from_pyfile('myConfig2.cfg')
 
 # Babel init
@@ -59,10 +59,9 @@ role = ""
 def getAllInventory(category):
 	conn = mysql.connect()
 	cursor = conn.cursor()
-	query = "SELECT iid, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.view_item_locations WHERE category = '{}';".format(category)
-	print(query)
-	cursor.execute(query)
 
+	cursor.execute(
+		"SELECT iid, name, qty_left, reorder_pt, unit, picture, category, price FROM Ascott_InvMgmt.view_item_locations WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
 
 	# cursor.execute(
@@ -85,6 +84,8 @@ def getAllInventory(category):
 					delivered_out = delivered_out + (-1*int(i[1]))
 				elif i[0].encode('ascii') == "in":
 					received = received + int(i[1])
+			value_in = received*item[7]
+			value_out = delivered_out*item[7]
 
 			cursor.execute(
 			"SELECT qty_left FROM Ascott_InvMgmt.view_item_locations WHERE iid='{}';".format(item[0]))
@@ -104,7 +105,10 @@ def getAllInventory(category):
 				"received": received,
 				"demand": delivered_out,
 				"picture": item[5].encode('ascii'),
-				"category": item[6].encode('ascii')
+				"category": item[6].encode('ascii'),
+				"value_in": value_in,
+				"value_out": value_out,
+				"price": item[7]
 				})
 			counter = item[0]
 
@@ -673,9 +677,14 @@ def item(iid):
 	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
 
-	name = item
+	
+	# name = item
+
+
+	# name = item
+
 	cursor = mysql.connect().cursor()
-	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit FROM Ascott_InvMgmt.view_item_locations WHERE iid = '{}';".format(iid)
+	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit, price FROM Ascott_InvMgmt.view_item_locations WHERE iid = '{}';".format(iid)
 	cursor.execute(query)
 	data = cursor.fetchall()
 	# d = [[s.encode('ascii') for s in list] for list in data]
@@ -689,14 +698,31 @@ def item(iid):
 			"qty_left": i[4],
 			"reorder": i[5],
 			"batch_size": i[6],
-			"unit": i[7].encode('ascii')})
+			"unit": i[7].encode('ascii'),
+			"price": i[8]})
 
 
 	print r
+
+	cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.pricechange WHERE item = '{}';".format(iid))
+	price = cursor.fetchall()
+	pricechanges = []
+	if price == ():
+		pricechanges.append({
+			"new_price": 0,
+			"date_effective": 0})
+	else:
+	
+		for item in price:
+			pricechanges.append({
+				"new_price": item[0],
+				"date_effective": item[1]})
+
 	try:
-		return render_template('item.html', item = r)
+		return render_template('item.html', item = r, pricechanges = pricechanges)
 	except:
-		return render_template('item.html', item = None)
+		return render_template('item.html', item = None, pricechanges = None)
+
 
 @application.route('/<lang_code>/review/<category>')
 def category(category):
