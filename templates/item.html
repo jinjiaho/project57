@@ -239,7 +239,7 @@
                 <form id="stockUpdateForm" method="POST">
                     <div class="modal-header">
                         <span class="close" data-dismiss="modal">&times;</span>
-                        <h4 id="form-header" style="text-transform: capitalize;">Update Stock for {{item[0].name}}</h4>
+                        <h4 id="form-header" style="text-transform: capitalize;">{{_('Update stock')}} - {{item[0].name}}</h4>
                     </div>
                     <div class="modal-body">
                         <div id="modal-picture" class='modal-pic' align="center"><img src='/static/img/items/{{item[0].category}}/{{item[0].picture}}'/></div>
@@ -249,14 +249,14 @@
                                 <option value={{l.location}}>{{l.location}}</option>
                                 {% endfor %}
                             </select><br/>
-                            <input type="number" name="qty" id="qty" value="" min="0" placeholder="Enter quantity"/><br/>
-                            <input type="radio" name="action" value="in" />In
-                            <input type="radio" name="action" value="out" checked/>Out
-                            <input type="radio" name="action" value="check" />Check
+                            <input type="number" name="qty" id="qty" value="" min="0" placeholder="{{_('Quantity')}}"/><br/>
+                            <input type="radio" name="action" value="in" />{{_('In')}}
+                            <input type="radio" name="action" value="out" checked/>{{_('Out')}}
+                            <input type="radio" name="action" value="check" />{{_('Check')}}
                         </div>
                     </div>
                     <div class="modal-footer" align="center" style="margin-top: 15px;">
-                        <button type="submit" class="btn btn-success my-cart-btn" style="">Submit</button>
+                        <button type="submit" class="btn btn-success my-cart-btn" style="">{{_('Submit')}}</button>
                     </div>
                 </form>
             </div>

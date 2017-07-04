@@ -264,3 +264,18 @@ msgstr "Laman tidak dijumpai"
 msgid "The link requested may be broken or the page may have been removed"
 msgstr ""
 "Pautan yang diminta boleh dipecahkan atau halaman mungkin telah dikeluarkan"
+
+msgid "In"
+msgstr "Dalam"
+
+msgid "Out"
+msgstr "Keluar"
+
+msgid "Check"
+msgstr "Penentuan harga"
+
+msgid "Submit"
+msgstr "Serahkan"
+
+msgid "Update stock"
+msgstr "Ubah kuantiti"

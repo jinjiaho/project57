@@ -265,3 +265,18 @@ msgstr "找不到网页"
 
 msgid "The link requested may be broken or the page may have been removed"
 msgstr "请求的链接可能已损坏或页面可能已被删除"
+
+msgid "In"
+msgstr "进"
+
+msgid "Out"
+msgstr "出"
+
+msgid "Check"
+msgstr "盘点"
+
+msgid "Submit"
+msgstr "输入"
+
+msgid "Update stock"
+msgstr "修改数量"

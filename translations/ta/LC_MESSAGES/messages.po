@@ -261,3 +261,18 @@ msgstr "பக்கம் காணப்படவில்லை"
 
 msgid "The link requested may be broken or the page may have been removed"
 msgstr "கோரப்பட்ட இணைப்பு உடைக்கப்படலாம் அல்லது பக்கம் அகற்றப்பட்டிருக்கலாம்"
+
+msgid "In"
+msgstr "இல்"
+
+msgid "Out"
+msgstr "அவுட்"
+
+msgid "Check"
+msgstr "பங்கு காசோலை"
+
+msgid "Submit"
+msgstr "கையால்"
+
+msgid "Update stock"
+msgstr "அளவு மாற்ற"
