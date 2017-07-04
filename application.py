@@ -807,10 +807,8 @@ def shelf(tag_id):
 
 @application.route('/<lang_code>/logout')
 def logout():
-	l = get_locale()[:]
-	print("language", l)
+	l = get_locale()
 	session.clear()
-	print("language", l)
 	return redirect(url_for("login", lang_code=l))
 
 

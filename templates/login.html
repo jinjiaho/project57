@@ -1,29 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-	<!-- Metadata -->
-	<title>{{_('Inventory Management')}} | Ascott</title>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta charset="utf-8">
-	<meta name="description" content="Login">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <link rel="icon" type="image/png" href="/static/img/favicon.png">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
-
-	<!-- JQuery JS -->
-	<script src="/static/js/jquery-3.2.1.min.js"></script>
-
-</head>
-
-<body>
-
-<style>
-body {background:#f7f7f7;}
-</style>
+{% extends "base3.html" %}
+{% block content %}
 
 <div class="container-fluid text-center">
 <div class="col-sm-6 col-sm-offset-3" style="margin-top:30px;">
@@ -74,5 +50,4 @@ body {background:#f7f7f7;}
 </div> <!-- /.col-sm-6 -->
 </div> <!-- /.container-fluid -->
 
-</body>
-</html>
+{% endblock %}
