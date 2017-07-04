@@ -17,6 +17,16 @@
     }
 </style>
 <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{category}} alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="alert-text">{{message}}</div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
     <!-- Info display -->
     <div class="col-md-3">
@@ -226,7 +236,7 @@
     <div id="stockUpdateModal" class="modal fade" data-backdrop="false">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="stockUpdateForm" data-role={{role}}>
+                <form id="stockUpdateForm" method="POST">
                     <div class="modal-header">
                         <span class="close" data-dismiss="modal">&times;</span>
                         <h4 id="form-header" style="text-transform: capitalize;">Update Stock for {{item[0].name}}</h4>
@@ -239,7 +249,7 @@
                                 <option value={{l.location}}>{{l.location}}</option>
                                 {% endfor %}
                             </select><br/>
-                            <input type="number" name="qty" value="" placeholder="Enter quantity"/><br/>
+                            <input type="number" name="qty" id="qty" value="" min="0" placeholder="Enter quantity"/><br/>
                             <input type="radio" name="action" value="in" />In
                             <input type="radio" name="action" value="out" checked/>Out
                             <input type="radio" name="action" value="check" />Check
@@ -258,10 +268,7 @@
     </div>
 </div>
 
-
-
-
-
+    
 
 <script>
 
@@ -272,6 +279,20 @@
 //     "qty": $('input[id="pred-manual-qty"]').val()
 // };
 
+
+// Function to prevent negative number input
+$(function() {
+    var number = $("#stockUpdateForm #qty");
+    number.onkeydown = function(e) {
+        if(!((e.keyCode > 95 && e.keyCode < 106)
+          || (e.keyCode > 47 && e.keyCode < 58) 
+          || e.keyCode == 8)) {
+            return false;
+        }
+    }
+})
+
+    
 
 function editReorder(form) {
     $.ajax({

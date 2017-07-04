@@ -661,10 +661,64 @@ def item(iid):
 	# user authentication
 	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
-	
-	name = item
+
+	if request.method == 'POST':
+		print("form received")
+		now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		user = session['username']
+		cursor = mysql.connect().cursor()
+		cursor.execute("SELECT name FROM Items WHERE iid={}".format(iid))
+		name = cursor.fetchone()[0]
+
+		# form data
+		location = request.form['location']
+		qty = int(request.form['qty'])
+		action = request.form['action']
+
+		try:
+			conn = mysql.connect()
+			cursor = conn.cursor()
+			cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid={} AND location='{}';".format(iid, location))
+			data = cursor.fetchall()
+			old_qty = data[0][0]
+			print(old_qty)
+			if action == 'out':
+				qty_left = old_qty  - qty
+				qty_diff = qty * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
+
+				if qty_left < 0:
+					flash('Not enough in store!', 'warning')
+
+			elif action == 'in':
+				qty_left = old_qty + qty
+				qty_diff = qty
+			else:
+				qty_left = qty
+				qty_diff = qty_left - old_qty # change the value of qty to the difference 
+			conn = mysql.connect()
+			cursor = conn.cursor()
+			update_items_query = "UPDATE TagItems SET qty_left={} WHERE iid={} AND location='{}';".format(str(qty_left), iid, location)
+
+			# general query for all actions
+			print(update_items_query)
+			cursor.execute(update_items_query)
+			conn.commit()
+
+			# Log action
+			conn = mysql.connect()
+			cursor = conn.cursor()
+			update_logs_query = "INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', '{}', {}, {}, '{}', '{}');".format(user, now, action, qty_diff, qty_left, name, location)
+			print(update_logs_query)
+			cursor.execute(update_logs_query)
+			conn.commit()
+
+			flash('Success!', 'success')
+		except:
+			flash('Oops! Something went wrong :(', 'danger')
+
+	# name = item
 	cursor = mysql.connect().cursor()
-	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit, iid FROM Ascott_InvMgmt.view_item_locations WHERE iid = '{}';".format(iid)
+	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit FROM Ascott_InvMgmt.view_item_locations WHERE iid = {};".format(iid)
 	cursor.execute(query)
 	data = cursor.fetchall()
 	# d = [[s.encode('ascii') for s in list] for list in data]
@@ -678,60 +732,11 @@ def item(iid):
 			"qty_left": i[4],
 			"reorder": i[5],
 			"batch_size": i[6],
-			"unit": i[7].encode('ascii'),
-			"iid": i[8]})
-
-	if request.method=='POST':
-		now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-		user = session['username']
-		iid = r[0].iid
-		iname = r[0].name
-
-		# form data
-		location = request.form['location']
-		qty = request.form['qty']
-		action = request.form['action']
-
-		try:
-			conn = mysql.connect()
-			cursor = conn.cursor()
-			cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid={} AND location={};".format(iid, location))
-			old_qty = cursor.fetchone()[0]
-			qty_diff = int(qty)
-			if action == 'out':
-				qty_left = old_qty  - qty_input
-				qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
-
-				if qty_left < 0:
-					flash('Not enough in store!', 'warning')
-
-			elif info[1] == 'in':
-				qty_left = old_qty + qty_input
-			else:
-				qty_left = qty_input
-				qty_diff = qty_left - old_qty # change the value of qty to the difference 
-			conn = mysql.connect()
-			cursor = conn.cursor()
-			update_items_query = "UPDATE TagItems SET qty_left={} WHERE iid={} AND location={};".format(str(qty_left), iid, location)
-
-			# general query for all actions
-			print(update_items_query)
-			cursor.execute(update_items_query)
-			conn.commit()
-			conn = mysql.connect()
-			cursor = conn.cursor()
-			update_logs_query = "INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');".format(user, now, action, qty_diff, qty_left, iname, location)
-
-			# create log for each item
-			print(update_logs_query)
-			cursor.execute(update_logs_query)
-			conn.commit()
-			flash('Success!', 'success')
-		except:
-			flash('Oops! Something went wrong :(', 'danger')
+			"unit": i[7].encode('ascii')})
 
 	# print d
-	print r
+	# print r
+	# print r[0]
 	try:
 		return render_template('item.html', item = r)
 	except:
@@ -821,19 +826,21 @@ def shelf(tag_id):
 				cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid="+item+" AND location='"+tag_id+"';")
 				conn.commit()
 				old_qty = cursor.fetchone()[0]
-				qty_input = int(info[0])
-				if info[1] == 'out':
-					qty_left = old_qty  - qty_input
-					qty_input = qty_input * (-1) 	# make qty_input negative to reflect taking qty OUT of store.
+				qty_diff = int(info[0])
+
+				# set qty left according to action. Only in and out for this page. 
+				# Supervisors input on another page.
+				if info[1] == 'in':
+					qty_left = old_qty + qty_diff
+
+				else:
+					qty_left = old_qty  - qty_diff
+					# make qty_input negative to reflect taking qty OUT of store.
+					qty_diff = qty_diff * (-1) 	
 
 					if qty_left < 0:
 						flash('Not enough in store!', 'warning')
 
-				elif info[1] == 'in':
-					qty_left = old_qty + qty_input
-				else:
-					qty_left = qty_input
-					qty_input = qty_left - old_qty # change the value of qty to the difference 
 				conn = mysql.connect()
 				cursor = conn.cursor()
 				update_items_query = "UPDATE TagItems SET qty_left="+str(qty_left)+" WHERE iid="+str(item)+" AND location='"+tag_id+"';"
@@ -844,7 +851,7 @@ def shelf(tag_id):
 				conn.commit()
 				conn = mysql.connect()
 				cursor = conn.cursor()
-				update_logs_query = "INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');".format(user, now, info[1], qty_input, qty_left, item, tag_id)
+				update_logs_query = "INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');".format(user, now, info[1], qty_diff, qty_left, item, tag_id)
 
 				# create log for each item
 				print(update_logs_query)
