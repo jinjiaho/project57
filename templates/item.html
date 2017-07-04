@@ -2,14 +2,186 @@
 {% block content %}
 <link rel="stylesheet" type="text/css" href="/static/css/loading.css"/>
 
+<style>
+    .panel-body button {
+        margin-top: 7px;
+    }
+
+    #stockUpdateModal input[type="radio"] {
+        margin-right: 2px;
+        margin-left: 5px;
+    }
+
+    #stockUpdateModal input {
+        margin-top: 10px;
+    }
+
+    {
+    font-size: 90%;
+}
+
+.ui-widget {
+    font-family: "Helvetica Neue","Trebuchet MS",Tahoma,Verdana,Arial,sans-serif;
+    background: #fff;
+}
+
+.ui-datepicker {
+    padding: 0;
+    width: 233px;
+    height: auto;
+    margin: 5px auto 0;
+    font: 9pt Arial, sans-serif;
+}
+
+.ui-datepicker-header {
+    border: none;
+    font-size: 80%;
+    -moz-border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0; /* border radius */
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box; /* prevents bg color from leaking outside the border */
+    background-color: #e0e8ec; /* layer fill content */
+    -moz-box-shadow: 0 1px 0 rgba(255,255,255,.53), inset 0 -1px 0 rgba(0,0,0,.12); /* drop shadow and inner shadow */
+    -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.53), inset 0 -1px 0 rgba(0,0,0,.12); /* drop shadow and inner shadow */
+    box-shadow: 0 1px 0 rgba(255,255,255,.53), inset 0 -1px 0 rgba(0,0,0,.12); /* drop shadow and inner shadow */
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxsaW5lYXJHcmFkaWVudCBpZD0iaGF0MCIgZ3JhZGllbnRVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHgxPSI1MCUiIHkxPSIxMDAlIiB4Mj0iNTAlIiB5Mj0iLTEuNDIxMDg1NDcxNTIwMmUtMTQlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMCIgc3RvcC1vcGFjaXR5PSIwLjIxIi8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmZiIgc3RvcC1vcGFjaXR5PSIwLjIxIi8+CiAgIDwvbGluZWFyR3JhZGllbnQ+Cgo8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0idXJsKCNoYXQwKSIgLz4KPC9zdmc+); /* gradient overlay */
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,.21) 0%, rgba(255,255,255,.21) 100%); /* gradient overlay */
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,.21) 0%, rgba(255,255,255,.21) 100%); /* gradient overlay */
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,.21) 0%, rgba(255,255,255,.21) 100%); /* gradient overlay */
+    background-image: linear-gradient(bottom, rgba(0,0,0,.21) 0%, rgba(255,255,255,.21) 100%); /* gradient overlay */
+}
+
+.ui-datepicker-title {
+    text-align: center;
+    color: #515d65; /* text color */
+    font-size: 13px;
+    font-weight: bold;
+    text-shadow: 0 1px 1px rgba(255,255,255,.8); /* drop shadow */
+
+}
+
+.ui-icon-circle-triangle-e {
+    background-image: url(images/ui-icons_454545_256x240.png);
+    background-position: -32px -16px;
+}
+
+.ui-icon-circle-triangle-w {
+    background-image: url(images/ui-icons_454545_256x240.png);
+    background-position: -96px -16px;
+}
+
+.ui-datepicker .ui-datepicker-prev{
+    float: left;
+    cursor:pointer;
+    background-position: center -30px;
+    font-size: 13px;
+}
+.ui-datepicker .ui-datepicker-next {
+    float: right;
+    cursor:pointer;
+    background-position: center 0px;
+    font-size: 13px;
+}
+
+.ui-state-default {
+    background: transparent;
+    border: none;
+    color: #2b2b2b;
+    font-family: "Myriad Pro";
+    font-weight: normal;
+    text-align: center;
+}
+
+.ui-datepicker-header .ui-state-hover {
+    background: #bdc5c9;
+}
+
+.ui-datepicker table {
+    margin: 0;
+    width: 100%;
+}
+
+.ui-datepicker th {
+    color: #9da7af;
+    font-size: 12px;
+    font-weight: normal;
+    -moz-border-radius: 216px 0 0 0 / 0 0 0 0;
+    -webkit-border-radius: 216px 0 0 0 / 0 0 0 0;
+    border-radius: 216px 0 0 0 / 0 0 0 0;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    background-color: rgba(0,0,0,.08);
+
+}
+
+.ui-datepicker td {
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 0;
+    -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxsaW5lYXJHcmFkaWVudCBpZD0iaGF0MCIgZ3JhZGllbnRVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHgxPSI1MCUiIHkxPSIxMDAlIiB4Mj0iNTAlIiB5Mj0iLTEuNDIxMDg1NDcxNTIwMmUtMTQlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMCIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmZiIgc3RvcC1vcGFjaXR5PSIwLjA2Ii8+CiAgIDwvbGluZWFyR3JhZGllbnQ+Cgo8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0idXJsKCNoYXQwKSIgLz4KPC9zdmc+);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,.06) 0%, rgba(255,255,255,.06) 100%);
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,.06) 0%, rgba(255,255,255,.06) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,.06) 0%, rgba(255,255,255,.06) 100%);
+    background-image: linear-gradient(bottom, rgba(0,0,0,.06) 0%, rgba(255,255,255,.06) 100%);
+
+}
+
+.ui-datepicker td:last-child {
+    border-right: none;
+}
+
+.ui-datepicker td span, 
+.ui-datepicker td a {
+    padding: .7em 0;
+    color: #6a747a;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: Arial;
+}
+
+.ui-datepicker-calendar .ui-state-hover {
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,.12) 0%, rgba(255,255,255,.06) 100%);
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,.12) 0%, rgba(255,255,255,.06) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,.12) 0%, rgba(255,255,255,.06) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,.12) 0%, rgba(255,255,255,.06) 100%);
+}
+
+.ui-state-active,
+.ui-state-active.ui-state-hover {
+    color: #fff;
+    background-color: #8ab8ed;
+    text-shadow: 0 1px 0 rgba(0,0,0,.26);
+    -moz-box-shadow: inset 0 4px 9px rgba(0,0,0,.24);
+    -webkit-box-shadow: inset 0 4px 9px rgba(0,0,0,.24);
+    box-shadow: inset 0 4px 9px rgba(0,0,0,.24);
+}
+
+
+</style>
 <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{category}} alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="alert-text">{{message}}</div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
     <!-- Info display -->
     <div class="col-md-3">
 
-        <!-- Image branding -->
+        <!-- Item branding -->
         <img src="/static/img/items/{{item[0].category}}/{{item[0].picture}}" alt="" class="img-rounded img-responsive hidden-xs hidden-sm">
-        <h3 style="line-height:1.2; padding-bottom: 8px;">{{item[0].name}}</h3>
+        <h3 id="item-name" style="line-height:1.2; padding-bottom: 8px;">{{item[0].name}}</h3>
 
         <!-- Locations -->
         <p class=""><span class="glyphicon glyphicon-map-marker" aria-hidden="true" style="font-size:20px;"></span> {% for i in item %}
@@ -18,30 +190,30 @@
 
         <!-- Item is in use -->
         {% if item[0].reorder != 0 %}
-        <p class="text-success"><span class="glyphicon glyphicon-ok" style="font-size:16px;" aria-hidden="true"></span> Item is in use</p>
+        <p class="text-success"><span class="glyphicon glyphicon-ok" style="font-size:16px;" aria-hidden="true"></span> {{_('Item is in use')}}</p>
         {% endif %}
         {% if item[0].reorder == 0 %}
-        <p class="text-danger"><span class="glyphicon glyphicon-remove" style="font-size:16px;" aria-hidden="true"></span> Item is discontinued</p>
+        <p class="text-danger"><span class="glyphicon glyphicon-remove" style="font-size:16px;" aria-hidden="true"></span> {{_('Item is discontinued')}}</p>
         {% endif %}
 
         <!-- Change reorder points -->
         {% if item[0].reorder != 0 %}
-        <button class="btn btn-default" style="margin-bottom: 5px; width:100%; background-color: #e6e6e6;" data-toggle="modal" data-target="#reorder-modal" id="#reorder-modal">Change minimum stock level</button>
+        <button class="btn btn-default" style="margin-bottom: 5px; width:100%; background-color: #e6e6e6;" data-toggle="modal" data-target="#reorder-modal" id="#reorder-modal">{{_('Change minimum stock level')}}</button>
         {% endif %}
 
         <!-- Discontinue item -->
         {% if item[0].reorder != 0 %}
-        <button class="btn btn-default" style="margin-bottom: 5px; width:100%; background-color: #e6e6e6;" data-toggle="modal" data-target="#discontinue-modal" id="#discontinue">Discontinue item</button>
+        <button class="btn btn-default" style="margin-bottom: 5px; width:100%; background-color: #e6e6e6;" data-toggle="modal" data-target="#discontinue-modal" id="#discontinue">{{_('Discontinue item')}}</button>
         {% endif %}
 
         <!-- Reinstate item -->
         {% if item[0].reorder == 0 %}
-        <button class="btn btn-default" style="margin-bottom: 5px; width:100%; background-color: #e6e6e6;" data-toggle="modal" data-target="#reinstate-modal" id="#reinstate">Reinstate item</button>
+        <button class="btn btn-default" style="margin-bottom: 5px; width:100%; background-color: #e6e6e6;" data-toggle="modal" data-target="#reinstate-modal" id="#reinstate">{{_('Reinstate item')}}</button>
         {% endif %}
 
         <!-- Remove item permanently -->
         {% if item[0].reorder == 0 %}
-        <button class="btn btn-danger" style="margin-bottom: 5px; width:100%;" data-toggle="modal" data-target="#remove-modal" id="#remove">Remove item from system</button>
+        <button class="btn btn-danger" style="margin-bottom: 5px; width:100%;" data-toggle="modal" data-target="#remove-modal" id="#remove">{{_('Remove item from system')}}</button>
         {% endif %}
 
         <!-- Change item price -->
@@ -50,7 +222,7 @@
 
         <!-- Reorder qty -->
         {% if item[0].reorder != 0 %}
-        <h4 style="line-height:1.5;">Reorder when quantity reaches <b style="font-size: 26px">{{item[0].reorder}}</b></h4>
+        <h4 style="line-height:1.5;">{{_('Reorder when quantity reaches')}} <b style="font-size: 26px">{{item[0].reorder}}</b></h4>
         {% endif %}
         <h4 style="line-height:1.0;">Price: <b style="font-size: 26px">${{item[0].price}}</b></h4>
 
@@ -59,11 +231,12 @@
 
     <!-- Chart display -->
 	<div class="col-md-9">
-    <h4>Quantity remaining</h4>
+    <h4>{{_('Quantity remaining')}}</h4>
     <div class="panel panel-default">
         <div class="panel-body">
             <div id="chart" style="height: 400px; margin: 0 auto"></div>
-            <div class="col-sm-4"><button class="btn btn-default" style="width:100%;" id="btn_stockUpdate">Stock Update</button></div>
+            <!-- <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}"> -->
+            <div class="col-sm-4"><button  data-toggle="modal" data-target="#stockUpdateModal" class="btn btn-default" style="width:100%;" id="btn_stockUpdate">Stock Update</button></div>
             <div class="col-sm-4"><button class="btn btn-default " style="width:100%;;" id="btn_getData">Get Data</button></div>
     		<div class="col-sm-4">
     			<button class="btn btn-default" style="width:100%;" id="btn_delItem" data-toggle="modal" data-target="#delModal">Delete</button>
@@ -86,10 +259,10 @@
                 <form method="POST">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Delete Items</h4>
+                        <h4 class="modal-title">Remove Item From Location</h4>
                     </div>
                     <div class="modal-body">
-                        <p>Select the locations that you want to delete the item from:</p>
+                        <p>Select the locations that you want to remove the item from:</p>
                         <p class="text-danger">Please make sure the items have been physically removed.</p>
                         {% for i in item %}
                             <div class="checkbox-custom">
@@ -262,11 +435,43 @@
 
 
 
+    <!-- Update Stock Modal -->
+    <div id="stockUpdateModal" class="modal fade" data-backdrop="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="stockUpdateForm" method="POST">
+                    <div class="modal-header">
+                        <span class="close" data-dismiss="modal">&times;</span>
+                        <h4 id="form-header" style="text-transform: capitalize;">{{_('Update stock')}} - {{item[0].name}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="modal-picture" class='modal-pic' align="center"><img src='/static/img/items/{{item[0].category}}/{{item[0].picture}}'/></div>
+                        <div class="qty-display form-fields" align='center'>
+                            <select name="location">
+                                {% for l in item %}
+                                <option value={{l.location}}>{{l.location}}</option>
+                                {% endfor %}
+                            </select><br/>
+                            <input type="number" name="qty" id="qty" value="" min="0" placeholder="{{_('Quantity')}}"/><br/>
+                            <input type="radio" name="action" value="in" />{{_('In')}}
+                            <input type="radio" name="action" value="out" checked/>{{_('Out')}}
+                            <input type="radio" name="action" value="check" />{{_('Check')}}
+                        </div>
+                    </div>
+                    <div class="modal-footer" align="center" style="margin-top: 15px;">
+                        <button type="submit" class="btn btn-success my-cart-btn" style="">{{_('Submit')}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- END Update Stock Modal -->
+
+
     </div>
 </div>
 
-
-
+    
 
 <script>
 
@@ -277,6 +482,20 @@
 //     "qty": $('input[id="pred-manual-qty"]').val()
 // };
 
+
+// Function to prevent negative number input
+$(function() {
+    var number = $("#stockUpdateForm #qty");
+    number.onkeydown = function(e) {
+        if(!((e.keyCode > 95 && e.keyCode < 106)
+          || (e.keyCode > 47 && e.keyCode < 58) 
+          || e.keyCode == 8)) {
+            return false;
+        }
+    }
+})
+
+    
 
 function editReorder(form) {
     $.ajax({
@@ -411,7 +630,7 @@ function initChart(dataSources) {
         },
 
         series: [{
-            name: '{{item[0].name}}',
+            name: '{{item[0].location}}',
             // Define the data points. All series have a dummy year
             // of 1970/71 in order to be compared on the same x axis. Note
             // that in JavaScript, months start at 0 for January, 1 for February etc.
@@ -425,7 +644,8 @@ getData(initChart);
 $(document).ready(function(){
     // insert any required code here
 
-
+    $( "#datepicker" ).datepicker({ minDate: 0});
+    
     $("#turn-on-par").click(function(){
         $("#pred").show();
     });
@@ -438,6 +658,21 @@ $(document).ready(function(){
     $("#turn-off-price").click(function(){
         $("#price").hide();
     });
+
+
+    // $("#turn-on-par").click(function(){
+    //     $("#pred").show();
+    // });
+    // $("#turn-off-par").click(function(){
+    //     $("#pred").hide();
+    // });
+    // $("h3#item-name").mouseenter(function(e){
+    //     e.stopPropagation()
+    //     $("h3#item-name").append( " <span class='glyphicon glyphicon-pencil' aria-hidden="true"></span>" );
+    // }).mouseleave(function(e){
+    //     e.stopPropagation()
+    //     $("h3#item-name").remove("span");
+    // });
 
 
 });

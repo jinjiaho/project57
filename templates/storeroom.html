@@ -35,7 +35,11 @@ a:focus {
         <div class="row">
             <div class="col-md-12">
                 {% for item in things %}
+                {% if permissions[1] == 0 %}
+                <a href="/{{g.current_lang}}/inventory/{{item.iid}}">
+                {% else %}
                 <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}">
+                {% endif %}
                     <div class="card col-lg-3 col-md-5 col-sm-5 col-xs-12">
                         <div class="content all-icons">
                             <div class="row">
@@ -55,7 +59,7 @@ a:focus {
     </div>
 </div>
 
-
+{% if permissions[1]==1 %}
 <div id="qtyModal" class="modal fade" data-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -68,15 +72,13 @@ a:focus {
                     <div id="modal-picture" class='modal-pic' align="center"><img src=""/></div>
                     <div class="qty-display form-fields">
                         <input id="modal-input-name" type="hidden" name="item" value="" />
-                        <input id="modal-input-qty" type="number" name="qty" value="" placeholder="Enter quantity"/>
+                        <input id="modal-input-qty" type="number" name="qty" value="" class="num-input" placeholder="Enter quantity"/>
                         <input id="modal-input-sku" type="hidden" name="sku" value="" />
-                        {% if role=='supervisor' %}
+                        {% if permissions[0]==0 %}
                         <input type="radio" name="action" value="in" />In
-                        <input type="radio" name="action" value="out" checked/>Out
-                        <input type="radio" name="action" value="check" />Check
-                        {% else %}
-                        <input type="radio" name="action" value="out" checked readonly/>Out
                         {% endif %}
+                        <input type="radio" name="action" value="out" checked/>Out
+                        <!-- <input type="radio" name="action" value="check" />Check -->
                     </div>
                 </div>
                 <div class="modal-footer" align="center" style="margin-top: 15px;">
@@ -121,4 +123,5 @@ a:focus {
 </div>
 
 <script src="/static/js/shelves.js" type="text/javascript"></script>
+{% endif %}
 {% endblock %}

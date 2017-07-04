@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Ascott IM\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-17 00:41+0800\n"
-"PO-Revision-Date: 2017-06-17 02:49+0800\n"
+"PO-Revision-Date: 2017-07-02 12:48+0800\n"
 "Last-Translator: szeswee\n"
 "Language-Team: Tamil\n"
 "Language: ta\n"
@@ -11,50 +11,268 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz\n"
+"X-Loco-Source-Locale: en\n"
+"X-Loco-Project-Id: 23924\n"
+"X-Loco-Api-Version: 1.0.17 20170620-1"
+
 
 msgid "Remember for one month"
 msgstr "ஒரு மாதம் நினைவில் கொள்ளுங்கள்"
+
+
 msgid "Username"
 msgstr "பயனர்பெயர்"
+
+
 msgid "Password"
 msgstr "கடவுச்சொல்"
+
+
 msgid "Login"
 msgstr "உள் நுழை"
+
+
 msgid "Username and/or password do not match records"
 msgstr "பயனர்பெயர் அல்லது கடவுச்சொல் பதிவுகளுடன் பொருந்தவில்லை"
+
+
 msgid "Inventory Management"
 msgstr "சரக்கு மேலாண்மை"
+
+
 msgid "Overview"
 msgstr "திரட்டு"
+
+
 msgid "Inventory"
 msgstr "சரக்கு பொருட்களை"
+
+
 msgid "Reports"
 msgstr "அறிக்கைகள்"
+
+
 msgid "Admin"
 msgstr "நிர்வாகம்"
+
+
 msgid "Logs"
 msgstr "நடவடிக்கை பதிவு"
+
+
 msgid "Logout"
 msgstr "வெளியேறு"
+
+
 msgid "Logged in as"
 msgstr "உள்நுழைந்துள்ளீர்"
+
+
 msgid "Low inventory"
 msgstr "குறைந்த சரக்கு உருப்படி நிலை"
+
+
 msgid "View all items"
 msgstr "எல்லா உருப்படிகளையும் காணலாம்"
+
+
 msgid "View more"
 msgstr "மேலும் பார்க்க"
+
+
 msgid "No items in need of restocking"
 msgstr "மீதமுள்ள தேவை இல்லை"
+
+
 msgid "Today's transactions"
 msgstr "இன்றைய பரிவர்த்தனைகள்"
+
+
 msgid "Guest Supplies"
 msgstr "விருந்தினர் விநியோகம்"
+
+
 msgid "Guest Hampers"
 msgstr "பகல் மாக்கன்"
+
+
 msgid "Kitchenware"
 msgstr "சமயலறை"
+
+
 msgid "Tap phone on tag"
 msgstr "டேக் மீது தட்டவும் தொலைபேசியைப் பயன்படுத்தவும்"
+
+
 msgid "History"
 msgstr "வரலாறு"
+
+#. Refers to the name of the user
+
+msgid "Name"
+msgstr "பெயர்"
+
+#. Refers to name of item
+
+msgid "Item"
+msgstr "பொருள்"
+
+
+msgid "Quantity"
+msgstr "அளவு"
+
+
+msgid "In/Out"
+msgstr "இல்/அவுட்"
+
+
+msgid "Timestamp"
+msgstr "டைம்ஸ்டாம்பைக்"
+
+#. "Remaining" here refers to the quantity of items remaining in stock
+
+msgid "Remaining"
+msgstr "மீதமுள்ள"
+
+
+msgid "Browse by Category"
+msgstr "வகை மூலம் உலவ"
+
+
+msgid "Browse by NFC tag grouping"
+msgstr "NFC டேக் குழுவை உலாவுக"
+
+
+msgid "Inventory list"
+msgstr "சரக்கு பட்டியல்"
+
+
+msgid "Search"
+msgstr "தேடல்"
+
+
+msgid "Filter"
+msgstr "வடிகட்டி"
+
+#. Refers to "quantity change"
+
+msgid "Change"
+msgstr "மாற்றம்"
+
+#. Refers to location as determined by NFC tag grouping
+
+msgid "Location"
+msgstr "இருப்பிடம்"
+
+#. Refers to the name of the Ascott property
+
+msgid "Property"
+msgstr "சொத்து"
+
+#. Export to Excel file
+
+msgid "Export"
+msgstr "ஏற்றுமதி"
+
+#. Refers to the unit measure of an item.
+#. E.g. "Per bottle", "per carton", "per pcs"
+
+msgid "Unit"
+msgstr "அலகு"
+
+#. Initial quantity of an item at month start
+
+msgid "Opening Stock"
+msgstr "பங்கு திறக்கிறது"
+
+#. Qty of item at month end
+
+msgid "Closing Stock"
+msgstr "பங்கு முடிவடைகிறது"
+
+#. Refers to how many items were consumed in that month
+
+msgid "Delivered Out"
+msgstr "வழங்கப்பட்டது"
+
+#. Refers to how many items were received from suppliers in the month
+
+msgid "Received In"
+msgstr "பெறப்பட்டது"
+
+#. Header for table showing all users
+
+msgid "Current Users"
+msgstr "தற்போதைய பயனர்கள்"
+
+#. Refers to the level of access right (role) given to the user
+
+msgid "Role"
+msgstr "பங்கு"
+
+#. Refers to how many items are left
+
+msgid "Quantity remaining"
+msgstr "மீதமுள்ள அளவு"
+
+#. Button info for changing what the minimum reorder point should be
+
+msgid "Change minimum stock level"
+msgstr "குறைந்தபட்ச பங்கு நிலை மாற்ற"
+
+#. Button for discontinuing item
+
+msgid "Discontinue item"
+msgstr "உருப்படியை நிறுத்தவும்"
+
+#. Button for reinstating item
+
+msgid "Reinstate item"
+msgstr "உருப்படியை மீண்டும்"
+
+#. Permanently remove item from database. This means the item cannot be reinstated again unless it is added manually
+
+msgid "Remove item from system"
+msgstr "கணினியிலிருந்து உருப்படியை அகற்று"
+
+#. Reorder when quantity reaches [INTEGER]
+
+msgid "Reorder when quantity reaches"
+msgstr "அளவு அடையும் போது மறுவரிசைப்படுத்துக"
+
+#. Item is currently in use and not discontinued
+
+msgid "Item is in use"
+msgstr "பொருள் பயன்பாட்டில் உள்ளது"
+
+
+msgid "Item is discontinued"
+msgstr "பொருள் நிறுத்தப்பட்டது"
+
+
+msgid "Latest stock movement"
+msgstr "சமீபத்திய பங்கு இயக்கம்"
+
+
+msgid "Page not found"
+msgstr "பக்கம் காணப்படவில்லை"
+
+
+msgid "The link requested may be broken or the page may have been removed"
+msgstr "கோரப்பட்ட இணைப்பு உடைக்கப்படலாம் அல்லது பக்கம் அகற்றப்பட்டிருக்கலாம்"
+
+msgid "In"
+msgstr "இல்"
+
+msgid "Out"
+msgstr "அவுட்"
+
+msgid "Check"
+msgstr "பங்கு காசோலை"
+
+msgid "Submit"
+msgstr "கையால்"
+
+msgid "Update stock"
+msgstr "அளவு மாற்ற"

@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve Ascott application
+After=network.target
+
+[Service]
+User=user
+Group=nginx
+WorkingDirectory=/home/ubuntu/capstone
+Environment="PATH=/home/ubuntu/capstone"
+ExecStart=/home/ubuntu/capstone/gunicorn --workers 8 --bind unix:application.sock -m 007 wsgi
+
+[Install]
+WantedBy=multi-user.target

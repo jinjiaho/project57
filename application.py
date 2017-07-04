@@ -32,9 +32,15 @@ import os, copy, re, csv, json_decode
 # the App Engine WSGI application server.
 
 application = Flask(__name__, instance_relative_config=True)
+# <<<<<<< HEAD
 application.config.from_object('config.DevConfig') # default configurations
 #application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
 application.config.from_pyfile('myConfig1.cfg') 
+# =======
+# application.config.from_object('config.Config') # default configurations
+# # application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
+# application.config.from_pyfile('myConfig1.cfg')
+# >>>>>>> 67f8dd17820a1bb183c5518fefd2b4ab2da5a611
 # application.config.from_pyfile('myConfig2.cfg')
 
 # Babel init
@@ -48,7 +54,6 @@ mysql.init_app(application)
 # global vars
 adminmode = False
 role = ""
-THRESHOLD = 1.2
 
 ###########################
 ##        METHODS        ##
@@ -144,7 +149,7 @@ def getAllLogs():
 		"SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE month(date_time) = month(now()) AND year(date_time) = year(now());")
 	data=cursor.fetchall()
 	things = []
-	
+
 	for row in data:
 		cursor.execute(
 			"SELECT name FROM Ascott_InvMgmt.Items WHERE iid  = '{}';".format(row[5]))
@@ -162,15 +167,15 @@ def getAllLogs():
 			"item":item_name[0][0].encode('ascii'),
 			"location":row[6]})
 		# print(things)
-			
+
 	return things
-		
+
 
 # Returns inventory items that are below threshold levels
 def getInventoryLow():
 
-	conn = mysql.connect()
-	cursor = conn.cursor()
+	THRESHOLD = 1.2
+	cursor = mysql.connect().cursor()
 	cursor.execute("""SELECT iid, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.view_item_locations
 		WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt AND
 		qty_left > 0
@@ -185,7 +190,7 @@ def getInventoryLow():
 			"reorder_pt": i[3],
 			"picture": i[4].encode('ascii'),
 			"category": i[5].encode('ascii')})
-		
+
 	return r
 
 def getDailyLogs():
@@ -196,7 +201,7 @@ def getDailyLogs():
 		"SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE day(date_time) = day(now());")
 	data=cursor.fetchall()
 	things = []
-	
+
 	for row in data:
 		things.append({"name": row[0].encode('ascii'),
 			"dateTime": row[1],
@@ -206,7 +211,7 @@ def getDailyLogs():
 			"item":row[5].encode('ascii'),
 			"location":row[6]})
 		print(things)
-			
+
 	return things
 
 # POST for getting chart data
@@ -233,10 +238,9 @@ def getChartData():
 		idItem = cursor.fetchone()[0]
 		# print(idItem)
 
-		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
-		query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
+		query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {}".format(idItem)
+		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
 		# TODO: string parameterisation
-		# query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
 		cursor.execute(query)
 		responseData = cursor.fetchall()
 
@@ -250,7 +254,7 @@ def editReorder():
 	print "request.json: ", request.json
 
 	data = request.get_json()
-	
+
 	if data["tracking"] == u"off" or (data["qty"] == u"" or data["qty"] == u"0"):
 		print("no qty specified")
 		new_reorder = 0
@@ -267,7 +271,7 @@ def editReorder():
 		cursor = conn.cursor()
 
 		cursor.execute(
-			"UPDATE Ascott_InvMgmt.Items SET reorder_pt=%s WHERE (name=%s AND iid > 0);", 
+			"UPDATE Ascott_InvMgmt.Items SET reorder_pt=%s WHERE (name=%s AND iid > 0);",
 			(new_reorder, name))
 		conn.commit()
 		# idItem = cursor.fetchone()
@@ -357,19 +361,19 @@ def login():
 
 		if form.validate() == False:
 			return render_template("login.html", form=form)
-		else: 
+		else:
 			username = form.username.data
 			password = form.password.data
 			remember = form.remember.data
-		
+
 			cursor = mysql.connect().cursor()
 			cursor.execute("SELECT username, password, role, name FROM User WHERE username= '" + username + "';")
 
 			# check if user and pass data is correct by executing the db
 			# data is stored as a tuple
 			data = cursor.fetchone()
-			
-			if data is None: 
+
+			if data is None:
 				# username does not match records
 				flash('User does not exist')
 				return redirect(url_for("login", lang_code=get_locale()))
@@ -418,7 +422,7 @@ def admin():
 	form = AddUserForm()
 	form2 =CreateNewItem()
 	form3 =AddNewLocation()
-	form4 =ExistingItemsLocation() 
+	form4 =ExistingItemsLocation()
 
 	#--------------users table-------------------------
 	conn = mysql.connect()
@@ -439,21 +443,21 @@ def admin():
 	cursor.execute("SELECT DISTINCT location FROM Ascott_InvMgmt.TagItems;")
 
 	data1 = cursor.fetchall() #displays all unique NFC id tags.
-	
+
 	NFCs=[]
 	group={}
 	items=[]
-	
+
 
 	for idNFC in data1:
 		NFCs.append(idNFC[0].encode('ascii'))
-	
+
 	for i in NFCs:
-		
+
 		#fetch all item names pertaining to the tag.
 		cursor.execute("SELECT name, iid FROM Ascott_InvMgmt.view_item_locations WHERE location = '{}';".format(i))
 		data3=cursor.fetchall()
-		
+
 		group[i] = data3
 
 
@@ -467,13 +471,13 @@ def admin():
 		items = cursor.fetchall()
 		# print (items)
 		flat_items = [item.encode('ascii') for sublist in items for item in sublist]
-		return render_template('admin.html', 
-			form=form, 
+		return render_template('admin.html',
+			form=form,
 			form2=form2,
-			form3=form3, 
-			form4=form4, 
-			users=things, 
-			group=group, 
+			form3=form3,
+			form4=form4,
+			users=things,
+			group=group,
 			item_list=flat_items)
 
 
@@ -481,12 +485,12 @@ def admin():
 
 		if request.form['name-form'] =='form':
 			if form.validate() == False:
-				return render_template('admin.html', 
-					form=form, 
+				return render_template('admin.html',
+					form=form,
 					form2=form2,
-					form3=form3, 
-					form4=form4, 
-					users=things, 
+					form3=form3,
+					form4=form4,
+					users=things,
 					group=group)
 			else:
 				username = form.username.data
@@ -495,7 +499,7 @@ def admin():
 				name = form.name.data
 
 				newuser=[username,password,role,name]
-				
+
 
 				conn = mysql.connect()
 				cursor = conn.cursor()
@@ -512,14 +516,14 @@ def admin():
 
 		elif request.form['name-form'] =='form2':
 			if form2.validate() == False:
-				return render_template('admin.html', 
-					form=form, 
+				return render_template('admin.html',
+					form=form,
 					form2=form2,
 					form3=form3,
-					form4=form4, 
-					users=things, 
+					form4=form4,
+					users=things,
 					group=group)
-			else: 
+			else:
 				iid = form2.iid.data
 
 				# query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE iid ='{}'".format(iid))
@@ -541,7 +545,7 @@ def admin():
 				cursor = conn.cursor()
 
 				query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(itemname, reorderpt, batchqty, category, picture, unit, price)
-	
+
 				cursor.execute(query)
 				# cursor.execute("COMMIT")
 				flash("New item is added!")
@@ -549,71 +553,71 @@ def admin():
 
 		elif request.form['name-form'] =='form3':
 			if form3.validate() == False:
-				return render_template('admin.html', 
-					form=form, 
+				return render_template('admin.html',
+					form=form,
 					form2=form2,
-					form3=form3, 
+					form3=form3,
 					form4=form4,
-					users=things, 
+					users=things,
 					group=group)
-			else: 
+			else:
 				location = form3.location.data
 				description= form3.description.data
 
 				newlocation = [location,description]
-				
+
 				conn = mysql.connect()
 				cursor = conn.cursor()
 
 				# TODO: string parameterisation
 				query = "INSERT INTO LocationInfo VALUES ('{}','{}'); COMMIT".format(newlocation[0],newlocation[1])
-	
+
 				cursor.execute(query)
 				# cursor.execute("COMMIT")
 				flash("New Location is Added!")
-				
+
 				return redirect(url_for('admin', lang_code=get_locale()))
 
 		elif request.form['name-form'] =='form4':
 			if form4.validate() == False:
-				return render_template('admin.html', 
-					form=form, 
+				return render_template('admin.html',
+					form=form,
 					form2=form2,
-					form3=form3, 
+					form3=form3,
 					form4=form4,
-					users=things, 
+					users=things,
 					group=group)
-			else: 
+			else:
 				itemname = form4.itemname.data
 				# qtyleft= form4.qtyleft.data
 				# location=form4.location.data
 				price = 0.0000
 
 				newEntries = [itemname,qtyleft,location]
-				
+
 				conn = mysql.connect()
 				cursor = conn.cursor()
 
 				cursor.execute("SELECT iid,reorder_pt,batch_qty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
-				
+
 				info = cursor.fetchall()
-				
+
 				listing=[]
 				for i in info:
 					for j in i:
 						listing.append(j)
-				
+
 				listing.insert(1,itemname)
 				listing.append(price)
 				# listing.insert(2,location)
 				# listing.insert(3,qtyleft)
-	
+
 				# TODO: string parameterisation
 				query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(listing[1],listing[2],listing[3],listing[4],listing[5],listing[6],listing[7])
-	
+
 				cursor.execute(query)
 				flash("Added Item to Location %s!" %location)
-				
+
 				return redirect(url_for('admin', lang_code=get_locale()))
 
 
@@ -621,7 +625,8 @@ def admin():
 def dashboard():
 
 	# user authentication
-	if not session["logged_in"]:
+	logged_in = auth()
+	if not logged_in:
 		return redirect(url_for("login", lang_code=get_locale()))
 
 	i = getInventoryLow()
@@ -638,7 +643,7 @@ def inventory():
 	# user authentication
 	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
-			
+
 	# get current list of all items listed in db
 	supplies = getAllInventory('Guest Supplies')
 	hampers = getAllInventory('Guest Hampers')
@@ -668,8 +673,13 @@ def item(iid):
 	# user authentication
 	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
+
 	
 	# name = item
+
+
+	# name = item
+
 	cursor = mysql.connect().cursor()
 	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit, price FROM Ascott_InvMgmt.view_item_locations WHERE iid = '{}';".format(iid)
 	cursor.execute(query)
@@ -720,9 +730,9 @@ def category(category):
 
 	category = category
 	itemtype = getAllInventory(category)
-	return render_template('category.html', 
-		category=category, 
-		itemtype=itemtype, 
+	return render_template('category.html',
+		category=category,
+		itemtype=itemtype,
 		role = session['role'],
 		user = session['username'])
 
@@ -739,7 +749,7 @@ def logs():
 	# names=getUniqueNames()
 	# items=getUniqueItems()
 	return render_template('logs.html',
-		logs=logs, 
+		logs=logs,
 		role = session['role'],
 		user = session['username'])
 	# names=names, items=items)
@@ -764,7 +774,7 @@ def shelf(tag_id):
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
-	cursor.execute("SELECT iid, name, category, picture FROM view_item_locations WHERE location = '{}';".format(tag_id))
+	cursor.execute("SELECT iid, name, category, picture FROM view_item_location WHERE location = '{}';".format(tag_id))
 
 	data=cursor.fetchall()
 	things = []
@@ -802,7 +812,7 @@ def shelf(tag_id):
 					qty_left = old_qty + qty_input
 				else:
 					qty_left = qty_input
-					qty_input = qty_left - old_qty # change the value of qty to the difference 
+					qty_input = qty_left - old_qty # change the value of qty to the difference
 				conn = mysql.connect()
 				cursor = conn.cursor()
 				update_items_query = "UPDATE TagItems SET qty_left="+str(qty_left)+" WHERE iid="+str(item)+" AND location='"+tag_id+"';"
@@ -825,26 +835,22 @@ def shelf(tag_id):
 
     	return render_template('storeroom.html', things=things,
     		role = session['role'],
-    		user = session['username'], 
+    		user = session['username'],
     		location = tag_id)
 
 
-@application.route('/<lang_code>/logout')
+@application.route('/logout')
 def logout():
-	l = get_locale()[:]
-	print("language", l)
 	session.clear()
-	print("language", l)
-	return redirect(url_for("login", lang_code=l))
+	return redirect(url_for("login", lang_code=get_locale()))
 
 
 @application.errorhandler(404)
 def page_not_found(e):
-	return render_template('error/404.html'), 404
+	"""Return a custom 404 error."""
+	return 'Sorry, nothing at this URL.', 404
 
-@application.errorhandler(500)
-def internal_server_error(e):
-	return render_template('error/500.html'), 500
 
+## testing
 if __name__ == '__main__':
 	application.run()

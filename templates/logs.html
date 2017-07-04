@@ -275,14 +275,14 @@ $(document).ready(function() {
                         <table id="logs" class="tablesorter">
                         <thead>
                         <tr>
-                            <th class="filter-select filter-onlyAvail" data-placeholder="All">Name</th>
-                            <th class="filter-select filter-onlyAvail" data-placeholder="All">Item</th>
-                            <th class="filter-select filter-onlyAvail" data-placeholder="All">Category</th>
-                            <th class="filter-select" data-placeholder="All">In/Out</th>
-                            <th data-filter="false">Quantity change</th>
-                            <th data-filter="false">Quantity remaining</th>
-                            <th>Date-Time</th>
-                            <th data-filter="false">Location</th>
+                            <th class="filter-select filter-onlyAvail" data-placeholder="All">{{_('Username')}}</th>
+                            <th class="filter-select filter-onlyAvail" data-placeholder="All">{{_('Item')}}</th>
+                            <th class="filter-select filter-onlyAvail" data-placeholder="All">{{_('Category')}}</th>
+                            <th class="filter-select" data-placeholder="All">{{_('In/Out')}}</th>
+                            <th data-filter="false">{{_('Quantity change')}}</th>
+                            <th data-filter="false">{{_('Quantity remaining')}}</th>
+                            <th>{{_('Timestamp')}}</th>
+                            <th data-filter="false">{{_('Location')}}</th>
                             </tr>
                         </thead>
                         <tbody id="myTable">
@@ -314,7 +314,7 @@ $(document).ready(function() {
             <li><a href="#">4</a></li>
             <li><a href="#">5</a></li>
         </ul> 
-			<button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+			<button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">{{_('Export')}}</button>
             <body onLoad="goforit()">
 		</div>
 
