@@ -664,7 +664,7 @@ def item(iid):
 	
 	name = item
 	cursor = mysql.connect().cursor()
-	query = "SELECT iid, name, category, picture, location, qty_left, reorder_pt, batch_qty, unit FROM Ascott_InvMgmt.view_item_locations WHERE iid = '{}';".format(iid)
+	query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit, iid FROM Ascott_InvMgmt.view_item_locations WHERE iid = '{}';".format(iid)
 	cursor.execute(query)
 	data = cursor.fetchall()
 	# d = [[s.encode('ascii') for s in list] for list in data]
