@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `Permissions`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Permissions` (
   `role` CHAR(50) NOT NULL,
-  `in` BOOLEAN NOT NULL,
+  `stock_in` BOOLEAN NOT NULL,
   `admin` BOOLEAN NOT NULL,
   PRIMARY KEY (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

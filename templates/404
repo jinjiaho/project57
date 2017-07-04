@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<p>Sorry, nothing at this URL.</p>
+
+{% endblock %}

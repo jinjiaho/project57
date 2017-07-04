@@ -2,6 +2,20 @@
 {% block content %}
 <link rel="stylesheet" type="text/css" href="/static/css/loading.css"/>
 
+<style>
+    .panel-body button {
+        margin-top: 7px;
+    }
+
+    #stockUpdateModal input[type="radio"] {
+        margin-right: 2px;
+        margin-left: 5px;
+    }
+
+    #stockUpdateModal input {
+        margin-top: 10px;
+    }
+</style>
 <div class="container">
 
     <!-- Info display -->
@@ -58,7 +72,8 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div id="chart" style="height: 400px; margin: 0 auto"></div>
-            <div class="col-sm-4"><button class="btn btn-default" style="width:100%;" id="btn_stockUpdate">Stock Update</button></div>
+            <!-- <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}"> -->
+            <div class="col-sm-4"><button  data-toggle="modal" data-target="#stockUpdateModal" class="btn btn-default" style="width:100%;" id="btn_stockUpdate">Stock Update</button></div>
             <div class="col-sm-4"><button class="btn btn-default " style="width:100%;;" id="btn_getData">Get Data</button></div>
     		<div class="col-sm-4">
     			<button class="btn btn-default" style="width:100%;" id="btn_delItem" data-toggle="modal" data-target="#delModal">Delete</button>
@@ -81,10 +96,10 @@
                 <form method="POST">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Delete Items</h4>
+                        <h4 class="modal-title">Remove Item From Location</h4>
                     </div>
                     <div class="modal-body">
-                        <p>Select the locations that you want to delete the item from:</p>
+                        <p>Select the locations that you want to remove the item from:</p>
                         <p class="text-danger">Please make sure the items have been physically removed.</p>
                         {% for i in item %}
                             <div class="checkbox-custom">
@@ -207,8 +222,43 @@
     <!-- END Remove item modal -->
 
 
+    <!-- Update Stock Modal -->
+    <div id="stockUpdateModal" class="modal fade" data-backdrop="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="stockUpdateForm" data-role={{role}}>
+                    <div class="modal-header">
+                        <span class="close" data-dismiss="modal">&times;</span>
+                        <h4 id="form-header" style="text-transform: capitalize;">Update Stock for {{item[0].name}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="modal-picture" class='modal-pic' align="center"><img src='/static/img/items/{{item[0].category}}/{{item[0].picture}}'/></div>
+                        <div class="qty-display form-fields" align='center'>
+                            <select name="location">
+                                {% for l in item %}
+                                <option value={{l.location}}>{{l.location}}</option>
+                                {% endfor %}
+                            </select><br/>
+                            <input type="number" name="qty" value="" placeholder="Enter quantity"/><br/>
+                            <input type="radio" name="action" value="in" />In
+                            <input type="radio" name="action" value="out" checked/>Out
+                            <input type="radio" name="action" value="check" />Check
+                        </div>
+                    </div>
+                    <div class="modal-footer" align="center" style="margin-top: 15px;">
+                        <button type="submit" class="btn btn-success my-cart-btn" style="">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- END Update Stock Modal -->
+
+
     </div>
 </div>
+
+
 
 
 
