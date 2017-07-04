@@ -180,7 +180,7 @@ $(document).ready(function() {
 </div>
 <div class="col-xs-5">
     <div class="pull-right" style="margin-top:25px;">
-      <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">Export</button>
+      <button onclick="exportTableToCSV('table.csv')" class="btn btn-default btn-block">{{_('Export')}}</button>
       <span align="right" id="clock" class="date"></span>
       <body onLoad="goforit()">
     </div><!-- /input-group -->
@@ -197,12 +197,12 @@ $(document).ready(function() {
                 <div class="content table-responsive table-full-width" style="margin-top: 20px;">
                     <table id="review" class="table table-hover">
                         <thead>
-                            <th data-placeholder="Search">Name</th>
-                            <th data-filter="false">Unit</th>
-                            <th data-filter="false">Initial Quantity</th>
-                            <th data-filter="false">In</th>
-                            <th data-filter="false">Out</th>
-                            <th data-filter="false">Remaining Quantity</th>
+                            <th data-placeholder="Search">{{_('Name')}}</th>
+                            <th data-filter="false">{{_('Unit')}}</th>
+                            <th data-filter="false">{{_('Opening Stock')}}</th>
+                            <th data-filter="false">{{_('Received In')}}</th>
+                            <th data-filter="false">{{_('Delivered Out')}}</th>
+                            <th data-filter="false">{{_('Closing Stock')}}</th>
                         </thead>
                         <tbody>
                         {% for item in itemtype %}
