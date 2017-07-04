@@ -23,7 +23,7 @@ function updateCart() {
         cartTable.append('<tr class="cart_item" id="'
             + item.sku + '"><td><img src="' 
             + item.picture + '"/></td><td>' + item.name + '</td><td><input type="number" name="' 
-            + item.sku + '" value="' + item.qty + '"/>' 
+            + item.sku + '" value="' + item.qty + '" class="num-input" />' 
             + item.action + '<input type="hidden" name="' + item.sku + '" value="'
             + item.action+'" /></td>'
             + '<td><a onclick="deleteRow(this)" href="javascript:void(0);">&times;</a></td></tr>');
@@ -54,7 +54,6 @@ function deleteRow(r) {
 
 $(function () {
   updateCart();
-  
 
   // When an item is clicked, open a modal with the item information
   $(".openModal").click(function() {
@@ -69,6 +68,20 @@ $(function () {
       $("#qtyForm #modal-input-name").val(name);
       $("#qtyModal h4").text(name);
   });
+
+  // // Function to prevent negative number input
+  // $(function() {
+  //     var numbers = $("#stockUpdateForm .num-input");
+  //     $.each(numbers, function(index, value){
+  //       numbers[index].onkeydown = function(e) {
+  //         if(!((e.keyCode > 95 && e.keyCode < 106)
+  //           || (e.keyCode > 47 && e.keyCode < 58) 
+  //           || e.keyCode == 8)) {
+  //             return false;
+  //         }
+  //       }
+  //     })
+  // })
 
   // When the form is submitted, handle it here instead of backend
   $("#qtyForm").on('submit', function(e) {
