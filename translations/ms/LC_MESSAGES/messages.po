@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Ascott IM\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-17 00:41+0800\n"
-"PO-Revision-Date: 2017-06-17 02:49+0800\n"
+"PO-Revision-Date: 2017-07-02 12:48+0800\n"
 "Last-Translator: szeswee\n"
 "Language-Team: Malay\n"
 "Language: ms\n"
@@ -11,50 +11,256 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz\n"
+"X-Loco-Source-Locale: en\n"
+"X-Loco-Project-Id: 23924\n"
+"X-Loco-Api-Version: 1.0.17 20170620-1"
+
 
 msgid "Remember for one month"
 msgstr "Ingat selama satu bulan"
+
+
 msgid "Username"
 msgstr "Nama pengguna"
+
+
 msgid "Password"
 msgstr "Kata laluan"
+
+
 msgid "Login"
 msgstr "Masuk"
+
+
 msgid "Username and/or password do not match records"
 msgstr "Nama pengguna dan/atau kata laluan tidak sepadan dengan rekod"
+
+
 msgid "Inventory Management"
 msgstr "Pengurusan inventori"
+
+
 msgid "Overview"
 msgstr "Gambaran keseluruhan"
+
+
 msgid "Inventory"
 msgstr "Item inventori"
+
+
 msgid "Reports"
 msgstr "Laporan"
+
+
 msgid "Admin"
 msgstr "Pentadbiran"
+
+
 msgid "Logs"
 msgstr "Log aktiviti"
+
+
 msgid "Logout"
 msgstr "Keluar"
+
+
 msgid "Logged in as"
 msgstr "Log masuk sebagai"
+
+
 msgid "Low inventory"
 msgstr "Tahap inventori yang rendah"
+
+
 msgid "View all items"
 msgstr "Lihat semua item"
+
+
 msgid "View more"
 msgstr "Lihat lagi"
+
+
 msgid "No items in need of restocking"
 msgstr "Tiada barang yang diperlukan untuk menetap semula"
+
+
 msgid "Today's transactions"
 msgstr "Urus niaga hari ini"
+
+
 msgid "Guest Supplies"
 msgstr "Bekalan tetamu"
+
+
 msgid "Guest Hampers"
 msgstr "Bakul makanan"
+
+
 msgid "Kitchenware"
 msgstr "Peralatan dapur"
+
+
 msgid "Tap phone on tag"
 msgstr "Gunakan telefon untuk mengetuk tag"
+
+
 msgid "History"
 msgstr "Sejarah"
+
+#. Refers to the name of the user
+
+msgid "Name"
+msgstr "Nama"
+
+#. Refers to name of item
+
+msgid "Item"
+msgstr ""
+"\n"
+"Item\n"
+
+
+msgid "Quantity"
+msgstr "Kuantiti"
+
+
+msgid "In/Out"
+msgstr "Dalam/Keluar"
+
+
+msgid "Timestamp"
+msgstr "Cap waktu"
+
+#. "Remaining" here refers to the quantity of items remaining in stock
+
+msgid "Remaining"
+msgstr "Baki"
+
+
+msgid "Browse by Category"
+msgstr "Semak imbas mengikut Kategori"
+
+
+msgid "Browse by NFC tag grouping"
+msgstr "Semak imbas oleh pengelasan tag NFC"
+
+
+msgid "Inventory list"
+msgstr "Senarai inventori"
+
+
+msgid "Search"
+msgstr "Carian"
+
+
+msgid "Filter"
+msgstr "Penapis"
+
+#. Refers to "quantity change"
+
+msgid "Change"
+msgstr "Ubah"
+
+#. Refers to location as determined by NFC tag grouping
+
+msgid "Location"
+msgstr "Lokasi"
+
+#. Refers to the name of the Ascott property
+
+msgid "Property"
+msgstr "Harta"
+
+#. Export to Excel file
+
+msgid "Export"
+msgstr "Eksport"
+
+#. Refers to the unit measure of an item.
+#. E.g. "Per bottle", "per carton", "per pcs"
+
+msgid "Unit"
+msgstr "Unit"
+
+#. Initial quantity of an item at month start
+
+msgid "Opening Stock"
+msgstr "Pembukaan Saham"
+
+#. Qty of item at month end
+
+msgid "Closing Stock"
+msgstr "Penutupan Saham"
+
+#. Refers to how many items were consumed in that month
+
+msgid "Delivered Out"
+msgstr "Dihantar"
+
+#. Refers to how many items were received from suppliers in the month
+
+msgid "Received In"
+msgstr "Diterima Dalam"
+
+#. Header for table showing all users
+
+msgid "Current Users"
+msgstr "Pengguna Semasa"
+
+#. Refers to the level of access right (role) given to the user
+
+msgid "Role"
+msgstr "Peranan"
+
+#. Refers to how many items are left
+
+msgid "Quantity remaining"
+msgstr "Baki kuantiti"
+
+#. Button info for changing what the minimum reorder point should be
+
+msgid "Change minimum stock level"
+msgstr "Tukar tahap stok minimum"
+
+#. Button for discontinuing item
+
+msgid "Discontinue item"
+msgstr "Tolak item"
+
+#. Button for reinstating item
+
+msgid "Reinstate item"
+msgstr "Pulihkan item"
+
+#. Permanently remove item from database. This means the item cannot be reinstated again unless it is added manually
+
+msgid "Remove item from system"
+msgstr "Alih keluar item dari sistem"
+
+#. Reorder when quantity reaches [INTEGER]
+
+msgid "Reorder when quantity reaches"
+msgstr "Susun semula apabila kuantiti sampai"
+
+#. Item is currently in use and not discontinued
+
+msgid "Item is in use"
+msgstr "Item sedang digunakan"
+
+
+msgid "Item is discontinued"
+msgstr "Item dihentikan"
+
+
+msgid "Latest stock movement"
+msgstr "Pergerakan saham terkini"
+
+
+msgid "Page not found"
+msgstr "Laman tidak dijumpai"
+
+
+msgid "The link requested may be broken or the page may have been removed"
+msgstr ""
+"Pautan yang diminta boleh dipecahkan atau halaman mungkin telah dikeluarkan"

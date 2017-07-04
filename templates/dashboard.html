@@ -133,12 +133,12 @@ a.thumbnail > img {
 <!-- Table of transactions -->
 <div class="col-md-12" style="margin-bottom:30px;"><table id="recent">
     <thead>
-        <th>Timestamp</th>
-        <th>User</th>
-        <th>Item</th>
-        <th>In/Out</th>
-        <th>Quantity change</th>
-        <th>Remaining</th>
+        <th>{{_('Timestamp')}}</th>
+        <th>{{_('Username')}}</th>
+        <th>{{_('Item')}}</th>
+        <th>{{_('In/Out')}}</th>
+        <th>{{_('Change')}}</th>
+        <th>{{_('Remaining')}}</th>
     </thead>
     <tbody>
     {% for log in l %}<tr>

@@ -226,10 +226,9 @@ def getChartData():
 		idItem = cursor.fetchone()[0]
 		# print(idItem)
 
-		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
-		query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
+		query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {}".format(idItem)
+		# query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
 		# TODO: string parameterisation
-		# query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
 		cursor.execute(query)
 		responseData = cursor.fetchall()
 
