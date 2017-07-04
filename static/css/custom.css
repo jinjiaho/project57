@@ -8,6 +8,7 @@ body {
   margin: 0 !important;
   padding: 0 !important;
   position: relative;
+  min-height: 100%;
 }
 
 #container {
@@ -22,7 +23,6 @@ body {
    padding:10px;
 }
 
-
 #footer {
    position:absolute;
    bottom:0;
@@ -30,6 +30,7 @@ body {
    height:60px;   /* Height of the footer */
    background:#ddd;
 }
+
 
 .content {
   height: 100%;

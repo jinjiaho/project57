@@ -51,25 +51,32 @@
 
 </head>
 <body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{category}} alert-dismissible" role="alert" style="margin:0 3em 1em 3em;">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <div class="alert-text">{{message}}</div>
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+<style>
+.container {
+  padding-top: 80px;
+}
+</style>
+    <div id="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{category}} alert-dismissible" role="alert" style="margin:0 3em 1em 3em;">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div class="alert-text">{{message}}</div>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
 
-    <!-- top navigation bar -->
-    {% include 'widgets/navbar.html' %}
+        <!-- top navigation bar -->
+        {% include 'widgets/navbar.html' %}
 
-    <!-- content block -->
-    {% block content %}{% endblock %}
+        <!-- content block -->
+        {% block content %}{% endblock %}
 
-    <!-- bottom footer block -->
-    {% include 'widgets/footer.html' %}
+        <!-- bottom footer block -->
+        {% include 'widgets/footer.html' %}
+    </div>
 
 <script>
 
