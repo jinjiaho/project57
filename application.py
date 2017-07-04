@@ -60,9 +60,10 @@ THRESHOLD = 1.2
 def getAllInventory(category):
 	conn = mysql.connect()
 	cursor = conn.cursor()
+	query = "SELECT iid, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.view_item_locations WHERE category = '{}';".format(category)
+	print(query)
+	cursor.execute(query)
 
-	cursor.execute(
-		"SELECT iid, name, qty_left, reorder_pt, unit, picture, category FROM Ascott_InvMgmt.view_item_locations WHERE category = '{}';".format(category))
 	data = cursor.fetchall()
 
 	# cursor.execute(
@@ -109,7 +110,6 @@ def getAllInventory(category):
 			counter = item[0]
 
 	return items
-
 
 # Returns all the items based on location. KIV for possible supervisor view filtering.
 def getFromLevels(location):
@@ -621,7 +621,11 @@ def dashboard():
 	l = getDailyLogs()
 	# l = getLogs()
 
-	return render_template('dashboard.html', role=session['role'], user=session['username'], items = i, logs = l)
+	return render_template('dashboard.html', 
+		role=session['role'], 
+		user=session['username'], 
+		items = i, 
+		logs = l)
 
 
 
@@ -631,11 +635,18 @@ def inventory():
 	# user authentication
 	if not session["logged_in"]:
 		return redirect(url_for("login", lang_code=session["lang_code"]))
-			
-	# get current list of all items listed in db
-	supplies = getAllInventory('Guest Supplies')
-	hampers = getAllInventory('Guest Hampers')
-	kitchenware = getAllInventory('Kitchenware')
+
+	cursor = mysql.connect().cursor()
+	cursor.execute("SELECT DISTINCT category FROM Items;")
+	data = cursor.fetchall()
+	categories = []
+	for c in data:
+		categories.append(getAllInventory(c[0].encode('ascii')))
+
+	# supplies = getAllInventory('Guest Supplies')
+	# hampers = getAllInventory('Guest Hampers')
+	# kitchenware = getAllInventory('Kitchenware')
+
 
 	# get list of all locations to display
 	location_query = "SELECT DISTINCT location FROM view_item_locations GROUP BY location DESC;"
@@ -644,16 +655,19 @@ def inventory():
 	locations = cursor.fetchall()
 	shelves = []
 	for i in locations:
-		print type(i[0])
+		# print type(i[0])
 		shelves.append(i[0].encode('ascii'))
+
+	
 
 	return render_template('inventory.html',
 		user = session['username'],
 		role = session['role'],
-		supplies = supplies,
-		hampers = hampers,
-		kitchenware = kitchenware,
+		categories = categories,
+		num_cat = len(categories),
 		shelves = shelves)
+
+
 
 @application.route('/<lang_code>/inventory/<int:iid>', methods=['GET', 'POST'])
 def item(iid):
@@ -734,9 +748,6 @@ def item(iid):
 			"batch_size": i[6],
 			"unit": i[7].encode('ascii')})
 
-	# print d
-	# print r
-	# print r[0]
 	try:
 		return render_template('item.html', item = r)
 	except:
