@@ -762,7 +762,7 @@ def item(iid):
         qty = int(request.form['qty'])
         action = request.form['action']
 
-        update = stockUpdate(iid, location, qty, user, action, now)
+        updateSuccess = stockUpdate(iid, location, qty, user, action, now)
         if updateSuccess:
             flash('Stock updated!', 'success')
         else:
@@ -770,7 +770,7 @@ def item(iid):
 
 
     cursor = mysql.connect().cursor()
-    query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit, price FROM Ascott_InvMgmt.view_item_locations WHERE iid = '{}';".format(iid)
+    query = "SELECT name, category, picture, location, qty_left, reorder_pt, batch_qty, unit, price FROM Ascott_InvMgmt.view_item_locations WHERE iid = {};".format(iid)
     cursor.execute(query)
     data = cursor.fetchall()
     # d = [[s.encode('ascii') for s in list] for list in data]
@@ -788,26 +788,26 @@ def item(iid):
             "price": i[8]})
 
 
-    print r
+    print(type(r[0]))
 
-    cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.pricechange WHERE item = '{}';".format(iid))
-    price = cursor.fetchall()
+    # cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.pricechange WHERE item = '{}';".format(iid))
+    # price = cursor.fetchall()
     pricechanges = []
-    if price == ():
-        pricechanges.append({
-            "new_price": 0,
-            "date_effective": 0})
-    else:
+    # if price == ():
+    #     pricechanges.append({
+    #         "new_price": 0,
+    #         "date_effective": 0})
+    # else:
     
-        for item in price:
-            pricechanges.append({
-                "new_price": item[0],
-                "date_effective": item[1]})
+    #     for item in price:
+    #         pricechanges.append({
+    #             "new_price": item[0],
+    #             "date_effective": item[1]})
 
     try:
         return render_template('item.html', item = r, pricechanges = pricechanges)
     except:
-        return render_template('item.html', item = None, pricechanges = None)
+        return render_template('item.html', item = r, pricechanges = None)
 
 
 @application.route('/<lang_code>/review/<category>')
