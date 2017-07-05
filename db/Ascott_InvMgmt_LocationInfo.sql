@@ -25,13 +25,14 @@ USE `Ascott_InvMgmt`;
 DROP TABLE IF EXISTS `LocationInfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `LocationInfo` (
+CREATE TABLE `TagInfo` (
+  `tid` int(11) NOT NULL AUTO_INCREMENT,
   `name` char(50) NOT NUlL,
   `location` varchar(45) NOT NULL,
   `remarks` varchar(255),
 
   PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `LocationInfo` WRITE;
@@ -39,10 +40,10 @@ INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Kitchenware'
 INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Chemical', 'Hskp Office', 'Daily linen movement');
 INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Runner', '6th Floor', null);
 INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('L\'Occitane', '7th Floor', 'Bathroom Amenities');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('ExtraBed&BabyCot', '9th Floor', null);
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('GuestSupplies(10F)', '10th Floor', 'Amenities');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('GuestSupplies(12F)', '12th Floor', 'Tissue roll & tissue box');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('GuestSupplies(13F)', '13th Floor', 'Slippers');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Extra Bed & Baby Cot', '9th Floor', null);
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Guest Supplies (10F)', '10th Floor', 'Amenities');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Guest Supplies (12F)', '12th Floor', 'Tissue roll & tissue box');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Guest Supplies (13F)', '13th Floor', 'Slippers');
 INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Hamper', '15th Floor', 'F&B');
 INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Linen', '17th Floor', 'New linen & towels');
 
