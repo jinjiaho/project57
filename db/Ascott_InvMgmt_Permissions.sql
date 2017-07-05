@@ -36,7 +36,7 @@ CREATE TABLE `Permissions` (
 LOCK TABLES `Permissions` WRITE;
 INSERT INTO Permissions VALUES ('supervisor', 0, 0);
 INSERT INTO Permissions VALUES ('runner', 0, 1);
-INSERT INTO Permissions VALUES ('attendant', 0, 0);
+INSERT INTO Permissions VALUES ('attendant', 1, 1);
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

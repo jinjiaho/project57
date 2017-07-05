@@ -36,6 +36,4 @@ SELECT COUNT(iid), location FROM TagItems GROUP BY location;
 
 LOCK TABLES Items WRITE;
 ALTER TABLE Items CHANGE COLUMN `category` `category` char(25) NOT NULL;
-ALTER TABLE Items CHANGE COLUMN `reorder_pt` `reorder_pt` int(11),
-DROP COLUMN discontinued;
 UNLOCK TABLES;
