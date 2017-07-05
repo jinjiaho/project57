@@ -121,14 +121,6 @@
   text-align:center;
 }
 
-.alert-danger {
-  background-color: #ff000f;
-}
-
-.alert-warning {
-  background-color: #fcab03;
-}
-
 .btn-wrapper {
   width: 100%;
   text-align: center;
@@ -188,11 +180,6 @@ span.cart-group img {
 .modal-pic img {
   max-width: 180px;
   margin-bottom: 20px;
-}
-
-.btn-success {
-  border-color: #4a960a;
-  color: #204c00;
 }
 
 div.modal .modal-header h4 {
