@@ -1,5 +1,5 @@
 # Script for database changes
-
+DROP TABLE TagItems;
 CREATE TABLE TagItems SELECT sku, location, qty_left FROM Items;
 SELECT * from TagItems;
 

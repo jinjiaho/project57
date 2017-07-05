@@ -26,16 +26,15 @@ DROP TABLE IF EXISTS `Items`;
 /*!40101 SET @saved_cs_client = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Items` (
-  `sku` int(11) NOT NULL,
+  `iid` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
-  `location` char(45) NOT NULL,
-  `qty_left` int(11) NOT NULL,
   `reorder_pt` int(11) NOT NULL,
   `batch_qty` int(11) NOT NULL,
   `category` char(25) NOT NULL,
   `picture` char(50) NOT NULL,
   `unit` char(10) NOT NULL,
-  PRIMARY KEY (`sku`,`location`)
+  `price` DECIMAL(13,4),
+  PRIMARY KEY (`iid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 LOCK TABLES `Items` WRITE;
