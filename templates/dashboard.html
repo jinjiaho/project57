@@ -121,7 +121,7 @@ a.thumbnail > img {
 <!-- 2nd header: Today's transactions -->
 <div class="row">
 <div class="col-xs-7">
-    <h3 style="margin-bottom:0px;">{{_("Today's transactions")}}</h3>
+    <h3 style="margin-bottom:0px;">{{_("Latest Stock Movement")}}</h3>
 </div>
 <div class="col-xs-5">
     <div class="pull-right" style="margin-top:25px;">
@@ -131,7 +131,8 @@ a.thumbnail > img {
 </div><hr>
 
 <!-- Table of transactions -->
-<div class="col-md-12" style="margin-bottom:30px;"><table id="recent">
+<div class="col-md-12" style="margin-bottom:30px;">
+  <table id="recent">
     <thead>
         <th>{{_('Timestamp')}}</th>
         <th>{{_('Username')}}</th>
@@ -141,16 +142,19 @@ a.thumbnail > img {
         <th>{{_('Remaining')}}</th>
     </thead>
     <tbody>
-    {% for log in l %}<tr>
-      <td>{{log.dateTime}}</td>
-      <td>{{log.name}}</td>
-      <td>{{log.item}}</td>
-      <td>{{log.action}}</td>
-      <td>{{log.move}}</td>
-      <td>{{log.remaining}}</td>
-    </tr>{% endfor %}
+    {% for log in l %}
+      <tr>
+        <td>{{log.dateTime}}</td>
+        <td>{{log}}</td>
+        <td>{{log.item}}</td>
+        <td>{{log.action}}</td>
+        <td>{{log.move}}</td>
+        <td>{{log.remaining}}</td>
+      </tr>
+    {% endfor %}
     </tbody>
-</table></div>
+  </table>
+</div>
 
 
 

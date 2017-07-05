@@ -33,3 +33,7 @@ CREATE TABLE IF NOT EXISTS PriceChange (
 SELECT * FROM PriceChange;
 
 SELECT COUNT(iid), location FROM TagItems GROUP BY location;
+
+LOCK TABLES Items WRITE;
+ALTER TABLE Items CHANGE COLUMN `category` `category` char(25) NOT NULL;
+UNLOCK TABLES;

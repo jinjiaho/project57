@@ -26,29 +26,26 @@ DROP TABLE IF EXISTS `LocationInfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `LocationInfo` (
+  `name` char(50) NOT NUlL,
   `location` varchar(45) NOT NULL,
-  `description` varchar(255) NULL,
+  `remarks` varchar(255),
 
-  PRIMARY KEY (`location`)
+  PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `LocationInfo` WRITE;
-/*!40000 ALTER TABLE `LocationInfo` DISABLE KEYS */;
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('B1C1',NULL);
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('B1C2',NULL);
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('B1C4',NULL);
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('B1C5',NULL);
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('B2C2',NULL);
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level4C2',NULL);
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level5C1','Level 5 Category 1');
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level5C3',NULL);
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level5C4',NULL);
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level6C2',NULL);
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level7C1','Level 7 Category 1');
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level7C2','');
-INSERT INTO `LocationInfo` (`location`,`description`) VALUES ('Level8C1','');
-/*!40000 ALTER TABLE `LocationInfo` ENABLE KEYS */;
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Kitchenware', 'B1', null);
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Chemical', 'Hskp Office', 'Daily linen movement');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Runner', '6th Floor', null);
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('L\'Occitane', '7th Floor', 'Bathroom Amenities');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('ExtraBed&BabyCot', '9th Floor', null);
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('GuestSupplies(10F)', '10th Floor', 'Amenities');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('GuestSupplies(12F)', '12th Floor', 'Tissue roll & tissue box');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('GuestSupplies(13F)', '13th Floor', 'Slippers');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Hamper', '15th Floor', 'F&B');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Linen', '17th Floor', 'New linen & towels');
+
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

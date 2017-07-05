@@ -16,6 +16,10 @@
 
 {% block content%}
 <style>
+.navbar.navbar-default {
+    position:relative;
+}
+
 .navbar-header {
   margin: 0;
 }
@@ -35,7 +39,7 @@ a:focus {
         <div class="row">
             <div class="col-md-12">
                 {% for item in things %}
-                {% if permissions[1] == 0 %}
+                {% if role == 'supervisor' %}
                 <a href="/{{g.current_lang}}/inventory/{{item.iid}}">
                 {% else %}
                 <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}">
@@ -59,7 +63,7 @@ a:focus {
     </div>
 </div>
 
-{% if permissions[1]==1 %}
+{% if role != 'supervisor' %}
 <div id="qtyModal" class="modal fade" data-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -74,7 +78,7 @@ a:focus {
                         <input id="modal-input-name" type="hidden" name="item" value="" />
                         <input id="modal-input-qty" type="number" name="qty" value="" class="num-input" placeholder="Enter quantity"/>
                         <input id="modal-input-sku" type="hidden" name="sku" value="" />
-                        {% if permissions[0]==0 %}
+                        {% if role == 'runner' %}
                         <input type="radio" name="action" value="in" />In
                         {% endif %}
                         <input type="radio" name="action" value="out" checked/>Out

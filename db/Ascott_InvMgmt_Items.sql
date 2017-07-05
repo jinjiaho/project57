@@ -32,7 +32,7 @@ CREATE TABLE `Items` (
   `qty_left` int(11) NOT NULL,
   `reorder_pt` int(11) NOT NULL,
   `batch_qty` int(11) NOT NULL,
-  `category` char(25) NOT NULL CHECK (`category` = 'Guest Supplies' or `category` = 'Guest Hampers' or `category` = 'Kitchenware'),
+  `category` char(25) NOT NULL,
   `picture` char(50) NOT NULL,
   `unit` char(10) NOT NULL,
   PRIMARY KEY (`sku`,`location`)

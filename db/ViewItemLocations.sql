@@ -12,7 +12,7 @@ INSERT INTO TagItems VALUES
     
     
 -- Creates a view to find all the items which are stored in more than one location
-CREATE VIEW view_item_locations AS 
+CREATE OR REPLACE VIEW view_item_locations AS 
 SELECT Items.*, TagItems.location, TagItems.qty_left
 FROM Items INNER JOIN TagItems 
 ON Items.iid = TagItems.iid;

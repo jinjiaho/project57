@@ -1,8 +1,14 @@
-html,
-body {
+html {
    margin:0;
    padding:0;
    height:100%;
+}
+
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  min-height: 100%;
 }
 
 #container {
@@ -17,7 +23,6 @@ body {
    padding:10px;
 }
 
-
 #footer {
    position:absolute;
    bottom:0;
@@ -25,6 +30,7 @@ body {
    height:60px;   /* Height of the footer */
    background:#ddd;
 }
+
 
 .content {
   height: 100%;
@@ -37,13 +43,17 @@ body {
 
 .modal {
    position: fixed;
-   z-index: 20;
+   z-index: 99999;
    display: none;
    top: 0;
    left:0;
    width: 100% !important;
    height: 100% !important;
    background: rgba(0,0,0,0.5);
+}
+
+.modal-dialog {
+  margin: 12vh auto;
 }
 
 .modal .qty-display {
@@ -90,6 +100,10 @@ body {
 
 .sidebar-wrapper .nav {
   list-style: none;
+}
+
+.navbar.navbar-default {
+  position: absolute;
 }
 
 .navbar .container-fluid {
