@@ -16,6 +16,7 @@ import os, copy, re, csv, json_decode
 # pip2 install flask-babel
 # pip2 install flask-wtf
 # pip2 install flask-mysql
+# pip2 install flask-uploads
 # pip2 install numpy
 # pip2 install scipy
 # pip2 install statsmodels
@@ -33,7 +34,7 @@ import os, copy, re, csv, json_decode
 # the App Engine WSGI application server.
 
 application = Flask(__name__, instance_relative_config=True)
-# application.config.from_object('config.DevConfig') # default configurations
+application.config.from_object('config.DevConfig') # default configurations
 application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
 # application.config.from_pyfile('myConfig1.cfg')
 # application.config.from_pyfile('myConfig2.cfg')
@@ -916,9 +917,7 @@ def logout():
 
 @application.errorhandler(404)
 def page_not_found(e):
-    """Return a custom 404 error."""
-    return 'Sorry, nothing at this URL.', 404
-
+    return render_template('error/404.html'), 404
 
 ## testing
 if __name__ == '__main__':
