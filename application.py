@@ -804,7 +804,7 @@ def item(iid):
             "price": i[8]})
 
 
-    print(type(r[0]))
+    # print(type(r[0]))
 
     # cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.pricechange WHERE item = '{}';".format(iid))
     # price = cursor.fetchall()
@@ -821,7 +821,10 @@ def item(iid):
     #             "date_effective": item[1]})
 
     try:
-        return render_template('item.html', item = r, pricechanges = pricechanges)
+    	if r != []:
+        	return render_template('item.html', item = r, pricechanges = pricechanges)
+        else:
+        	return render_template('item.html', item = r, pricechanges = pricechanges)
     except:
         return render_template('item.html', item = r, pricechanges = None)
 

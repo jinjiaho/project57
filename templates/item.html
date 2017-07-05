@@ -166,7 +166,8 @@
 </style>
 <div class="container">
     
-    <!-- Info display -->
+    {% if item %}
+    <!-- INFO SIDEBAR -->
     <div class="col-md-3">
 
         <!-- Item branding -->
@@ -203,17 +204,18 @@
         <!-- Change item price -->
         <!-- <button class="btn btn-default" style="width:100%; background-color: #e6e6e6;" data-toggle="modal" data-target="#price-settings" id="#price-settings">Price settings</button> -->
 
-
         <!-- Reorder qty -->
         {% if item[0].reorder >= 0 %}
         <h4 style="line-height:1.5;">{{_('Reorder when quantity reaches')}} <b style="font-size: 26px">{{item[0].reorder}}</b></h4>
         {% endif %}
-        <h4 style="line-height:1.0;">Price: <b style="font-size: 26px">${{item[0].price}}</b></h4>
+
+        <!-- Unit price -->
+        <h4 style="line-height:1.5;">{{_('Price')}}:<b style="font-size: 26px"> $ {{item[0].price}}</b></h4>
 
     </div>
-    <!-- END Info display -->
+    <!-- END INFO SIDEBAR -->
 
-    <!-- Chart display -->
+    <!-- CHART MAIN CONTENT -->
 	<div class="col-md-9">
     <h4>{{_('Quantity remaining')}}</h4>
     <div class="panel panel-default">
@@ -234,7 +236,7 @@
                 </div>
             </div> -->
         </div>
-    </div>
+    </div></div>
     <!-- END Chart display -->
 
 
@@ -404,21 +406,18 @@
     </div>
     <!-- END Update Stock Modal -->
 
-
+    {% else %}
+    <div class="col-md-12 text-center">
+        <h3 class="text-info">{{_('Item ID not in system')}}</h3>
+        <p>{{_('The item requested may have been removed')}}</p>
     </div>
+    {% endif %}
+    
 </div>
 
 
 
 <script>
-
-// var reorder = {
-//     "name":  "{{item[0].name}}",
-//     "tracking": $('input[name="on-off"]:checked').val(),
-//     "prediction": $('input[name="manual-auto"]:checked').val(),
-//     "qty": $('input[id="pred-manual-qty"]').val()
-// };
-
 
 // Function to prevent negative number input
 $(function() {
@@ -453,7 +452,7 @@ function editReorder(form) {
 
 $('#reorder-form').submit(function(event) {
     var reorder = {
-        "name":  "{{item[0].name}}",
+        "name":  "{% if item %}{{item[0].name}}{% endif %}",
         "tracking": $('input[name="on-off"]:checked').val(),
         "prediction": $('input[name="manual-auto"]:checked').val(),
         "qty": $('input[id="pred-manual-qty"]').val()
@@ -465,7 +464,7 @@ $('#reorder-form').submit(function(event) {
 
 $('#discontinue-button').click(function(event) {
     var reorder = {
-        "name":  "{{item[0].name}}",
+        "name":  "{% if item %}{{item[0].name}}{% endif %}",
         "tracking": $('input[name="on-off"]:checked').val(),
         "prediction": $('input[name="manual-auto"]:checked').val(),
         "qty": $('input[id="pred-manual-qty"]').val()
@@ -480,7 +479,7 @@ function getData(callback) {
     $.ajax({
         type: "POST",
         url: "/api/getChartData",
-        data: JSON.stringify("{{item[0].name}}"),
+        data: JSON.stringify("{% if item %}{{item[0].name}}{% endif %}"),
         dataType: "json",
         contentType: "application/json",
         success: function(response, status, jqXHR) {
@@ -502,7 +501,7 @@ function initChart(dataSources) {
             type: 'area'
         },
         // title: {
-        //     text: '{{item[0].name}}'
+        //     text: '{% if item %}{{item[0].name}}{% endif %}'
         // },
         // subtitle: {
         //     text: 'Quantity remaining'
@@ -567,7 +566,7 @@ function initChart(dataSources) {
         },
 
         series: [{
-            name: '{{item[0].location}}',
+            name: '{% if item %}{{item[0].name}}{% endif %}',
             // Define the data points. All series have a dummy year
             // of 1970/71 in order to be compared on the same x axis. Note
             // that in JavaScript, months start at 0 for January, 1 for February etc.

@@ -99,19 +99,15 @@ a.thumbnail > img {
 }
 
 /* styling for the list of locations */
-#location-list button {
-  margin: 5px 10px; /* space out the buttons */
+#location-list a {
+  margin-bottom: 5px; /* space out the buttons */
   background-color: #f5f5f5; /* match accordion colors */
   color: #337ab7; /* match accordion colors */
 }
 
-#location-list a:hover {
-  text-decoration: none; /* Removes a random dash that appears */
-}
-
 </style>
 <div class="container">
-<!-- 1st row: Inventory list -->
+<!-- 1st row: PAGE HEADER -->
   <div class="row">
     <div class="col-xs-7">
         <h3 style="margin-bottom:0px;">{{_('Inventory list')}}</h3>
@@ -129,7 +125,7 @@ a.thumbnail > img {
   </div><hr>
 
 <!-- 2nd row: Inventory list -->
-  <div class="section">
+  <div>
     <h4>{{_('Browse by Category')}}</h4>
     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
       {% for c in categories %}
@@ -137,7 +133,7 @@ a.thumbnail > img {
         <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-{{ categories.index(c) }}" aria-expanded="true" aria-controls="collapse-{{categories.index(c)}}">
             <div class="panel-heading text-center" role="tab" id="heading-{{categories.index(c)}}" style="background-color:#f5f5f5;">
               <h4 class="panel-title">
-                {{ c.keys()[0] }}
+                {{ _(c.keys()[0]) }}
               </h4>
             </div>
         </a>
@@ -177,18 +173,14 @@ a.thumbnail > img {
     </div>
   </div>
 
-  <div class="section">
+  <div style="padding-top:20px; padding-bottom:30px;">
     <h4>{{_('Browse by Storeroom')}}</h4>
-    <div class="content">
       <div class='row'>
-        <div id="location-list">
-          {% for s in shelves %}
-            <a href="/{{g.current_lang}}/shelves/{{s}}">
-              <button class="btn btn-default">{{s}}</button>
-            </a>
-          {% endfor %}
-        </div>
-      </div>
+        {% for s in shelves %}
+          <div id="location-list" class="col-sm-2">
+            <a class="btn btn-default btn-block" href="/{{g.current_lang}}/shelves/{{s}}" role="button">{{s}}</a>
+          </div>
+        {% endfor %}
     </div>
   </div>
 
@@ -217,10 +209,12 @@ var substringMatcher = function(strs) {
   };
 };
 
-var supplies = {{ supplies|safe }};
-var hampers = {{ hampers|safe }};
-var kitchenware = {{ kitchenware|safe }};
-var all_items = supplies.concat(hampers, kitchenware);
+var all_cat = {{ categories|safe }};
+var all_items = [];
+for (c = 0; c < all_cat.length; c++) {
+
+}
+
 
 $('.typeahead').typeahead({
   hint: true,
