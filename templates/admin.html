@@ -23,10 +23,10 @@
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#summary" aria-controls="home" role="tab" data-toggle="tab">Summary</a></li>
-    <li role="presentation"><a href="#user" aria-controls="user" role="tab" data-toggle="tab">Users</a></li>
-    <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">Items</a></li>
-    <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">Locations</a></li>
-    <li role="presentation"><a href="#existitem" aria-controls="existitem" role="tab" data-toggle="tab">Existing Items</a></li>
+    <li role="presentation"><a href="#user" aria-controls="user" role="tab" data-toggle="tab">New User</a></li>
+    <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">New Item</a></li>
+    <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">New Storeroom</a></li>
+    <li role="presentation"><a href="#existitem" aria-controls="existitem" role="tab" data-toggle="tab">Assign Item to Storeroom</a></li>
     
 </ul>
 
@@ -58,7 +58,7 @@
             </table>
         </div>
 
-        <h4>{{_('NFC Tags Grouping')}}</h4>
+        <h4>{{_('Storerooms')}}</h4>
 
         
         {% for key, values in group.iteritems() %}
@@ -177,19 +177,6 @@
         
 
         <div class="row form-group">
-            {{ form2.sku.label }}
-            {% if form2.sku.errors %}
-                {% for error in form2.sku.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form2.sku(class="form-control", placeholder="SKU Number")}}
-            </div>
-        </div>
-
-        <div class="row form-group">
             {{ form2.itemname.label }}
             {% if form2.itemname.errors %}
                 {% for error in form2.itemname.errors %}
@@ -202,44 +189,6 @@
             </div>
         </div>
 
-        <!-- <div class="row form-group">
-            {{ form2.location.label }} <br>
-            {% for subfield in form2.location %}
-                <tr>
-                    <td>{{ subfield }}</td>
-                    <td>{{ subfield.label }}</td>
-                    <br>
-                </tr>
-            {% endfor %}
-        </div>
-        <br> -->
-        <div class="row form-group">
-            {{ form2.location.label }}
-            {% if form2.location.errors %}
-                {% for error in form2.location.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form2.location(class="form-control")}}
-            </div>
-        </div>
-        
-
-        <div class="row form-group">
-            {{ form2.qtyleft.label }} 
-            {% if form2.qtyleft.errors %}
-                {% for error in form2.qtyleft.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form2.qtyleft(class="form-control", placeholder="Quantity Available") }}
-            </div>
-        </div>
-        
 
         <div class="row form-group">
             {{ form2.reorderpt.label }}
@@ -250,7 +199,7 @@
             {% endif %}
             
             <div class="form-group">
-            {{ form2.reorderpt(class="form-control", placeholder="Reorder Point") }}
+            {{ form2.reorderpt(class="form-control", placeholder="Min. Stock") }}
             </div>
         </div>
 
@@ -305,6 +254,19 @@
             {{ form2.unit(class="form-control")}}
             </div>
         </div>
+
+        <div class="row form-group">
+            {{ form2.price.label }}
+            {% if form2.price.errors %}
+                {% for error in form2.price.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="form-group">
+            {{ form2.price(class="form-control", placeholder="Unit Price") }}
+            </div>
+        </div>
        
 
         <div class="row form-group"> 
@@ -332,7 +294,19 @@
         <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form3' >
-        <h3> Add a New Location Tag </h3>
+        <h3> Add a New Storeroom or Shelf </h3>
+        <div class="row form-group">
+            {{ form3.name.label }}
+            {% if form3.name.errors %}
+                {% for error in form3.name.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form3.name(class="form-control", placeholder="Name of storeroom (without spaces)")}}
+            </div>
+        </div>
 
         <div class="row form-group">
             {{ form3.location.label }}
@@ -343,16 +317,16 @@
             {% endif %}
 
             <div class="form-group">
-            {{ form3.location(class="form-control", placeholder="Location of tag (No Spaces")}}
+            {{ form3.location(class="form-control", placeholder="Location of storeroom") }}
             </div>
         </div>
 
 
         <div class="row form-group">
-            {{ form3.description.label }}
+            {{ form3.remarks.label }}
 
             <div class="form-group">
-            {{ form3.description(class="form-control", placeholder="Simple description of tag")}}
+            {{ form3.remarks(class="form-control", placeholder="Remarks (optional)")}}
             </div>
         </div>
 

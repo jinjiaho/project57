@@ -35,19 +35,17 @@ CREATE TABLE `LocationInfo` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `LocationInfo` WRITE;
-/*!40000 ALTER TABLE `LocationInfo` DISABLE KEYS */;
 INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Kitchenware', 'B1', null);
 INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Chemical', 'Hskp Office', 'Daily linen movement');
 INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Runner', '6th Floor', null);
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('L\'occitane', '7th Floor', 'Bathroom Amenities');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Extra Bed & Baby Cot', '9th Floor', null);
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Guest Supplies (10F)', '10th Floor', 'Amenities');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Guest Supplies (12F)', '12th Floor', 'Tissue roll & tissue box');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Guest Supplies (13F)', '13th Floor', 'Slippers');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('L\'Occitane', '7th Floor', 'Bathroom Amenities');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('ExtraBed&BabyCot', '9th Floor', null);
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('GuestSupplies(10F)', '10th Floor', 'Amenities');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('GuestSupplies(12F)', '12th Floor', 'Tissue roll & tissue box');
+INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('GuestSupplies(13F)', '13th Floor', 'Slippers');
 INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Hamper', '15th Floor', 'F&B');
 INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Linen', '17th Floor', 'New linen & towels');
 
-/*!40000 ALTER TABLE `LocationInfo` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

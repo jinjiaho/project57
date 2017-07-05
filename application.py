@@ -129,8 +129,8 @@ def inventoryQuick(location):
                 "name": d[1].encode('ascii'),
                 "category": d[2].encode('ascii'),
                 "picture": d[3].encode('ascii'),
-                "remaining": float(d[4]),
-                "reorder": float(d[5])
+                "remaining": d[4],
+                "reorder": d[5]
                 })
     else:
         cursor.execute("SELECT iid, name, category, picture FROM view_item_locations WHERE location='{}' AND reorder_pt >= 0;".format(location))
@@ -585,19 +585,17 @@ def admin():
                     users=things,
                     group=group)
             else:
-                iid = form2.iid.data
 
                 # query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE iid ='{}'".format(iid))
 
                 itemname = form2.itemname.data
-                # location = form2.location.data
-                # qtyleft = form2.qtyleft.data
                 reorderpt = form2.reorderpt.data
                 batchqty = form2.batchqty.data
                 category = form2.category.data
                 picture = form2.picture.data
                 unit = form2.unit.data
-                price = 0.0000 # TODO: CREATE FORM FIELD FOR PRICE
+                price = form2.price.data
+
 
                 # newitem = [iid, itemname, reorderpt, batchqty, category, picture, unit]
 
@@ -605,7 +603,7 @@ def admin():
                 conn = mysql.connect()
                 cursor = conn.cursor()
 
-                query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(itemname, reorderpt, batchqty, category, picture, unit, price)
+                query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}',{},{},'{}','{}',{},{}); COMMIT;".format(itemname, reorderpt, batchqty, category, picture, unit, price)
 
                 cursor.execute(query)
                 # cursor.execute("COMMIT")
@@ -622,16 +620,17 @@ def admin():
                     users=things,
                     group=group)
             else:
+                name = form3.name.data
                 location = form3.location.data
-                description= form3.description.data
-
-                newlocation = [location,description]
+                remarks = form3.remarks.data
+                # if remarks == None:
+                #     remarks = 'null'
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
 
                 # TODO: string parameterisation
-                query = "INSERT INTO LocationInfo VALUES ('{}','{}'); COMMIT".format(newlocation[0],newlocation[1])
+                query = "INSERT INTO LocationInfo VALUES ('{}','{}', '{}'); COMMIT".format(name, location, remarks)
 
                 cursor.execute(query)
                 # cursor.execute("COMMIT")
@@ -650,34 +649,24 @@ def admin():
                     group=group)
             else:
                 itemname = form4.itemname.data
-                # qtyleft= form4.qtyleft.data
-                # location=form4.location.data
-                price = 0.0000
+                qty= form4.qtyleft.data
+                location=form4.location.data
 
-                newEntries = [itemname,qtyleft,location]
+                try:
+                    conn = mysql.connect()
+                    cursor = conn.cursor()
 
-                conn = mysql.connect()
-                cursor = conn.cursor()
+                    cursor.execute("SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
 
-                cursor.execute("SELECT iid,reorder_pt,batch_qty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
+                    iid = cursor.fetchall()[0][0]
 
-                info = cursor.fetchall()
+                    # TODO: string parameterisation
+                    query = "INSERT INTO TagItems VALUES ({}, '{}', {}); COMMIT".format(iid, location, qty)
 
-                listing=[]
-                for i in info:
-                    for j in i:
-                        listing.append(j)
-
-                listing.insert(1,itemname)
-                listing.append(price)
-                # listing.insert(2,location)
-                # listing.insert(3,qtyleft)
-
-                # TODO: string parameterisation
-                query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(listing[1],listing[2],listing[3],listing[4],listing[5],listing[6],listing[7])
-
-                cursor.execute(query)
-                flash("Added Item to Location %s!" %location)
+                    cursor.execute(query)
+                    flash("Added Item to Location %s!" %location, "success")
+                except:
+                    flash("Oops! Something went wrong :(", "danger")
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
@@ -709,17 +698,30 @@ def inventory():
     # user authentication
     if not session["logged_in"]:
         return redirect(url_for("login", lang_code=session["lang_code"]))
+    
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT DISTINCT category FROM Items;")
+    cats = cursor.fetchall()
+    itemsByCat = []
+    for cat in cats:
+        itemsByCat.append({cat[0].encode('ascii'):[]})
 
     data = inventoryQuick(None)
-    categories = [[],[],[]]
-    for i in data:
-        if i['category'] == 'Guest Hampers':
-            categories[0].append(i)
-        elif i['category'] == 'Guest Supplies':
-            categories[1].append(i)
-        else:
-            categories[2].append(i)
 
+    for i in data:
+        print(type(i))
+        for cat in itemsByCat:
+            if cat.keys()[0] == i['category']:
+                cat[i['category']].append(i)
+                print(i['category'])
+
+    print(itemsByCat)
+
+    print(itemsByCat[0].keys()[0])
+
+    print(itemsByCat[0])
+
+    # A list of a dictionary of a list of dictionaries.
 
     # supplies = getAllInventory('Guest Supplies')
     # hampers = getAllInventory('Guest Hampers')
@@ -735,13 +737,11 @@ def inventory():
         # print type(i[0])
         shelves.append(i[0].encode('ascii'))
 
-    
-
     return render_template('inventory.html',
         user = session['username'],
         role = session['role'],
-        categories = categories,
-        num_cat = len(categories),
+        categories = itemsByCat,
+        num_cat = len(itemsByCat),
         shelves = shelves)
 
 
