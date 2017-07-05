@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, g
 from flask_babel import Babel
+from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -15,6 +16,7 @@ import os, copy, re, csv, json_decode
 # pip2 install flask-babel
 # pip2 install flask-wtf
 # pip2 install flask-mysql
+# pip2 install flask-uploads
 # pip2 install numpy
 # pip2 install scipy
 # pip2 install statsmodels
@@ -32,7 +34,7 @@ import os, copy, re, csv, json_decode
 # the App Engine WSGI application server.
 
 application = Flask(__name__, instance_relative_config=True)
-# application.config.from_object('config.DevConfig') # default configurations
+application.config.from_object('config.DevConfig') # default configurations
 application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
 # application.config.from_pyfile('myConfig1.cfg')
 # application.config.from_pyfile('myConfig2.cfg')
@@ -48,6 +50,11 @@ mysql.init_app(application)
 # global vars
 adminmode = False
 role = ""
+
+# Configure the image uploading via Flask-Uploads
+photos = UploadSet('images', IMAGES)
+configure_uploads(application, photos)
+
 
 ###########################
 ##        METHODS        ##
@@ -167,7 +174,7 @@ def stockUpdate(iid, location, inputQty, user, action, time):
             qty_diff = qty
         else:
             qty_left = inputQty
-            qty_diff = qty_left - old_qty # change the value of qty to the difference 
+            qty_diff = qty_left - old_qty # change the value of qty to the difference
         conn = mysql.connect()
         cursor = conn.cursor()
         update_items_query = "UPDATE TagItems SET qty_left={} WHERE iid={} AND location='{}';".format(qty_left, iid, location)
@@ -501,176 +508,184 @@ def admin():
 
 #-------------NFCID----------------------------------
 
-    cursor.execute("SELECT DISTINCT location FROM Ascott_InvMgmt.TagItems;")
+	cursor.execute("SELECT DISTINCT location FROM Ascott_InvMgmt.TagItems;")
 
-    data1 = cursor.fetchall() #displays all unique NFC id tags.
+	data1 = cursor.fetchall() #displays all unique NFC id tags.
 
-    NFCs=[]
-    group={}
-    items=[]
+	NFCs=[]
+	group={}
+	items=[]
 
+	for idNFC in data1:
+		NFCs.append(idNFC[0].encode('ascii'))
 
-    for idNFC in data1:
-        NFCs.append(idNFC[0].encode('ascii'))
+	for i in NFCs:
 
-    for i in NFCs:
+		#fetch all item names pertaining to the tag.
+		cursor.execute("SELECT name, iid FROM Ascott_InvMgmt.view_item_locations WHERE location = '{}';".format(i))
+		data3=cursor.fetchall()
 
-        #fetch all item names pertaining to the tag.
-        cursor.execute("SELECT name, iid FROM Ascott_InvMgmt.view_item_locations WHERE location = '{}';".format(i))
-        data3=cursor.fetchall()
-
-        group[i] = data3
-
-
-    if request.method =="GET":
-
-        # user authentication
-        if not session["logged_in"]:
-            return redirect(url_for("login", lang_code=session["lang_code"]))
-
-        cursor.execute("SELECT DISTINCT name FROM Ascott_InvMgmt.Items;")
-        items = cursor.fetchall()
-        # print (items)
-        flat_items = [item.encode('ascii') for sublist in items for item in sublist]
-        return render_template('admin.html',
-            form=form,
-            form2=form2,
-            form3=form3,
-            form4=form4,
-            users=things,
-            group=group,
-            item_list=flat_items)
+		group[i] = data3
 
 
-    elif request.method == "POST":
 
-        if request.form['name-form'] =='form':
-            if form.validate() == False:
-                return render_template('admin.html',
-                    form=form,
-                    form2=form2,
-                    form3=form3,
-                    form4=form4,
-                    users=things,
-                    group=group)
-            else:
-                username = form.username.data
-                password = generate_password_hash(form.password.data)
-                role = form.role.data
-                name = form.name.data
+	if request.method =="GET":
 
-                newuser=[username,password,role,name]
+		# user authentication
+		if not session["logged_in"]:
+			return redirect(url_for("login", lang_code=session["lang_code"]))
 
+		cursor.execute("SELECT DISTINCT name FROM Ascott_InvMgmt.Items;")
+		items = cursor.fetchall()
+		# print (items)
+		flat_items = [item.encode('ascii') for sublist in items for item in sublist]
+		return render_template('admin.html',
+			form=form,
+			form2=form2,
+			form3=form3,
+			form4=form4,
+			users=things,
+			group=group,
+			item_list=flat_items)
 
-                conn = mysql.connect()
-                cursor = conn.cursor()
+# ------------------All the various form tabs----------------------
+# ------------------Add User Form ----------------------
+	elif request.method == "POST":
 
-                # TODO: string parameterisation
-                query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
+		if request.form['name-form'] =='form':
+			if form.validate() == False:
+				return render_template('admin.html',
+					form=form,
+					form2=form2,
+					form3=form3,
+					form4=form4,
+					users=things,
+					group=group)
+			else:
+				username = form.username.data
+				password = generate_password_hash(form.password.data)
+				role = form.role.data
+				name = form.name.data
 
-                # query = "INSERT INTO User (username,password,role,name) VALUES ();"
-
-                cursor.execute(query)
-                # cursor.execute("COMMIT")
-                flash("User has been added!")
-                return redirect(url_for('admin', lang_code=get_locale()))
-
-        elif request.form['name-form'] =='form2':
-            if form2.validate() == False:
-                print("Couldn't validate form")
-                return render_template('admin.html',
-                    form=form,
-                    form2=form2,
-                    form3=form3,
-                    form4=form4,
-                    users=things,
-                    group=group)
-            else:
-
-                # query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE iid ='{}'".format(iid))
-                print("form received")
-                itemname = form2.itemname.data
-                reorderpt = form2.reorderpt.data
-                batchqty = form2.batchqty.data
-                category = form2.category.data
-                picture = form2.picture.data
-                unit = form2.unit.data
-                price = form2.price.data
+				newuser=[username,password,role,name]
 
 
-                # newitem = [iid, itemname, reorderpt, batchqty, category, picture, unit]
-                try:
-                    # TODO: string parameterisation
-                    conn = mysql.connect()
-                    cursor = conn.cursor()
+				conn = mysql.connect()
+				cursor = conn.cursor()
 
-                    query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}',{},{},'{}','{}','{}',{}); COMMIT;".format(itemname, reorderpt, batchqty, category, picture, unit, price)
-                    print(query)
-                    cursor.execute(query)
-                    flash("Item has been added!", "success")
-                except:
-                    flash("Oops! Something went wrong :(", "danger")
-                return redirect(url_for('admin', lang_code=get_locale(), ))
+				# TODO: string parameterisation
+				query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
 
-        elif request.form['name-form'] =='form3':
-            if form3.validate() == False:
-                return render_template('admin.html',
-                    form=form,
-                    form2=form2,
-                    form3=form3,
-                    form4=form4,
-                    users=things,
-                    group=group)
-            else:
-                name = form3.name.data
-                location = form3.location.data
-                remarks = form3.remarks.data
-                # if remarks == None:
-                #     remarks = 'null'
+				# query = "INSERT INTO User (username,password,role,name) VALUES ();"
 
-                conn = mysql.connect()
-                cursor = conn.cursor()
+				cursor.execute(query)
+				# cursor.execute("COMMIT")
+				flash("User has been added!")
+				return redirect(url_for('admin', lang_code=get_locale()))
 
-                # TODO: string parameterisation
-                query = "INSERT INTO LocationInfo VALUES ('{}','{}', '{}'); COMMIT".format(name, location, remarks)
+# ------------------Add Item Form ----------------------
+		elif request.form['name-form'] =='form2':
+			if form2.validate() == False:
+				return render_template('admin.html',
+					form=form,
+					form2=form2,
+					form3=form3,
+					form4=form4,
+					users=things,
+					group=group)
+			else:
 
-                cursor.execute(query)
-                # cursor.execute("COMMIT")
-                flash("New Location is Added!")
+				itemname = form2.itemname.data
 
-                return redirect(url_for('admin', lang_code=get_locale()))
+				reorderpt = form2.reorderpt.data
+				batchqty = form2.batchqty.data
+				category = form2.category.data
+				unit = form2.unit.data
+				price = form2.price.data
+				categorystr = category.encode('ascii','ignore')
 
-        elif request.form['name-form'] =='form4':
-            if form4.validate() == False:
-                return render_template('admin.html',
-                    form=form,
-                    form2=form2,
-                    form3=form3,
-                    form4=form4,
-                    users=things,
-                    group=group)
-            else:
-                itemname = form4.itemname.data
-                qty= form4.qtyleft.data
-                location=form4.location.data
+				if 'photo' in request.files:
 
-                try:
-                    conn = mysql.connect()
-                    cursor = conn.cursor()
+					filename =photos.save(request.files['photo'])
 
-                    cursor.execute("SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
+				item = [itemname, reorderpt, batchqty, category, filename, unit,price]
 
-                    iid = cursor.fetchall()[0][0]
+				try:
+					# TODO: string parameterisation
+					conn = mysql.connect()
+					cursor = conn.cursor()
 
-                    # TODO: string parameterisation
-                    query = "INSERT INTO TagItems VALUES ({}, '{}', {}); COMMIT".format(iid, location, qty)
+					query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(item[0],item[1],item[2],item[3],item[4],item[5],item[6])
+					cursor.execute(query)
 
-                    cursor.execute(query)
-                    flash("Added Item to Location %s!" %location, "success")
-                except:
-                    flash("Oops! Something went wrong :(", "danger")
+					flash("Item has been added!", "success")
+				except:
+					flash("Oops! Something went wrong :(", "danger")
 
-                return redirect(url_for('admin', lang_code=get_locale()))
+				return redirect(url_for('admin', lang_code=get_locale()))
+
+# ------------------Add Location form ----------------------
+
+		elif request.form['name-form'] =='form3':
+			if form3.validate() == False:
+				return render_template('admin.html',
+					form=form,
+					form2=form2,
+					form3=form3,
+					form4=form4,
+					users=things,
+					group=group)
+			else:
+				location = form3.location.data
+				description= form3.description.data
+
+				newlocation = [location,description]
+
+				conn = mysql.connect()
+				cursor = conn.cursor()
+
+				# TODO: string parameterisation
+				query = "INSERT INTO LocationInfo VALUES ('{}','{}'); COMMIT".format(newlocation[0],newlocation[1])
+
+				cursor.execute(query)
+				# cursor.execute("COMMIT")
+				flash("New Location is Added!")
+
+				return redirect(url_for('admin', lang_code=get_locale()))
+
+# ------------------Add Existing Items to New Locations form ----------------------
+
+		elif request.form['name-form'] =='form4':
+			if form4.validate() == False:
+				return render_template('admin.html',
+					form=form,
+					form2=form2,
+					form3=form3,
+					form4=form4,
+					users=things,
+					group=group)
+			else:
+
+				itemname = form4.itemname.data
+				amt = form4.qtyleft.data
+				location=form4.location.data
+				try:
+
+					conn = mysql.connect()
+					cursor = conn.cursor()
+					cursor.execute("SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
+					info = cursor.fetchone()
+
+					# TODO: string parameterisation
+					query = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ('{}','{}','{}'); COMMIT".format(info,location,amt)
+					# query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
+
+					cursor.execute(query)
+					flash("Added Item to Location %s!" %location, "success")
+				except:
+					flash("Oops! Something went wrong :(", "danger")
+
+				return redirect(url_for('admin', lang_code=get_locale()))
 
 
 @application.route('/<lang_code>/dashboard')
@@ -686,10 +701,10 @@ def dashboard():
     print(l)
     # l = getLogs()
 
-    return render_template('dashboard.html', 
-        role=session['role'], 
-        user=session['username'], 
-        items = i, 
+    return render_template('dashboard.html',
+        role=session['role'],
+        user=session['username'],
+        items = i,
         logs = l)
 
 
@@ -700,7 +715,7 @@ def inventory():
     # user authentication
     if not session["logged_in"]:
         return redirect(url_for("login", lang_code=session["lang_code"]))
-    
+
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT DISTINCT category FROM Items;")
     cats = cursor.fetchall()
@@ -789,7 +804,7 @@ def item(iid):
             "price": i[8]})
 
 
-    print(type(r[0]))
+    # print(type(r[0]))
 
     # cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.pricechange WHERE item = '{}';".format(iid))
     # price = cursor.fetchall()
@@ -799,14 +814,17 @@ def item(iid):
     #         "new_price": 0,
     #         "date_effective": 0})
     # else:
-    
+
     #     for item in price:
     #         pricechanges.append({
     #             "new_price": item[0],
     #             "date_effective": item[1]})
 
     try:
-        return render_template('item.html', item = r, pricechanges = pricechanges)
+    	if r != []:
+        	return render_template('item.html', item = r, pricechanges = pricechanges)
+        else:
+        	return render_template('item.html', item = r, pricechanges = pricechanges)
     except:
         return render_template('item.html', item = r, pricechanges = None)
 
@@ -902,9 +920,7 @@ def logout():
 
 @application.errorhandler(404)
 def page_not_found(e):
-    """Return a custom 404 error."""
-    return 'Sorry, nothing at this URL.', 404
-
+    return render_template('error/404.html'), 404
 
 ## testing
 if __name__ == '__main__':
