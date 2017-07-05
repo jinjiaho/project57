@@ -22,7 +22,7 @@ class CreateNewItem(FlaskForm):
 	category = SelectField('Category of Item', choices = myDetails('category'), validators = [DataRequired()]) 
 	picture = StringField('Full Name for the file', validators = [DataRequired()])
 	unit = SelectField('Unit Size', choices = myDetails('unit'), validators = [DataRequired()]) 
-	price = DecimalField('Unit Price', places=4, rounding=None)
+	price = DecimalField('Unit Price', places=4, rounding=None, validators = [DataRequired()])
 	submitTwo = SubmitField('Add New Item')
 
 class ExistingItemsLocation(FlaskForm):

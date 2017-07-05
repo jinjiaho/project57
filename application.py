@@ -577,6 +577,7 @@ def admin():
 
         elif request.form['name-form'] =='form2':
             if form2.validate() == False:
+                print("Couldn't validate form")
                 return render_template('admin.html',
                     form=form,
                     form2=form2,
@@ -587,7 +588,7 @@ def admin():
             else:
 
                 # query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE iid ='{}'".format(iid))
-
+                print("form received")
                 itemname = form2.itemname.data
                 reorderpt = form2.reorderpt.data
                 batchqty = form2.batchqty.data
@@ -598,17 +599,18 @@ def admin():
 
 
                 # newitem = [iid, itemname, reorderpt, batchqty, category, picture, unit]
+                try:
+                    # TODO: string parameterisation
+                    conn = mysql.connect()
+                    cursor = conn.cursor()
 
-                # TODO: string parameterisation
-                conn = mysql.connect()
-                cursor = conn.cursor()
-
-                query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}',{},{},'{}','{}',{},{}); COMMIT;".format(itemname, reorderpt, batchqty, category, picture, unit, price)
-
-                cursor.execute(query)
-                # cursor.execute("COMMIT")
-                flash("New item is added!")
-                return redirect(url_for('admin', lang_code=get_locale()))
+                    query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}',{},{},'{}','{}','{}',{}); COMMIT;".format(itemname, reorderpt, batchqty, category, picture, unit, price)
+                    print(query)
+                    cursor.execute(query)
+                    flash("Item has been added!", "success")
+                except:
+                    flash("Oops! Something went wrong :(", "danger")
+                return redirect(url_for('admin', lang_code=get_locale(), ))
 
         elif request.form['name-form'] =='form3':
             if form3.validate() == False:
@@ -743,7 +745,6 @@ def inventory():
         categories = itemsByCat,
         num_cat = len(itemsByCat),
         shelves = shelves)
-
 
 @application.route('/<lang_code>/inventory/<int:iid>', methods=['GET', 'POST'])
 def item(iid):
