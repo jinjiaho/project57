@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, g
 from flask_babel import Babel
+from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -48,6 +49,11 @@ mysql.init_app(application)
 # global vars
 adminmode = False
 role = ""
+
+# Configure the image uploading via Flask-Uploads
+photos = UploadSet('images', IMAGES)
+configure_uploads(application, photos)
+
 
 ###########################
 ##        METHODS        ##
@@ -435,7 +441,6 @@ def admin():
 	group={}
 	items=[]
 
-
 	for idNFC in data1:
 		NFCs.append(idNFC[0].encode('ascii'))
 
@@ -446,6 +451,7 @@ def admin():
 		data3=cursor.fetchall()
 
 		group[i] = data3
+
 
 
 	if request.method =="GET":
@@ -467,7 +473,8 @@ def admin():
 			group=group,
 			item_list=flat_items)
 
-
+# ------------------All the various form tabs----------------------
+# ------------------Add User Form ----------------------
 	elif request.method == "POST":
 
 		if request.form['name-form'] =='form':
@@ -501,6 +508,7 @@ def admin():
 				flash("User has been added!")
 				return redirect(url_for('admin', lang_code=get_locale()))
 
+# ------------------Add Item Form ----------------------
 		elif request.form['name-form'] =='form2':
 			if form2.validate() == False:
 				return render_template('admin.html',
@@ -511,32 +519,40 @@ def admin():
 					users=things,
 					group=group)
 			else:
-				iid = form2.iid.data
 
+
+				# iid = form2.iid.data
 				# query1 = "SELECT itemname,reorderpt,batchqty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE iid ='{}'".format(iid))
-
 				itemname = form2.itemname.data
 				# location = form2.location.data
 				# qtyleft = form2.qtyleft.data
 				reorderpt = form2.reorderpt.data
 				batchqty = form2.batchqty.data
 				category = form2.category.data
-				picture = form2.picture.data
+				# picture = form2.picture.data
 				unit = form2.unit.data
-				price = 0.0000 # TODO: CREATE FORM FIELD FOR PRICE
+				price = form2.price.data
+				categorystr = category.encode('ascii','ignore')
+				# print(type(categorystr))
 
-				# newitem = [iid, itemname, reorderpt, batchqty, category, picture, unit]
+				if 'photo' in request.files:
+
+					filename =photos.save(request.files['photo'])
+
+				item = [itemname, reorderpt, batchqty, category, filename, unit,price]
 
 				# TODO: string parameterisation
 				conn = mysql.connect()
 				cursor = conn.cursor()
 
-				query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(itemname, reorderpt, batchqty, category, picture, unit, price)
+				query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(item[0],item[1],item[2],item[3],item[4],item[5],item[6])
 
 				cursor.execute(query)
 				# cursor.execute("COMMIT")
 				flash("New item is added!")
 				return redirect(url_for('admin', lang_code=get_locale()))
+
+# ------------------Add Location form ----------------------
 
 		elif request.form['name-form'] =='form3':
 			if form3.validate() == False:
@@ -565,6 +581,8 @@ def admin():
 
 				return redirect(url_for('admin', lang_code=get_locale()))
 
+# ------------------Add Existing Items to New Locations form ----------------------
+
 		elif request.form['name-form'] =='form4':
 			if form4.validate() == False:
 				return render_template('admin.html',
@@ -576,31 +594,20 @@ def admin():
 					group=group)
 			else:
 				itemname = form4.itemname.data
-				# qtyleft= form4.qtyleft.data
-				# location=form4.location.data
-				price = 0.0000
-
-				newEntries = [itemname,qtyleft,location]
+				amt = form4.qtyleft.data
+				location=form4.location.data
 
 				conn = mysql.connect()
 				cursor = conn.cursor()
+				cursor.execute("SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
 
-				cursor.execute("SELECT iid,reorder_pt,batch_qty,category,picture,unit FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
 
-				info = cursor.fetchall()
+				info = cursor.fetchone()
 
-				listing=[]
-				for i in info:
-					for j in i:
-						listing.append(j)
-
-				listing.insert(1,itemname)
-				listing.append(price)
-				# listing.insert(2,location)
-				# listing.insert(3,qtyleft)
 
 				# TODO: string parameterisation
-				query = "INSERT INTO Items (name, reorder_pt, batch_qty, category, picture, unit, price) VALUES ('{}','{}','{}','{}','{}','{}','{}'); COMMIT".format(listing[1],listing[2],listing[3],listing[4],listing[5],listing[6],listing[7])
+				query = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ('{}','{}','{}'); COMMIT".format(info,location,amt)
+				# query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
 
 				cursor.execute(query)
 				flash("Added Item to Location %s!" %location)

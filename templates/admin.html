@@ -1,4 +1,5 @@
 {% extends "base2.html" %}
+
 {% block content %}
 
 <style>
@@ -27,11 +28,11 @@
     <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">Items</a></li>
     <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">Locations</a></li>
     <li role="presentation"><a href="#existitem" aria-controls="existitem" role="tab" data-toggle="tab">Existing Items</a></li>
-    
+
 </ul>
 
 <div class="tab-content">
-  
+
     <div role="tabpanel" id="summary" class="tab-pane fade in active">
         <h3>HOME</h3>
 
@@ -40,17 +41,17 @@
         <div class="table-responsive">
             <table class="table">
                 <thead>
-                
+
                     <th>{{_('Name')}}</th>
                     <th>{{_('Role')}}</th>
                 </thead>
-                
+
                 <tbody>
                 {% for user in users %}
                 <tr>
                     <td>{{ user.name }}</td>
                     <td>{{ user.role }}</td>
-                    
+
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -60,40 +61,40 @@
 
         <h4>{{_('NFC Tags Grouping')}}</h4>
 
-        
+
         {% for key, values in group.iteritems() %}
-        
+
         <!--find a way to create a button-->
         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ key }}" aria-expanded="false" aria-controls="collapseExample">{{ key }}</button>
         <div class="collapse" id="{{ key }}">
-        
+
             <ul class="list-group">
 
                 {% for i in values %}
                     <li class="list-group-item"><a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }} </a></li>
 
-                {% endfor %}                
-        
+                {% endfor %}
+
 
             </ul>
 
         </div>
 
         {% endfor %}
-        
+
 
     </div>
-    
-    
-    
-<!-- ******************* NEW USER TAB *****************************-->  
+
+
+
+<!-- ******************* NEW USER TAB *****************************-->
     <div role="tabpanel" id="user" class="tab-pane fade">
 
         <h3>Create A New User</h3>
         <form method="POST" action="/{{g.current_lang}}/admin" >
             {{ form.hidden_tag() }}
             <input type="hidden" name="name-form" value='form')>
-        
+
 
         <div class="row form-group">
             {{ form.name.label }}
@@ -107,10 +108,10 @@
             {{ form.name(class="form-control", placeholder="Name of User")}}
             </div>
         </div>
-        
+
 
         <div class="row form-group">
-            {{ form.username.label }} 
+            {{ form.username.label }}
             {% if form.username.errors %}
                 {% for error in form.username.errors %}
                 <p class="error-message">{{ error }}</p>
@@ -121,7 +122,7 @@
             {{ form.username(class="form-control", placeholder="Username") }}
             </div>
         </div>
-        
+
 
         <div class="row form-group">
             {{ form.password.label }}
@@ -130,12 +131,12 @@
                 <p class="error-message">{{ error }}</p>
                 {% endfor %}
             {% endif %}
-            
+
             <div class="form-group">
             {{ form.password(class="form-control", placeholder="Password") }}
             </div>
         </div>
-       
+
 
         <div class="row form-group">
             {{ form.role.label }} <br>
@@ -149,7 +150,7 @@
         </div>
         <br>
 
-        <div class="row form-group"> 
+        <div class="row form-group">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                 <ul class="error-message">
@@ -171,23 +172,11 @@
 <!--#........................TAB3.............................  -->
     <div role="tabpanel" id="item" class="tab-pane fade">
         <h3>Add A New Item</h3>
-        <form method="POST" action="/{{g.current_lang}}/admin">
-            {{ form.hidden_tag() }}
+        <form method="POST" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >
+            {{ form2.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form2' >
-        
 
-        <div class="row form-group">
-            {{ form2.sku.label }}
-            {% if form2.sku.errors %}
-                {% for error in form2.sku.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
 
-            <div class="form-group">
-            {{ form2.sku(class="form-control", placeholder="SKU Number")}}
-            </div>
-        </div>
 
         <div class="row form-group">
             {{ form2.itemname.label }}
@@ -202,44 +191,7 @@
             </div>
         </div>
 
-        <!-- <div class="row form-group">
-            {{ form2.location.label }} <br>
-            {% for subfield in form2.location %}
-                <tr>
-                    <td>{{ subfield }}</td>
-                    <td>{{ subfield.label }}</td>
-                    <br>
-                </tr>
-            {% endfor %}
-        </div>
-        <br> -->
-        <div class="row form-group">
-            {{ form2.location.label }}
-            {% if form2.location.errors %}
-                {% for error in form2.location.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
 
-            <div class="form-group">
-            {{ form2.location(class="form-control")}}
-            </div>
-        </div>
-        
-
-        <div class="row form-group">
-            {{ form2.qtyleft.label }} 
-            {% if form2.qtyleft.errors %}
-                {% for error in form2.qtyleft.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form2.qtyleft(class="form-control", placeholder="Quantity Available") }}
-            </div>
-        </div>
-        
 
         <div class="row form-group">
             {{ form2.reorderpt.label }}
@@ -248,7 +200,7 @@
                 <p class="error-message">{{ error }}</p>
                 {% endfor %}
             {% endif %}
-            
+
             <div class="form-group">
             {{ form2.reorderpt(class="form-control", placeholder="Reorder Point") }}
             </div>
@@ -261,7 +213,7 @@
                 <p class="error-message">{{ error }}</p>
                 {% endfor %}
             {% endif %}
-            
+
             <div class="form-group">
             {{ form2.batchqty(class="form-control", placeholder="Batch Size Per Box") }}
             </div>
@@ -280,18 +232,16 @@
             </div>
         </div>
 
-        <div class="row form-group">
-            {{ form2.picture.label }}
-            {% if form2.picture.errors %}
-                {% for error in form2.picture.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-            
-            <div class="form-group">
-            {{ form2.picture(class="form-control", placeholder="Picture File Name") }}
-            </div>
+      
+
+
+        <div>
+          <input type=file name=photo>
         </div>
+
+
+
+
 
         <div class="row form-group">
             {{ form2.unit.label }}
@@ -305,9 +255,21 @@
             {{ form2.unit(class="form-control")}}
             </div>
         </div>
-       
 
-        <div class="row form-group"> 
+        <div class="row form-group">
+            {{ form2.price.label }}
+            {% if form2.price.errors %}
+                {% for error in form2.price.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form2.price(class="form-control", placeholder="Price of Item")}}
+            </div>
+        </div>
+
+        <div class="row form-group">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                 <ul class="error-message">
@@ -321,8 +283,8 @@
 
         {{ form2.submitTwo(class="width-35 pull-right btn btn-sm btn-primary") }}
 
-        
-        </form> 
+
+        </form>
 
 
     </div>
@@ -356,7 +318,7 @@
             </div>
         </div>
 
-        <div class="row form-group"> 
+        <div class="row form-group">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                 <ul class="error-message">
@@ -367,7 +329,7 @@
                 {% endif %}
             {% endwith %}
         </div>
-        
+
         {{ form3.submitThree(class="width-35 pull-right btn btn-sm btn-primary") }}
 
         </form>
@@ -381,7 +343,7 @@
             {{ form.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form4'>
         <h3> Add Existing Items to New Locations</h3>
-        
+
 
         <div class="row form-group">
             {{ form4.itemname.label }}
@@ -395,8 +357,8 @@
             {{ form4.itemname(class="form-control typeahead", placeholder="Name of Existing Item")}}
             </div>
         </div>
-        
-        
+
+
         <div class="row form-group">
             {{ form4.location.label }}
             {% if form4.location.errors %}
@@ -409,10 +371,10 @@
             {{ form4.location(class="form-control")}}
             </div>
         </div>
-        
-        
+
+
         <div class="row form-group">
-            {{ form4.qtyleft.label }} 
+            {{ form4.qtyleft.label }}
             {% if form4.qtyleft.errors %}
                 {% for error in form4.qtyleft.errors %}
                 <p class="error-message">{{ error }}</p>
@@ -423,9 +385,9 @@
             {{ form4.qtyleft(class="form-control", placeholder="Quantity Available") }}
             </div>
         </div>
-        
 
-        <div class="row form-group"> 
+
+        <div class="row form-group">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                 <ul class="error-message">
@@ -488,6 +450,3 @@ $('#add-item-name .typeahead').typeahead({
 
 </body>
 {% endblock %}
-
-
-
