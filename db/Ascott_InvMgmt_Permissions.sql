@@ -31,6 +31,8 @@ CREATE TABLE `Permissions` (
   `admin` BOOLEAN NOT NULL,
   PRIMARY KEY (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+-- BOOLEAN: 0 is True, 1 is False;
+-- this table shows the access privileges of users based on their roles. 
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `Permissions` WRITE;

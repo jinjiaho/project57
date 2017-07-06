@@ -22,30 +22,29 @@ USE `Ascott_InvMgmt`;
 -- Table structure for table `LocationInfo`
 --
 
-DROP TABLE IF EXISTS `LocationInfo`;
+DROP TABLE IF EXISTS `TagInfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `TagInfo` (
   `tid` int(11) NOT NULL AUTO_INCREMENT,
-  `name` char(50) NOT NUlL,
-  `location` varchar(45) NOT NULL,
+  `tname` char(50) NOT NUlL,
+  `storeroom` char(45) NOT NULL,
   `remarks` varchar(255),
-
-  PRIMARY KEY (`name`)
+  PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `LocationInfo` WRITE;
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Kitchenware', 'B1', null);
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Chemical', 'Hskp Office', 'Daily linen movement');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Runner', '6th Floor', null);
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('L\'Occitane', '7th Floor', 'Bathroom Amenities');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Extra Bed & Baby Cot', '9th Floor', null);
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Guest Supplies (10F)', '10th Floor', 'Amenities');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Guest Supplies (12F)', '12th Floor', 'Tissue roll & tissue box');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Guest Supplies (13F)', '13th Floor', 'Slippers');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Hamper', '15th Floor', 'F&B');
-INSERT INTO `LocationInfo` (`name`, `location`, `remarks`) VALUES ('Linen', '17th Floor', 'New linen & towels');
+LOCK TABLES `TagInfo` WRITE;
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Kitchenware', 'B1', null);
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Chemical', 'Hskp Office', 'Daily linen movement');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Runner', '6th Floor', null);
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('L\'Occitane', '7th Floor', 'Bathroom Amenities');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Extra Bed & Baby Cot', '9th Floor', null);
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Guest Supplies (10F)', '10th Floor', 'Amenities');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Guest Supplies (12F)', '12th Floor', 'Tissue roll & tissue box');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Guest Supplies (13F)', '13th Floor', 'Slippers');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Hamper', '15th Floor', 'F&B');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Linen', '17th Floor', 'New linen & towels');
 
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -1,9 +1,13 @@
+DROP TABLE IF EXISTS TagItems;
 CREATE TABLE IF NOT EXISTS TagItems (
 	iid int(11) NOT NULL,
     tag int(11) NOT NULL,
-    qty int(8) NOT NULL CHECK (qty >= 0),
+    qty_left int(8) NOT NULL CHECK (qty >= 0),
     PRIMARY KEY (iid, tag)
 );
+-- iid: item id
+-- tag: tag id
+-- qty: number left in the store
 
 LOCK TABLES TagItems WRITE;
 INSERT INTO TagItems VALUES (1, 9, 38);
