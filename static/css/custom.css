@@ -19,7 +19,8 @@
 }
 
 .modal-dialog {
-  margin: 12vh auto;
+  /*margin: 12vh auto;*/
+  /*this is commented out because it distorts modal view on mobile*/
 }
 
 .modal .qty-display {
