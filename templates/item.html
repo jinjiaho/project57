@@ -459,12 +459,24 @@ $('#reorder-form').submit(function(event) {
 $('#discontinue-button').click(function(event) {
     var reorder = {
         "name":  "{% if item %}{{item[0].name}}{% endif %}",
-        "tracking": $('input[name="on-off"]:checked').val(),
-        "prediction": $('input[name="manual-auto"]:checked').val(),
-        "qty": $('input[id="pred-manual-qty"]').val()
+        "tracking": "off",
+        "reorder": -1,
+        "qty": 0
     };
     event.preventDefault();
-    discontinue();
+    editReorder(reorder);
+    location.reload();
+});
+
+$('#reinstate-button').click(function(event) {
+    var reorder = {
+        "name":  "{% if item %}{{item[0].name}}{% endif %}",
+        "tracking": "off",
+        "reorder": 1,
+        "qty": 0
+    };
+    event.preventDefault();
+    editReorder(reorder);
     location.reload();
 });
 
@@ -486,15 +498,16 @@ function getData(callback) {
     });
 }
 
-function discontinue(callback) {
+function editReorder(dataSources) {
     $.ajax({
         type: "POST",
-        url: "/api/discontinue",
-        data: JSON.stringify("{% if item %}{{item[0].name}}{% endif %}"),
+        url: "/api/editReorder",
+        data: JSON.stringify(dataSources),
         dataType: "json",
         contentType: "application/json",
+        async: false,
         success: function(response, status, jqXHR) {
-            //
+            // empty pass
         }
     });
 }

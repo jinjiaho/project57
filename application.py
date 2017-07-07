@@ -344,13 +344,8 @@ def editReorder():
     print "request.json: ", request.json
 
     data = request.get_json()
-
-    if data["tracking"] == u"off" or (data["qty"] == u"" or data["qty"] == u"0"):
-        print("no qty specified")
-        new_reorder = 0
-    else:
-        new_reorder = int(data[u"qty"])
     name = data["name"].encode('ascii')
+    reorder = data["reorder"]
 
 
     if not request.json:
@@ -361,7 +356,7 @@ def editReorder():
         cursor = conn.cursor()
 
         cursor.execute(
-            "UPDATE Ascott_InvMgmt.Items SET reorder_pt={} WHERE (name='{}' AND iid > 0);".format(new_reorder, name))
+            "UPDATE Ascott_InvMgmt.Items SET reorder_pt={} WHERE (name='{}' AND iid > 0);".format(reorder, name))
         conn.commit()
         # idItem = cursor.fetchone()
 
