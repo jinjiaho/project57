@@ -763,12 +763,6 @@ def inventory():
                 cat[i['category']].append(i)
                 print(i['category'])
 
-    print(itemsByCat)
-
-    print(itemsByCat[0].keys()[0])
-
-    print(itemsByCat[0])
-
     # A list of a dictionary of a list of dictionaries.
 
     # supplies = getAllInventory('Guest Supplies')
@@ -782,7 +776,7 @@ def inventory():
     locations = cursor.fetchall()
     shelves = []
     for i in locations:
-        cursor.execute("SELECT tname FROM TagInfo WHERE tid={}".format(i[0]))
+        cursor.execute("SELECT storeroom FROM TagInfo WHERE tid={}".format(i[0]))
         l_name = cursor.fetchall()[0][0]
         shelves.append(l_name)
 
@@ -836,21 +830,21 @@ def item(iid):
             "price": i[8]})
 
 
-    # print(type(r[0]))
+    print(type(r[0]))
 
-    # cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.pricechange WHERE item = '{}';".format(iid))
-    # price = cursor.fetchall()
+    cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.PriceChange WHERE item = '{}';".format(iid))
+    price = cursor.fetchall()
     pricechanges = []
-    # if price == ():
-    #     pricechanges.append({
-    #         "new_price": 0,
-    #         "date_effective": 0})
-    # else:
+    if price == ():
+        pricechanges.append({
+            "new_price": 0,
+            "date_effective": 0})
+    else:
 
-    #     for item in price:
-    #         pricechanges.append({
-    #             "new_price": item[0],
-    #             "date_effective": item[1]})
+        for item in price:
+            pricechanges.append({
+                "new_price": item[0],
+                "date_effective": item[1]})
 
     try:
         if r != []:
@@ -877,7 +871,41 @@ def category(category):
         user = session['username'])
 
 
+@application.route('/<lang_code>/storeroom/<storeroom>')
+def storeroom(storeroom):
+    # user authentication
+    if not session["logged_in"]:
+        return redirect(url_for("login", lang_code=session["lang_code"]))
 
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(storeroom))
+    tags = cursor.fetchall()[0]
+
+    items = {}
+
+    for t in tags:
+        cursor.execute("SELECT iid, name, picture, reorder_pt, qty_left FROM view_item_locations WHERE tag={}".format(t))
+        data = cursor.fetchall()
+        for d in data:
+            if d[0] in items.keys():
+                items[d[0]]['qty_left'] += d[4]
+            else: 
+                items[d[0]] = {
+                    'name':d[1].encode('ascii'),
+                    'picture':d[2].encode('ascii'),
+                    'reorder_pt':d[3],
+                    'qty_left':d[4]
+                }
+
+    print(type(items))
+    print(type(items[16]))
+    print(items)
+    return render_template('storeroom.html',
+        storename = storeroom,
+        items = items,
+        user = session['username'],
+        role = session['role'])
+                    
 @application.route('/<lang_code>/logs')
 def logs():
 
@@ -913,11 +941,6 @@ def shelf(tag_id):
 
     items = inventoryQuick(tag_id)
 
-    # get permissions for user
-    # cursor.execute("SELECT stock_in, admin FROM Permissions WHERE role='{}'".format(session['role']))
-    # permissions = cursor.fetchall()[0][0]
-    # print(permissions)
-
     if request.method == 'POST':
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         form_data = request.form
@@ -938,10 +961,11 @@ def shelf(tag_id):
         except:
             flash('Oops! Something went wrong :(', 'danger')
 
-    return render_template('storeroom.html', things=items,
+    return render_template('shelf.html', things=items,
         role = session['role'],
         user = session['username'],
         location = tag_id)
+
 
 
 @application.route('/logout')
