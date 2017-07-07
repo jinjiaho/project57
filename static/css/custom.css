@@ -1,37 +1,3 @@
-html {
-   margin:0;
-   padding:0;
-   height:100%;
-}
-
-body {
-  margin: 0 !important;
-  padding: 0 !important;
-  position: relative;
-  min-height: 100%;
-}
-
-#container {
-   min-height:100%;
-   position:absolute;
-   padding-bottom: 60px;  /* Height of the footer */
-   left: 0;
-   right: 0;
-}
-
-#header {
-   padding:10px;
-}
-
-#footer {
-   position:absolute;
-   bottom:0;
-   width:100%;
-   height:60px;   /* Height of the footer */
-   background:#ddd;
-}
-
-
 .content {
   height: 100%;
 }
@@ -41,32 +7,22 @@ body {
   width: 100%;
 }
 
-.modal {
-   position: fixed;
-   z-index: 99999;
-   display: none;
-   top: 0;
-   left:0;
-   width: 100% !important;
-   height: 100% !important;
-   background: rgba(0,0,0,0.5);
-}
-
 .modal-dialog {
-  margin: 12vh auto;
+  /*margin: 12vh auto;*/
+  /*this is commented out because it distorts modal view on mobile*/
 }
 
 .modal .qty-display {
-    width: 180px;
+    /*width: 180px;
     margin: 0 auto;
-    z-index: 99999;
+    z-index: 99999;*/
 }
 
 .modal .qty-display input {
-    width: 180px;
+    /*width: 180px;
     padding: 5px;
     border: 1px solid #777;
-    border-radius: 5px;
+    border-radius: 5px;*/
 }
 
 .mobile-icon-list {
@@ -102,33 +58,6 @@ body {
   list-style: none;
 }
 
-.navbar.navbar-default {
-  position: absolute;
-}
-
-.navbar .container-fluid {
-  height: 65px;
-}
-
-.navbar-header .navbar-toggle {
-  margin: 10px 15px 10px 0;
-  width: 40px;
-
-  display: block; }
- 
-.navbar-header .collapse, .navbar-toggle {
-  display: block !important; }
-
-.navbar .navbar-brand {
-  color: #1d4262;
-}]
-
-.navbar-header {
-  float: none; 
-  font-size: large;
-  margin-top: 25px;
-  margin-bottom: 10px;
-}
 
 .sup-view .font-icon-list {
   padding-left: 20px;
@@ -180,14 +109,6 @@ body {
   position: relative;
   bottom: 10px;
   text-align:center;
-}
-
-.alert-danger {
-  background-color: #ff000f;
-}
-
-.alert-warning {
-  background-color: #fcab03;
 }
 
 .btn-wrapper {
@@ -249,11 +170,6 @@ span.cart-group img {
 .modal-pic img {
   max-width: 180px;
   margin-bottom: 20px;
-}
-
-.btn-success {
-  border-color: #4a960a;
-  color: #204c00;
 }
 
 div.modal .modal-header h4 {

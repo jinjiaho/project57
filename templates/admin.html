@@ -26,8 +26,8 @@
     <li role="presentation" class="active"><a href="#summary" aria-controls="home" role="tab" data-toggle="tab">Summary</a></li>
     <li role="presentation"><a href="#user" aria-controls="user" role="tab" data-toggle="tab">New User</a></li>
     <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">New Item</a></li>
-    <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">New Storeroom</a></li>
-    <li role="presentation"><a href="#existitem" aria-controls="existitem" role="tab" data-toggle="tab">Assign Item to Storeroom</a></li>
+    <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">New Tag</a></li>
+    <li role="presentation"><a href="#existitem" aria-controls="existitem" role="tab" data-toggle="tab">Assign Item to Tag</a></li>
 
 </ul>
 
@@ -173,7 +173,7 @@
 
     <div role="tabpanel" id="item" class="container-fluid tab-pane fade">
         <h3>Add A New Item</h3>
-        <form method="POST" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >
+        <form method="POST" id="newItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >
             {{ form2.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form2' >
 
@@ -242,22 +242,6 @@
 
 
         <div class="row form-group">
-            {{ form2.unit.label }}
-            {% if form2.unit.errors %}
-                {% for error in form2.unit.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form2.unit(class="form-control")}}
-            </div>
-        </div>
-
-
-
-
-        <div class="row form-group">
             {{ form2.price.label }}
             {% if form2.price.errors %}
                 {% for error in form2.price.errors %}
@@ -271,6 +255,44 @@
         </div>
 
 
+        <div class="row form-group">
+            {{ form2.count_unit.label }}
+            {% if form2.count_unit.errors %}
+                {% for error in form2.count_unit.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div id="add-item-name" class="form-group">
+            {{ form2.count_unit(class="form-control", placeholder="eg. carton, pc, kg")}}
+            </div>
+        </div>
+
+        <div class="row form-group">
+            {{ form2.order_unit.label }}
+            {% if form2.order_unit.errors %}
+                {% for error in form2.order_unit.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div id="add-item-name" class="form-group">
+            {{ form2.order_unit(class="form-control", placeholder="eg. carton, pc, kg")}}
+            </div>
+        </div>
+
+        <div class="row form-group">
+            {{ form2.order_multiplier.label }}
+            {% if form2.order_multiplier.errors %}
+                {% for error in form2.order_multiplier.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form2.order_multiplier(class="form-control", placeholder="Items in each order") }}
+            </div>
+        </div>
 
         <div class="row form-group">
             {% with messages = get_flashed_messages() %}
@@ -287,8 +309,7 @@
         {{ form2.submitTwo(class="width-35 pull-right btn btn-sm btn-primary") }}
 
 
-        </form>
-
+        </form><br/>
 
     </div>
 
@@ -297,17 +318,17 @@
         <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form3' >
-        <h3> Add a New Storeroom or Shelf </h3>
+        <h3> Add a New Tag</h3>
         <div class="row form-group">
-            {{ form3.name.label }}
-            {% if form3.name.errors %}
-                {% for error in form3.name.errors %}
+            {{ form3.tname.label }}
+            {% if form3.tname.errors %}
+                {% for error in form3.tname.errors %}
                 <p class="error-message">{{ error }}</p>
                 {% endfor %}
             {% endif %}
 
             <div class="form-group">
-            {{ form3.name(class="form-control", placeholder="Name of storeroom (without spaces)")}}
+            {{ form3.tname(class="form-control", placeholder="Name of new tag")}}
             </div>
         </div>
 
@@ -357,7 +378,7 @@
         <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form4'>
-        <h3> Add Existing Items to New Locations</h3>
+        <h3> Assign Item to Tag</h3>
 
 
         <div class="row form-group">
@@ -389,15 +410,29 @@
 
 
         <div class="row form-group">
-            {{ form4.qtyleft.label }}
-            {% if form4.qtyleft.errors %}
-                {% for error in form4.qtyleft.errors %}
+            {{ form4.tname.label }}
+            {% if form4.tname.errors %}
+                {% for error in form4.tname.errors %}
                 <p class="error-message">{{ error }}</p>
                 {% endfor %}
             {% endif %}
 
             <div class="form-group">
-            {{ form4.qtyleft(class="form-control", placeholder="Quantity Available") }}
+            {{ form4.tname(class="form-control")}}
+            </div>
+        </div>
+
+
+        <div class="row form-group">
+            {{ form4.qty.label }}
+            {% if form4.qty.errors %}
+                {% for error in form4.qty.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form4.qty(class="form-control", placeholder="Quantity Available") }}
             </div>
         </div>
 

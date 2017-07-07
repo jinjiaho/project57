@@ -22,23 +22,30 @@ USE `Ascott_InvMgmt`;
 -- Table structure for table `LocationInfo`
 --
 
-DROP TABLE IF EXISTS `Permissions`;
-/*!40101 SET @saved_cs_client = @@character_set_client */;
+DROP TABLE IF EXISTS `TagInfo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Permissions` (
-  `role` CHAR(50) NOT NULL,
-  `stock_in` BOOLEAN NOT NULL,
-  `admin` BOOLEAN NOT NULL,
-  PRIMARY KEY (`role`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
--- BOOLEAN: 0 is True, 1 is False;
--- this table shows the access privileges of users based on their roles. 
+CREATE TABLE `TagInfo` (
+  `tid` int(11) NOT NULL AUTO_INCREMENT,
+  `tname` char(50) NOT NUlL,
+  `storeroom` char(45) NOT NULL,
+  `remarks` varchar(255),
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `Permissions` WRITE;
-INSERT INTO Permissions VALUES ('supervisor', 0, 0);
-INSERT INTO Permissions VALUES ('runner', 0, 1);
-INSERT INTO Permissions VALUES ('attendant', 1, 1);
+LOCK TABLES `TagInfo` WRITE;
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Kitchenware', 'B1', null);
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Chemical', 'Hskp Office', 'Daily linen movement');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Runner', '6th Floor', null);
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('L\'Occitane', '7th Floor', 'Bathroom Amenities');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Extra Bed & Baby Cot', '9th Floor', null);
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Guest Supplies (10F)', '10th Floor', 'Amenities');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Guest Supplies (12F)', '12th Floor', 'Tissue roll & tissue box');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Guest Supplies (13F)', '13th Floor', 'Slippers');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Hamper', '15th Floor', 'F&B');
+INSERT INTO `TagInfo` (`tname`, `storeroom`, `remarks`) VALUES ('Linen', '17th Floor', 'New linen & towels');
+
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
