@@ -20,10 +20,12 @@ class CreateNewItem(FlaskForm):
 	itemname = StringField('Item Name', validators=[DataRequired("Please enter the name of the new item.")])
 	category = SelectField('Category of Item', choices = myDetails('category'), validators = [DataRequired()])
 	price = DecimalField('Unit Price', places=4, rounding=None, validators = [DataRequired()])
+	# price = IntegerField('Unit Price',validators = [DataRequired()])
 	reorderpt = IntegerField('Reorder point', validators = [DataRequired()])
 	count_unit = StringField('Unit for counting', validators = [DataRequired()])
 	order_unit = StringField('Unit for ordering', validators = [DataRequired()])
 	order_multiplier = DecimalField('Qty in one unit ordered', places=4, rounding=None, validators = [DataRequired()])
+	# order_multiplier = IntegerField('Qty in one unit ordered',validators = [DataRequired()])
 
 	submitTwo = SubmitField('Add New Item')
 

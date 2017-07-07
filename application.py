@@ -619,34 +619,35 @@ def admin():
 
                 itemname = form2.itemname.data
                 reorderpt = form2.reorderpt.data
-                category = form2.category.data.encode('ascii')
+                category = form2.category.data
                 price = form2.price.data
-                out_by = form2.count_unit.data.encode('ascii')
-                in_by = form2.order_unit.data.encode('ascii')
+                out_by = form2.count_unit.data
+                in_by = form2.order_unit.data
                 in_out_ratio = form2.order_multiplier.data
-                categorystr = category.encode('ascii','ignore')
+
 
                 if 'photo' in request.files:
                     filename =photos.save(request.files['photo'])
 
-                item = [itemname, reorderpt, batchqty, category, filename, unit,price]
-
+                item = [itemname, category,filename, price, reorderpt, out_by,in_by,in_out_ratio]
+                print(item)
                 try:
                     # TODO: string parameterisation
                     conn = mysql.connect()
                     cursor = conn.cursor()
 
                     # TODO: Change form to input appropriate information
-                    query = "INSERT INTO Items (name, category, picture, price, reorder_pt, out_by, in_by, in_out_ratio) VALUES ('{}','{}','{}',{},{},'{}','{}',{});".format(itemname, categorystr, filename, price, reorderpt, out_by, in_by, in_out_ratio)
+                    query = "INSERT INTO Items (name, category, picture, price, reorder_pt, out_by, in_by, in_out_ratio) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}');".format(item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7])
                     cursor.execute(query)
-                    cursor.commit()
+                    conn.commit()
 
                     flash("Item has been added!", "success")
 
-                except:
+                except Exception as e:
+                    print(e)
                     flash("Oops! Something went wrong :(", "danger")
 
-            return redirect(url_for('admin', lang_code=get_locale()))
+                return redirect(url_for('admin', lang_code=get_locale()))
 
 # ------------------Add Location form ----------------------
         # TODO: Change form to get appropriate values
