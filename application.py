@@ -272,21 +272,24 @@ def getDailyLogs():
     cursor = conn.cursor()
     cursor.execute(
         "SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE day(date_time) = day(now());")
+    conn.commit()
     data=cursor.fetchall()
     things = []
 
-    for row in data:
-        cursor = mysql.connect().cursor()
-        cursor.execute("SELECT name FROM Items WHERE iid={};".format(iid))
-        item_name = cursor.fetchall()[0][0]
 
-        things.append({"name": row[0].encode('ascii'),
-            "dateTime": row[1],
-            "action":row[2].encode('ascii'),
-            "move":row[3],
-            "remaining":row[4],
-            "item":item_name.encode('ascii'),
-            "location":row[6].encode('ascii')})
+    for row in data:
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		cursor.execute("SELECT name FROM Items WHERE iid={};".format(row[5]))
+		item_name = cursor.fetchall()[0][0]
+
+		things.append({"name": row[0].encode('ascii'),
+			"dateTime": row[1],
+			"action":row[2].encode('ascii'),
+			"move":row[3],
+			"remaining":row[4],
+			"item":item_name.encode('ascii'),
+			"location":row[6].encode('ascii')})
 
     return things
 
