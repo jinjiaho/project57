@@ -127,9 +127,11 @@ def getAllInventory(category):
 # If location is None, we can infer that user has admin rights, and can therefore see the qty left.
 def inventoryQuick(location):
     items = []
-    cursor = mysql.connect().cursor()
+    conn = mysql.connect()
+    cursor = conn.cursor()
     if location == None:
-        cursor.execute("SELECT iid, name, category, picture, SUM(qty_left), reorder_pt FROM view_item_locations GROUP BY iid;")
+        cursor.execute("""SELECT iid, name, category, picture, SUM(qty_left), reorder_pt FROM view_item_locations
+        				GROUP BY iid;""")
         data = cursor.fetchall()
         for d in data:
             items.append(
@@ -141,8 +143,13 @@ def inventoryQuick(location):
                 "reorder": d[5]
                 })
     else:
-        cursor.execute("SELECT iid, name, category, picture FROM view_item_locations WHERE tag={} AND reorder_pt >= 0;".format(location))
+    	cursor.execute("""SELECT tname FROM TagInfo
+        				WHERE tid='{}';""".format(location))
+    	tagID = cursor.fetchone()
+        cursor.execute("""SELECT iid, name, category, picture FROM view_item_locations
+        				WHERE tag='{}' AND reorder_pt >= 0;""".format(tagID))
         data = cursor.fetchall()
+    	conn.commit()
         for d in data:
             items.append(
                 {"iid":d[0],
@@ -183,7 +190,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
         # general query for all actions
         print(update_items_query)
         cursor.execute(update_items_query)
-        conn.commit()
+
 
         cursor.execute("SELECT tname FROM TagInfo WHERE tid={};".format(tagId))
         location = cursor.fetchall()[0][0]
@@ -638,7 +645,7 @@ def admin():
 
                 except:
                     flash("Oops! Something went wrong :(", "danger")
-                    
+
             return redirect(url_for('admin', lang_code=get_locale()))
 
 # ------------------Add Location form ----------------------
