@@ -277,7 +277,7 @@ def getDailyLogs():
 
     for row in data:
         cursor = mysql.connect().cursor()
-        cursor.execute("SELECT name FROM Items WHERE iid={};".format(iid))
+        cursor.execute("SELECT name FROM Items WHERE iid={};".format(row[5]))
         item_name = cursor.fetchall()[0][0]
 
         things.append({"name": row[0].encode('ascii'),
@@ -591,7 +591,7 @@ def admin():
 
                 cursor.execute(query)
                 # cursor.execute("COMMIT")
-                flash("User has been added!")
+                flash("User has been added!", "success")
                 return redirect(url_for('admin', lang_code=get_locale()))
 
 # ------------------Add Item Form ----------------------
@@ -661,7 +661,7 @@ def admin():
                 query = "INSERT INTO TagInfo ('tname', 'storeroom', 'remarks') VALUES ('{}','{}','{}');".format(tname, location, remarks)
                 cursor.execute(query)
                 cursor.commit()
-                flash("New Location is Added!")
+                flash("New Location is Added!", "success")
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
@@ -687,15 +687,22 @@ def admin():
                     conn = mysql.connect()
                     cursor = conn.cursor()
                     cursor.execute("SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
-                    info = cursor.fetchone()
+                    info = cursor.fetchall()[0][0]
+                    print(info)
 
                     # TODO: string parameterisation
-                    query = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ({},{},{});".format(info,location,amt)
-                    # query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
-                    cursor.execute(query)
-                    cursor.commit()
 
-                    flash("Added Item to Location {}!".format(), "success")
+                    cursor.execute("SELECT tid FROM TagInfo WHERE tname='{}';".format(tname))
+                    tid = cursor.fetchall()[0][0]
+
+                    # cursor = mysql.connect().commit()
+
+                    query = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ({},{},{}); COMMIT;".format(info,tid,amt)
+                    # query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
+                    print(query)
+                    cursor.execute(query)
+
+                    flash("Added Item to Location!", "success")
                 except:
                     flash("Oops! Something went wrong :(", "danger")
 
