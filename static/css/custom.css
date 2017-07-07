@@ -7,33 +7,22 @@
   width: 100%;
 }
 
-.modal {
-   position: fixed;
-   z-index: 99999;
-   display: none;
-   top: 0;
-   left:0;
-   width: 100% !important;
-   height: 100% !important;
-   background: rgba(0,0,0,0.5);
-}
-
 .modal-dialog {
   /*margin: 12vh auto;*/
   /*this is commented out because it distorts modal view on mobile*/
 }
 
 .modal .qty-display {
-    width: 180px;
+    /*width: 180px;
     margin: 0 auto;
-    z-index: 99999;
+    z-index: 99999;*/
 }
 
 .modal .qty-display input {
-    width: 180px;
+    /*width: 180px;
     padding: 5px;
     border: 1px solid #777;
-    border-radius: 5px;
+    border-radius: 5px;*/
 }
 
 .mobile-icon-list {
