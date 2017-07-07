@@ -106,7 +106,7 @@ a.thumbnail > img {
   <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
     <div class="overview-item-group alert {% if i.qty_left > i.reorder_pt and i.qty_left <= 1.2*i.reorder_pt %}alert-warning{% endif %}{% if i.qty_left <= i.reorder_pt%}alert-danger{% endif %}">
       <div class="overview-item-img" align='center'>
-        <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
+        <img src="/static/img/items/{{i.picture}}"/>
       </div>
       <div class="alert-group pull-right">
         <div class="overview-item-label">{{i.name}}</div>
@@ -121,7 +121,7 @@ a.thumbnail > img {
 <!-- 2nd header: Today's transactions -->
 <div class="row">
 <div class="col-xs-7">
-    <h3 style="margin-bottom:0px;">{{_("Latest Stock Movement")}}</h3>
+    <h3 style="margin-bottom:0px;">{{_("Today's stock movement")}}</h3>
 </div>
 <div class="col-xs-5">
     <div class="pull-right" style="margin-top:25px;">
