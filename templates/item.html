@@ -206,7 +206,7 @@
             <div id="chart" style="height: 400px; margin: 0 auto"></div>
             <!-- <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}"> -->
             {% if item[0].reorder >= 0 %}
-            <div class="col-sm-12"><button  data-toggle="modal" data-target="#stockUpdateModal" class="btn btn-default" style="width:100%;" id="btn_stockUpdate">Update Stock</button></div>
+            <div class="col-sm-12"><button  data-toggle="modal" data-target="#stock-update-modal" class="btn btn-default" style="width:100%;" id="btn_stockUpdate">Update Stock</button></div>
             {% endif %}
             <!-- <div class="col-sm-4"><button class="btn btn-default " style="width:100%;;" id="btn_getData">Get Data</button></div>
     		<div class="col-sm-4">
@@ -252,9 +252,7 @@
     <!-- END Modal #1 display -->
 
     <!-- Reorder point modal display -->
-    <div id="reorder-modal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
+    <div id="reorder-modal" class="modal fade" role="dialog" tabindex="-1"><div class="modal-dialog" role="document"><div class="modal-content">
                 <div class="modal-body">
                     <form id="reorder-form">
                         <div id="pred" style="display:{% if item[0].reorder == 0 %}none{% endif %};">
@@ -358,7 +356,7 @@
     
 
     <!-- Update Stock Modal -->
-    <div id="stockUpdateModal" class="modal fade" tabindex="-1" role="dialog"><div class="modal-dialog" role="document"><div class="modal-content">
+    <div id="stock-update-modal" class="modal fade" tabindex="-1" role="dialog"><div class="modal-dialog" role="document"><div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title">{{_('Update stock')}} - {{item[0].name}}</h4>
@@ -436,17 +434,14 @@ function editReorder(form) {
         contentType: "application/json",
         async: false,
         success: function(response, status, jqXHR) {
-            var filtered = response;
-            // console.log(response)
-            console.log("success")
-            // callback(filtered);
+            // empty function
         }
     });
 }
 
 $('#reorder-form').submit(function(event) {
     var reorder = {
-        "name":  "{% if item %}{{item[0].name}}{% endif %}",
+        "name": "{% if item %}{{item[0].name}}{% endif %}",
         "tracking": $('input[name="on-off"]:checked').val(),
         "prediction": $('input[name="manual-auto"]:checked').val(),
         "qty": $('input[id="pred-manual-qty"]').val()
@@ -458,7 +453,7 @@ $('#reorder-form').submit(function(event) {
 
 $('#discontinue-button').click(function(event) {
     var reorder = {
-        "name":  "{% if item %}{{item[0].name}}{% endif %}",
+        "name": "{% if item %}{{item[0].name}}{% endif %}",
         "tracking": "off",
         "reorder": -1,
         "qty": 0
@@ -472,7 +467,7 @@ $('#reinstate-button').click(function(event) {
     var reorder = {
         "name":  "{% if item %}{{item[0].name}}{% endif %}",
         "tracking": "off",
-        "reorder": 1,
+        "reorder": 56,
         "qty": 0
     };
     event.preventDefault();
@@ -494,20 +489,6 @@ function getData(callback) {
                 filtered.push([new Date(response[c][0]).getTime(), response[c][1]]);
             }
             callback(filtered);
-        }
-    });
-}
-
-function editReorder(dataSources) {
-    $.ajax({
-        type: "POST",
-        url: "/api/editReorder",
-        data: JSON.stringify(dataSources),
-        dataType: "json",
-        contentType: "application/json",
-        async: false,
-        success: function(response, status, jqXHR) {
-            // empty pass
         }
     });
 }
