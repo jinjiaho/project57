@@ -190,20 +190,25 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
         # general query for all actions
         print(update_items_query)
         cursor.execute(update_items_query)
+        conn.commit()
 
-
+        conn = mysql.connect()
+        cursor = conn.cursor()
         cursor.execute("SELECT tname FROM TagInfo WHERE tid={};".format(tagId))
         location = cursor.fetchall()[0][0]
         # Log action
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        update_logs_query = "INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');".format(user, time, action, qty_diff, qty_left, iid, location)
+        # conn = mysql.connect()
+        # cursor = conn.cursor()
+        update_logs_query = """INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location)
+                                VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');""".format(user, time, action, qty_diff, qty_left, iid, location)
         print(update_logs_query)
         cursor.execute(update_logs_query)
         conn.commit()
 
         return True
-    except:
+
+    except Exception as e:
+        print e
         return False
 
 
@@ -807,9 +812,10 @@ def item(iid):
         updateSuccess = stockUpdate(iid, location, qty, user, action, now)
         if updateSuccess:
             flash('Stock updated!', 'success')
+            return redirect(url_for("item", lang_code=get_locale(), iid=iid))
         else:
             flash('Oops! Something went wrong :(', 'danger')
-
+            return redirect(url_for("item", lang_code=get_locale(), iid=iid))
 
     cursor = mysql.connect().cursor()
     query = "SELECT name, category, picture, tag, qty_left, reorder_pt, in_out_ratio, out_by, price FROM Ascott_InvMgmt.view_item_locations WHERE iid = {};".format(iid)

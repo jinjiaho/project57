@@ -142,14 +142,14 @@ a.thumbnail > img {
         <th>{{_('Remaining')}}</th>
     </thead>
     <tbody>
-    {% for log in l %}
+    {% for l in logs %}
       <tr>
-        <td>{{log.dateTime}}</td>
-        <td>{{log}}</td>
-        <td>{{log.item}}</td>
-        <td>{{log.action}}</td>
-        <td>{{log.move}}</td>
-        <td>{{log.remaining}}</td>
+        <td>{{l.dateTime}}</td>
+        <td>{{l.name}}</td>
+        <td>{{l.item}}</td>
+        <td>{{l.action}}</td>
+        <td>{{l.move}}</td>
+        <td>{{l.remaining}}</td>
       </tr>
     {% endfor %}
     </tbody>
