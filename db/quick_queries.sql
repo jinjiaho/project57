@@ -6,7 +6,7 @@ UNLOCK TABLES;
 
 SELECT * FROM view_item_locations;
 SELECT * FROM TagItems;
-SELECT * FROM LocationInfo;
+SELECT * FROM TagInfo;
 SELECT * FROM Items;
 SELECT * FROM Logs;
 SELECT * FROM Permissions;

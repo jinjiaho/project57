@@ -26,16 +26,18 @@ DROP TABLE IF EXISTS `Logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Logs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user` varchar(45) NOT NULL,
+  `id` int(11) NOT NULL,
+  `user` char(45) NOT NULL,
   `date_time` datetime NOT NULL,
-  `action` char(45) NOT NULL, -- 'out', 'in' or 'check' --
+  `action` char(45) NOT NULL, 
   `qty_moved` int(45) NOT NULL,
   `qty_left` int(45) NOT NULL,
-  `item` varchar(45) NOT NULL,
-  `location` varchar(45) NOT NULL,
+  `item` int(11) NOT NULL,
+  `location` char(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+-- actions: 'out' (to take out of store), 'in' (for incoming stock), or 'check' (for stock check)
+-- item: item ID
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `Logs` WRITE;

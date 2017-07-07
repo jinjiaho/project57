@@ -4,9 +4,9 @@ from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 
 application = Flask(__name__, instance_relative_config=True)
-application.config.from_object('config.Config') # default configurations
-# application.config.from_pyfile('amazonRDS.cfg')
-application.config.from_pyfile('myConfig1.cfg')
+# application.config.from_object('config.Config') # default configurations
+application.config.from_pyfile('amazonRDS.cfg')
+# application.config.from_pyfile('myConfig1.cfg')
 
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
@@ -33,7 +33,7 @@ def myLocation(required):
 	location = []
 	conn = mysql.connect()
 	cursor = conn.cursor()
-	cursor.execute("SELECT %s FROM Ascott_InvMgmt.LocationInfo;" %(required))
+	cursor.execute("SELECT %s FROM Ascott_InvMgmt.TagInfo;" %(required))
 	data1 = cursor.fetchall()
  	data2 = sorted(set(list(data1)))
  	for i in data2:
@@ -41,5 +41,5 @@ def myLocation(required):
  		x=(y,y)
  		location.append(x)
 
-
  	return location
+
