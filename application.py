@@ -36,8 +36,8 @@ import os, copy, re, csv, json_decode
 application = Flask(__name__, instance_relative_config=True)
 application.config.from_object('config.DevConfig') # default configurations
 application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
-# application.config.from_pyfile('myConfig1.cfg')
-# application.config.from_pyfile('myConfig2.cfg')
+#application.config.from_pyfile('myConfig1.cfg')
+#application.config.from_pyfile('myConfig2.cfg')
 
 # Babel init
 babel = Babel(application)
@@ -70,6 +70,7 @@ def getAllInventory(category):
     cursor.execute(
         "SELECT iid, name, qty_left, reorder_pt, out_by, picture, category, price FROM Ascott_InvMgmt.view_item_locations WHERE category = '{}';".format(category))
     data = cursor.fetchall()
+    print(data)
 
     # cursor.execute(
     #   "SELECT DISTINCT iid FROM Ascott_InvMgmt.Items WHERE category = '{}';".format(category))
@@ -126,9 +127,11 @@ def getAllInventory(category):
 # If location is None, we can infer that user has admin rights, and can therefore see the qty left.
 def inventoryQuick(location):
     items = []
-    cursor = mysql.connect().cursor()
+    conn = mysql.connect()
+    cursor = conn.cursor()
     if location == None:
-        cursor.execute("SELECT iid, name, category, picture, SUM(qty_left), reorder_pt FROM view_item_locations GROUP BY iid;")
+        cursor.execute("""SELECT iid, name, category, picture, SUM(qty_left), reorder_pt FROM view_item_locations
+        				GROUP BY iid;""")
         data = cursor.fetchall()
         for d in data:
             items.append(
@@ -140,8 +143,13 @@ def inventoryQuick(location):
                 "reorder": d[5]
                 })
     else:
-        cursor.execute("SELECT iid, name, category, picture FROM view_item_locations WHERE tag={} AND reorder_pt >= 0;".format(location))
+    	cursor.execute("""SELECT tname FROM TagInfo
+        				WHERE tid='{}';""".format(location))
+    	tagID = cursor.fetchone()
+        cursor.execute("""SELECT iid, name, category, picture FROM view_item_locations
+        				WHERE tag='{}' AND reorder_pt >= 0;""".format(tagID))
         data = cursor.fetchall()
+    	conn.commit()
         for d in data:
             items.append(
                 {"iid":d[0],
@@ -182,7 +190,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
         # general query for all actions
         print(update_items_query)
         cursor.execute(update_items_query)
-        conn.commit()
+
 
         cursor.execute("SELECT tname FROM TagInfo WHERE tid={};".format(tagId))
         location = cursor.fetchall()[0][0]
@@ -272,8 +280,10 @@ def getDailyLogs():
     cursor = conn.cursor()
     cursor.execute(
         "SELECT user, date_time, action, qty_moved, qty_left, item, location FROM Ascott_InvMgmt.Logs WHERE day(date_time) = day(now());")
+    conn.commit()
     data=cursor.fetchall()
     things = []
+
 
     for row in data:
         cursor = mysql.connect().cursor()
@@ -287,7 +297,6 @@ def getDailyLogs():
             "remaining":row[4],
             "item":item_name.encode('ascii'),
             "location":row[6].encode('ascii')})
-
     return things
 
 # POST for getting chart data
@@ -608,34 +617,35 @@ def admin():
 
                 itemname = form2.itemname.data
                 reorderpt = form2.reorderpt.data
-                category = form2.category.data.encode('ascii')
+                category = form2.category.data
                 price = form2.price.data
-                out_by = form2.count_unit.data.encode('ascii')
-                in_by = form2.order_unit.data.encode('ascii')
+                out_by = form2.count_unit.data
+                in_by = form2.order_unit.data
                 in_out_ratio = form2.order_multiplier.data
-                categorystr = category.encode('ascii','ignore')
+
 
                 if 'photo' in request.files:
                     filename =photos.save(request.files['photo'])
 
-                item = [itemname, reorderpt, batchqty, category, filename, unit,price]
-
+                item = [itemname, category,filename, price, reorderpt, out_by,in_by,in_out_ratio]
+                print(item)
                 try:
                     # TODO: string parameterisation
                     conn = mysql.connect()
                     cursor = conn.cursor()
 
                     # TODO: Change form to input appropriate information
-                    query = "INSERT INTO Items (name, category, picture, price, reorder_pt, out_by, in_by, in_out_ratio) VALUES ('{}','{}','{}',{},{},'{}','{}',{});".format(itemname, categorystr, filename, price, reorderpt, out_by, in_by, in_out_ratio)
+                    query = "INSERT INTO Items (name, category, picture, price, reorder_pt, out_by, in_by, in_out_ratio) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}');".format(item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7])
                     cursor.execute(query)
-                    cursor.commit()
+                    conn.commit()
 
                     flash("Item has been added!", "success")
 
-                except:
+                except Exception as e:
+                    print(e)
                     flash("Oops! Something went wrong :(", "danger")
-                    
-            return redirect(url_for('admin', lang_code=get_locale()))
+
+                return redirect(url_for('admin', lang_code=get_locale()))
 
 # ------------------Add Location form ----------------------
         # TODO: Change form to get appropriate values

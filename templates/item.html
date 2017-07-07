@@ -171,7 +171,7 @@
     <div class="col-md-3">
 
         <!-- Item branding -->
-        <img src="/static/img/items/{{item[0].category}}/{{item[0].picture}}" alt="" class="img-rounded img-responsive hidden-xs hidden-sm">
+        <img src="/static/img/items/{{item[0].picture}}" alt="" class="img-rounded img-responsive hidden-xs hidden-sm">
         <h3 id="item-name" style="line-height:1.2; padding-bottom: 8px;">{{item[0].name}}</h3>
 
         <!-- Locations -->
@@ -391,7 +391,7 @@
                                 <option value={{l.location}}>{{l.location}}</option>
                                 {% endfor %}
                             </select><br/>
-                            <input type="number" name="qty" id="qty" value="" min="0" placeholder="{{_('Quantity')}}"/><br/>
+                            <input type="number" class="form-control" name="qty" id="qty" value="" min="0" placeholder="{{_('Quantity')}}"/><br/>
                             <input type="radio" name="action" value="in" />{{_('In')}}
                             <input type="radio" name="action" value="out" checked/>{{_('Out')}}
                             <input type="radio" name="action" value="check" />{{_('Check')}}
@@ -470,7 +470,7 @@ $('#discontinue-button').click(function(event) {
         "qty": $('input[id="pred-manual-qty"]').val()
     };
     event.preventDefault();
-    console.log(editReorder(reorder));
+    discontinue();
     location.reload();
 });
 
@@ -488,6 +488,19 @@ function getData(callback) {
                 filtered.push([new Date(response[c][0]).getTime(), response[c][1]]);
             }
             callback(filtered);
+        }
+    });
+}
+
+function discontinue(callback) {
+    $.ajax({
+        type: "POST",
+        url: "/api/discontinue",
+        data: JSON.stringify("{% if item %}{{item[0].name}}{% endif %}"),
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response, status, jqXHR) {
+            //
         }
     });
 }
