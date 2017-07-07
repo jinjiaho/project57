@@ -33,7 +33,7 @@
 
 <div class="tab-content">
 
-    <div role="tabpanel" id="summary" class="tab-pane fade in active">
+    <div role="tabpanel" id="summary" class="container-fluid tab-pane fade in active">
         <h3>HOME</h3>
 
         <h4>{{_('Current Users')}}</h4>
@@ -88,7 +88,7 @@
 
 
 <!-- ******************* NEW USER TAB *****************************-->
-    <div role="tabpanel" id="user" class="tab-pane fade">
+    <div role="tabpanel" id="user" class="container-fluid tab-pane fade">
 
         <h3>Create A New User</h3>
         <form method="POST" action="/{{g.current_lang}}/admin" >
@@ -170,7 +170,8 @@
     </div>
 
 <!--#........................TAB3.............................  -->
-    <div role="tabpanel" id="item" class="tab-pane fade">
+
+    <div role="tabpanel" id="item" class="container-fluid tab-pane fade">
         <h3>Add A New Item</h3>
         <form method="POST" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >
             {{ form2.hidden_tag() }}
@@ -189,34 +190,6 @@
             </div>
         </div>
 
-
-
-        <div class="row form-group">
-            {{ form2.reorderpt.label }}
-            {% if form2.reorderpt.errors %}
-                {% for error in form2.reorderpt.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form2.reorderpt(class="form-control", placeholder="Min. Stock") }}
-            </div>
-        </div>
-
-        <div class="row form-group">
-            {{ form2.batchqty.label }}
-            {% if form2.batchqty.errors %}
-                {% for error in form2.batchqty.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form2.batchqty(class="form-control", placeholder="Batch Size Per Box") }}
-            </div>
-        </div>
-
         <div class="row form-group">
             {{ form2.category.label }}
             {% if form2.category.errors %}
@@ -230,9 +203,41 @@
             </div>
         </div>
 
+        <div class="row form-group">
+          <b>{{_('Upload Picture')}}</b>
 
-        <div>
+          <div class="form-group">
+
           <input type=file name=photo>
+          </div>
+        </div>
+
+
+        <div class="row form-group">
+            {{ form2.reorderpt.label }}
+            {% if form2.reorderpt.errors %}
+                {% for error in form2.reorderpt.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form2.reorderpt(class="form-control", placeholder="Input Min. Stock to Order") }}
+            </div>
+        </div>
+
+
+        <div class="row form-group">
+            {{ form2.batchqty.label }}
+            {% if form2.batchqty.errors %}
+                {% for error in form2.batchqty.errors %}
+                <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+            {{ form2.batchqty(class="form-control", placeholder="Number of Items Per Carton") }}
+            </div>
         </div>
 
 
@@ -287,8 +292,8 @@
 
     </div>
 
-
-    <div role="tabpanel" id="group" class="tab-pane fade">
+<!--#........................TAB4.............................  -->
+    <div role="tabpanel" id="group" class="container-fluid tab-pane fade">
         <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form3' >
@@ -347,8 +352,8 @@
     </div>
 
 
-
-    <div role="tabpanel" id="existitem" class="tab-pane fade">
+<!--#........................TAB5.............................  -->
+    <div role="tabpanel" id="existitem" class="container-fluid tab-pane fade">
         <form method="POST" action="/{{g.current_lang}}/admin">
             {{ form.hidden_tag() }}
             <input type="hidden"  name="name-form" value='form4'>

@@ -45,7 +45,7 @@ class RetrievalForm(FlaskForm):
 
 
 class AddNewLocation(FlaskForm):
-	name = StringField('Name', validators=[DataRequired("Please enter the name of the storeroom without spaces.")])
+	name = StringField('Name the Location', validators=[DataRequired("Please enter the name of the storeroom without spaces.")])
 	location = StringField('Location of Storeroom', validators=[DataRequired("Please enter the location.")])
 	remarks = StringField('Remarks')
 	submitThree = SubmitField("Enter")

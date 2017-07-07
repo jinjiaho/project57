@@ -33,9 +33,9 @@ import os, copy, re, csv, json_decode
 # the App Engine WSGI application server.
 
 application = Flask(__name__, instance_relative_config=True)
-# application.config.from_object('config.DevConfig') # default configurations
-application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
-# application.config.from_pyfile('myConfig1.cfg')
+application.config.from_object('config.DevConfig') # default configurations
+# application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
+application.config.from_pyfile('myConfig1.cfg')
 # application.config.from_pyfile('myConfig2.cfg')
 
 # Babel init
