@@ -42,4 +42,3 @@ def myLocation(required):
  		location.append(x)
 
  	return location
-
