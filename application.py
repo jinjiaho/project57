@@ -35,8 +35,8 @@ import os, copy, re, csv, json_decode
 
 application = Flask(__name__, instance_relative_config=True)
 application.config.from_object('config.DevConfig') # default configurations
-application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
-#application.config.from_pyfile('myConfig1.cfg')
+#application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
+application.config.from_pyfile('myConfig1.cfg')
 #application.config.from_pyfile('myConfig2.cfg')
 
 # Babel init
@@ -832,19 +832,19 @@ def item(iid):
 
     # print(type(r[0]))
 
-    # cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.pricechange WHERE item = '{}';".format(iid))
-    # price = cursor.fetchall()
+    cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.pricechange WHERE item = '{}';".format(iid))
+    price = cursor.fetchall()
     pricechanges = []
-    # if price == ():
-    #     pricechanges.append({
-    #         "new_price": 0,
-    #         "date_effective": 0})
-    # else:
+    if price == ():
+        pricechanges.append({
+            "new_price": 0,
+            "date_effective": 0})
+    else:
 
-    #     for item in price:
-    #         pricechanges.append({
-    #             "new_price": item[0],
-    #             "date_effective": item[1]})
+        for item in price:
+            pricechanges.append({
+                "new_price": item[0],
+                "date_effective": item[1]})
 
     try:
         if r != []:
