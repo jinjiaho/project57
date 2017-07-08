@@ -143,11 +143,8 @@ def inventoryQuick(location):
                 "reorder": d[5]
                 })
     else:
-    	cursor.execute("""SELECT tname FROM TagInfo
-        				WHERE tid='{}';""".format(location))
-    	tagID = cursor.fetchone()
         cursor.execute("""SELECT iid, name, category, picture FROM view_item_locations
-        				WHERE tag='{}' AND reorder_pt >= 0;""".format(tagID))
+        				WHERE tag='{}' AND reorder_pt >= 0;""".format(location))
         data = cursor.fetchall()
     	conn.commit()
         for d in data:
@@ -166,10 +163,12 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
+        print("SELECT qty_left FROM view_item_locations WHERE iid={} AND tag={};".format(iid, tagId))
         cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid={} AND tag={};".format(iid, tagId))
+        print('not this one')
         data = cursor.fetchall()
         old_qty = data[0][0]
-        print(old_qty)
+
         if action == 'out':
             qty_left = old_qty  - inputQty
             qty_diff = inputQty * (-1)     # make qty_input negative to reflect taking qty OUT of store.
@@ -190,20 +189,25 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
         # general query for all actions
         print(update_items_query)
         cursor.execute(update_items_query)
+        conn.commit()
 
-
+        conn = mysql.connect()
+        cursor = conn.cursor()
         cursor.execute("SELECT tname FROM TagInfo WHERE tid={};".format(tagId))
         location = cursor.fetchall()[0][0]
         # Log action
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        update_logs_query = "INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location) VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');".format(user, time, action, qty_diff, qty_left, iid, location)
+        # conn = mysql.connect()
+        # cursor = conn.cursor()
+        update_logs_query = """INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location)
+                                VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');""".format(user, time, action, qty_diff, qty_left, iid, location)
         print(update_logs_query)
         cursor.execute(update_logs_query)
         conn.commit()
 
         return True
-    except:
+
+    except Exception as e:
+        print e
         return False
 
 
@@ -286,19 +290,17 @@ def getDailyLogs():
 
 
     for row in data:
-		conn = mysql.connect()
-		cursor = conn.cursor()
-		cursor.execute("SELECT name FROM Items WHERE iid={};".format(row[5]))
-		item_name = cursor.fetchall()[0][0]
+        cursor = mysql.connect().cursor()
+        cursor.execute("SELECT name FROM Items WHERE iid={};".format(row[5]))
+        item_name = cursor.fetchall()[0][0]
 
-		things.append({"name": row[0].encode('ascii'),
-			"dateTime": row[1],
-			"action":row[2].encode('ascii'),
-			"move":row[3],
-			"remaining":row[4],
-			"item":item_name.encode('ascii'),
-			"location":row[6].encode('ascii')})
-
+        things.append({"name": row[0].encode('ascii'),
+            "dateTime": row[1],
+            "action":row[2].encode('ascii'),
+            "move":row[3],
+            "remaining":row[4],
+            "item":item_name.encode('ascii'),
+            "location":row[6].encode('ascii')})
     return things
 
 # POST for getting chart data
@@ -341,13 +343,8 @@ def editReorder():
     print "request.json: ", request.json
 
     data = request.get_json()
-
-    if data["tracking"] == u"off" or (data["qty"] == u"" or data["qty"] == u"0"):
-        print("no qty specified")
-        new_reorder = 0
-    else:
-        new_reorder = int(data[u"qty"])
     name = data["name"].encode('ascii')
+    reorder = data["reorder"]
 
 
     if not request.json:
@@ -358,7 +355,7 @@ def editReorder():
         cursor = conn.cursor()
 
         cursor.execute(
-            "UPDATE Ascott_InvMgmt.Items SET reorder_pt={} WHERE (name='{}' AND iid > 0);".format(new_reorder, name))
+            "UPDATE Ascott_InvMgmt.Items SET reorder_pt={} WHERE (name='{}' AND iid > 0);".format(reorder, name))
         conn.commit()
         # idItem = cursor.fetchone()
 
@@ -597,12 +594,12 @@ def admin():
 
                 # TODO: string parameterisation
                 query = "INSERT INTO User VALUES ('{}','{}','{}','{}');".format(newuser[0],newuser[1],newuser[2],newuser[3])
-                cursor.commit()
+                conn.commit()
                 # query = "INSERT INTO User (username,password,role,name) VALUES ();"
 
                 cursor.execute(query)
                 # cursor.execute("COMMIT")
-                flash("User has been added!")
+                flash("User has been added!", "success")
                 return redirect(url_for('admin', lang_code=get_locale()))
 
 # ------------------Add Item Form ----------------------
@@ -619,34 +616,35 @@ def admin():
 
                 itemname = form2.itemname.data
                 reorderpt = form2.reorderpt.data
-                category = form2.category.data.encode('ascii')
+                category = form2.category.data
                 price = form2.price.data
-                out_by = form2.count_unit.data.encode('ascii')
-                in_by = form2.order_unit.data.encode('ascii')
+                out_by = form2.count_unit.data
+                in_by = form2.order_unit.data
                 in_out_ratio = form2.order_multiplier.data
-                categorystr = category.encode('ascii','ignore')
+
 
                 if 'photo' in request.files:
                     filename =photos.save(request.files['photo'])
 
-                item = [itemname, reorderpt, batchqty, category, filename, unit,price]
-
+                item = [itemname, category,filename, price, reorderpt, out_by,in_by,in_out_ratio]
+                print(item)
                 try:
                     # TODO: string parameterisation
                     conn = mysql.connect()
                     cursor = conn.cursor()
 
                     # TODO: Change form to input appropriate information
-                    query = "INSERT INTO Items (name, category, picture, price, reorder_pt, out_by, in_by, in_out_ratio) VALUES ('{}','{}','{}',{},{},'{}','{}',{});".format(itemname, categorystr, filename, price, reorderpt, out_by, in_by, in_out_ratio)
+                    query = "INSERT INTO Items (name, category, picture, price, reorder_pt, out_by, in_by, in_out_ratio) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}');".format(item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7])
                     cursor.execute(query)
-                    cursor.commit()
+                    conn.commit()
 
                     flash("Item has been added!", "success")
 
-                except:
+                except Exception as e:
+                    print(e)
                     flash("Oops! Something went wrong :(", "danger")
 
-            return redirect(url_for('admin', lang_code=get_locale()))
+                return redirect(url_for('admin', lang_code=get_locale()))
 
 # ------------------Add Location form ----------------------
         # TODO: Change form to get appropriate values
@@ -671,8 +669,8 @@ def admin():
                 # TODO: string parameterisation
                 query = "INSERT INTO TagInfo ('tname', 'storeroom', 'remarks') VALUES ('{}','{}','{}');".format(tname, location, remarks)
                 cursor.execute(query)
-                cursor.commit()
-                flash("New Location is Added!")
+                conn.commit()
+                flash("New Location is Added!", "success")
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
@@ -698,15 +696,22 @@ def admin():
                     conn = mysql.connect()
                     cursor = conn.cursor()
                     cursor.execute("SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
-                    info = cursor.fetchone()
+                    info = cursor.fetchall()[0][0]
+                    print(info)
 
                     # TODO: string parameterisation
-                    query = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ({},{},{});".format(info,location,amt)
-                    # query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
-                    cursor.execute(query)
-                    cursor.commit()
 
-                    flash("Added Item to Location {}!".format(), "success")
+                    cursor.execute("SELECT tid FROM TagInfo WHERE tname='{}';".format(tname))
+                    tid = cursor.fetchall()[0][0]
+
+                    # cursor = mysql.connect().commit()
+
+                    query = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ({},{},{}); COMMIT;".format(info,tid,amt)
+                    # query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
+                    print(query)
+                    cursor.execute(query)
+
+                    flash("Added Item to Location!", "success")
                 except:
                     flash("Oops! Something went wrong :(", "danger")
 
@@ -757,12 +762,6 @@ def inventory():
                 cat[i['category']].append(i)
                 print(i['category'])
 
-    print(itemsByCat)
-
-    print(itemsByCat[0].keys()[0])
-
-    print(itemsByCat[0])
-
     # A list of a dictionary of a list of dictionaries.
 
     # supplies = getAllInventory('Guest Supplies')
@@ -776,7 +775,7 @@ def inventory():
     locations = cursor.fetchall()
     shelves = []
     for i in locations:
-        cursor.execute("SELECT tname FROM TagInfo WHERE tid={}".format(i[0]))
+        cursor.execute("SELECT storeroom FROM TagInfo WHERE tid={}".format(i[0]))
         l_name = cursor.fetchall()[0][0]
         shelves.append(l_name)
 
@@ -804,12 +803,17 @@ def item(iid):
         qty = int(request.form['qty'])
         action = request.form['action']
 
-        updateSuccess = stockUpdate(iid, location, qty, user, action, now)
+        cursor = mysql.connect().cursor()
+        cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(location))
+        tagId = cursor.fetchall()[0][0]
+
+        updateSuccess = stockUpdate(iid, tagId, qty, user, action, now)
         if updateSuccess:
             flash('Stock updated!', 'success')
+            return redirect(url_for("item", lang_code=get_locale(), iid=iid))
         else:
             flash('Oops! Something went wrong :(', 'danger')
-
+            return redirect(url_for("item", lang_code=get_locale(), iid=iid))
 
     cursor = mysql.connect().cursor()
     query = "SELECT name, category, picture, tag, qty_left, reorder_pt, in_out_ratio, out_by, price FROM Ascott_InvMgmt.view_item_locations WHERE iid = {};".format(iid)
@@ -830,9 +834,11 @@ def item(iid):
             "price": i[8]})
 
 
-    # print(type(r[0]))
+    print(type(r[0]))
+
 
     cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.pricechange WHERE item = '{}';".format(iid))
+
     price = cursor.fetchall()
     pricechanges = []
     if price == ():
@@ -871,7 +877,41 @@ def category(category):
         user = session['username'])
 
 
+@application.route('/<lang_code>/storeroom/<storeroom>')
+def storeroom(storeroom):
+    # user authentication
+    if not session["logged_in"]:
+        return redirect(url_for("login", lang_code=session["lang_code"]))
 
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(storeroom))
+    tags = cursor.fetchall()[0]
+
+    items = {}
+
+    for t in tags:
+        cursor.execute("SELECT iid, name, picture, reorder_pt, qty_left FROM view_item_locations WHERE tag={}".format(t))
+        data = cursor.fetchall()
+        for d in data:
+            if d[0] in items.keys():
+                items[d[0]]['qty_left'] += d[4]
+            else: 
+                items[d[0]] = {
+                    'name':d[1].encode('ascii'),
+                    'picture':d[2].encode('ascii'),
+                    'reorder_pt':d[3],
+                    'qty_left':d[4]
+                }
+
+    print(type(items))
+    print(type(items[16]))
+    print(items)
+    return render_template('storeroom.html',
+        storename = storeroom,
+        items = items,
+        user = session['username'],
+        role = session['role'])
+                    
 @application.route('/<lang_code>/logs')
 def logs():
 
@@ -905,12 +945,10 @@ def shelf(tag_id):
     if not session["logged_in"]:
         return redirect(url_for("login", lang_code=session["lang_code"]))
 
+    cursor = mysql.connect().cursor()
     items = inventoryQuick(tag_id)
-
-    # get permissions for user
-    # cursor.execute("SELECT stock_in, admin FROM Permissions WHERE role='{}'".format(session['role']))
-    # permissions = cursor.fetchall()[0][0]
-    # print(permissions)
+    cursor.execute("""SELECT tname FROM TagInfo WHERE tid={};""".format(tag_id))
+    tagName = cursor.fetchone()[0].encode('ascii')
 
     if request.method == 'POST':
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -920,10 +958,10 @@ def shelf(tag_id):
         try:
             conn = mysql.connect()
             cursor = conn.cursor()
-            updateSuccess = True
+            updateSuccess = False
             for item, info in form_data.iterlists():
                 iid = item
-                inputQty = info[0]
+                inputQty = int(info[0])
                 action = info[1]
 
                 updateSuccess = stockUpdate(iid, tag_id, inputQty, user, action, now)
@@ -932,10 +970,12 @@ def shelf(tag_id):
         except:
             flash('Oops! Something went wrong :(', 'danger')
 
-    return render_template('storeroom.html', things=items,
+    return render_template('shelf.html', things=items,
         role = session['role'],
         user = session['username'],
-        location = tag_id)
+        location = tag_id,
+        tagName = tagName)
+
 
 
 @application.route('/logout')

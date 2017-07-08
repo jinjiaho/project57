@@ -227,18 +227,6 @@
         </div>
 
 
-        <div class="row form-group">
-            {{ form2.count_unit.label }}
-            {% if form2.count_unit.errors %}
-                {% for error in form2.count_unit.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form2.count_unit(class="form-control", placeholder="Number of Items Per Carton") }}
-            </div>
-        </div>
 
 
         <div class="row form-group">

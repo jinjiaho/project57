@@ -7,24 +7,6 @@
   width: 100%;
 }
 
-.modal-dialog {
-  /*margin: 12vh auto;*/
-  /*this is commented out because it distorts modal view on mobile*/
-}
-
-.modal .qty-display {
-    /*width: 180px;
-    margin: 0 auto;
-    z-index: 99999;*/
-}
-
-.modal .qty-display input {
-    /*width: 180px;
-    padding: 5px;
-    border: 1px solid #777;
-    border-radius: 5px;*/
-}
-
 .mobile-icon-list {
   padding: 0px;
 }
@@ -111,6 +93,10 @@
   text-align:center;
 }
 
+.alert-success {
+  background-color: #65e82c;
+}
+
 .btn-wrapper {
   width: 100%;
   text-align: center;
@@ -173,8 +159,8 @@ span.cart-group img {
 }
 
 div.modal .modal-header h4 {
-  margin: 0px;
-  color: #1d4262;
+  m/*argin: 0px;
+  co*/lor: #1d4262;
 }
 
 .qty-display.form-group label, 

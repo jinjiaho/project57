@@ -93,7 +93,7 @@ a.thumbnail > img {
 
 <!-- If no items running low, display this text -->
 {% if not items %}
-<div class="col-md-12 text-center">
+<div class="col-md-12 text-center" style="margin-bottom: 40px;">
     <h3 class="text-info">{{_('No items in need of restocking')}}</h3>
 </div>
 {% endif %}
@@ -106,7 +106,7 @@ a.thumbnail > img {
   <div class="font-icon-list col-lg-4 col-md-4 col-sm-6 col-xs-12" style="">
     <div class="overview-item-group alert {% if i.qty_left > i.reorder_pt and i.qty_left <= 1.2*i.reorder_pt %}alert-warning{% endif %}{% if i.qty_left <= i.reorder_pt%}alert-danger{% endif %}">
       <div class="overview-item-img" align='center'>
-        <img src="/static/img/items/{{i.category}}/{{i.picture}}"/>
+        <img src="/static/img/items/{{i.picture}}"/>
       </div>
       <div class="alert-group pull-right">
         <div class="overview-item-label">{{i.name}}</div>
@@ -121,7 +121,7 @@ a.thumbnail > img {
 <!-- 2nd header: Today's transactions -->
 <div class="row">
 <div class="col-xs-7">
-    <h3 style="margin-bottom:0px;">{{_("Latest Stock Movement")}}</h3>
+    <h3 style="margin-bottom:0px;">{{_("Today's stock movement")}}</h3>
 </div>
 <div class="col-xs-5">
     <div class="pull-right" style="margin-top:25px;">
@@ -142,14 +142,14 @@ a.thumbnail > img {
         <th>{{_('Remaining')}}</th>
     </thead>
     <tbody>
-    {% for log in l %}
+    {% for l in logs %}
       <tr>
-        <td>{{log.dateTime}}</td>
-        <td>{{log}}</td>
-        <td>{{log.item}}</td>
-        <td>{{log.action}}</td>
-        <td>{{log.move}}</td>
-        <td>{{log.remaining}}</td>
+        <td>{{l.dateTime}}</td>
+        <td>{{l.name}}</td>
+        <td>{{l.item}}</td>
+        <td>{{l.action}}</td>
+        <td>{{l.move}}</td>
+        <td>{{l.remaining}}</td>
       </tr>
     {% endfor %}
     </tbody>
