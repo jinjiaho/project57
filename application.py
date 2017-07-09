@@ -12,7 +12,7 @@ import os, copy, re, csv, json_decode, imaging
 # pip2 install flask
 # pip2 install mysql-python
 # pip2 install mysqlclient
-# pip2 install SQLAlchemy
+# pip2 install flask-SQLAlchemy
 # pip2 install flask-babel
 # pip2 install flask-wtf
 # pip2 install flask-mysql
@@ -669,8 +669,9 @@ def admin():
 
                 if 'photo' in request.files:
                     filename = photos.save(request.files['photo'])
+                    thumbnail = imaging.Imaging().thumb(filename)
 
-                item = [itemname, category, filename, price, reorderpt, out_by, in_by, in_out_ratio]
+                item = [itemname, category, thumbnail, price, reorderpt, out_by, in_by, in_out_ratio]
                 print(item)
                 try:
                     # TODO: string parameterisation
