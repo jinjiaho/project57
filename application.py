@@ -21,6 +21,7 @@ import os, copy, re, csv, json_decode
 # pip2 install scipy
 # pip2 install statsmodels
 # pip2 install pandas
+# pip2 install PIL
 # eb init -p python2.7 aim
 # eb init
 # eb create flask-env
@@ -343,6 +344,7 @@ def editReorder():
     print "request.json: ", request.json
 
     data = request.get_json()
+    print(data)
     name = data["name"].encode('ascii')
     reorder = data["reorder"]
 
@@ -368,6 +370,44 @@ def editReorder():
 
         return jsonify("")
 
+# @application.route('/api/editPrice', methods=["POST"])
+# def editPrice():
+
+#     print "content_type: ", request.content_type
+#     print "request.json: ", request.json
+
+#     data = request.get_json()
+#     # print(data)
+#     iid = data["iid"]
+#     newprice = data["price"]
+#     effectdate = data["effectdate"]
+
+#     # print(iid)
+#     # print(newprice)
+#     # print(effectdate)
+
+
+#     if not request.json:
+#         print "Bad json format"
+#         page_not_found(400)
+#     else:
+#         conn = mysql.connect()
+#         cursor = conn.cursor()
+
+#         cursor.execute(
+#             "UPDATE Ascott_InvMgmt.PriceChange SET new_price='{}' AND date_effective='{}' WHERE (item = '{}');".format(newprice, effectdate, iid))
+#         conn.commit()
+#         # idItem = cursor.fetchone()
+
+#         # # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
+#         # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
+#         # # TODO: string parameterisation
+#         # # query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
+#         # cursor.execute(query)
+#         # responseData = cursor.fetchall()
+
+#         return jsonify("")
+
 # true if user is authenticated, else false
 def auth():
     if u'logged_in' in session:
@@ -387,6 +427,10 @@ def lang_strip(s):
     if l:
         return l.group()
     return None
+
+@application.template_filter('curr_time')
+def curr_time(s):
+    return s+datetime.now().strftime('%I:%M %p')
 
 # case query for mobile input
 def input_handler(qty, user):
@@ -836,22 +880,23 @@ def item(iid):
             "reorder": i[5],
             "batch_size": i[6],
             "unit": i[7].encode('ascii'),
-            "price": i[8]})
+            "price": round(i[8],2)})
 
-
-    print(type(r[0]))
 
     cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.PriceChange WHERE item = '{}';".format(iid))
+
     price = cursor.fetchall()
     pricechanges = []
     if price == ():
         pricechanges.append({
+        	"iid":iid,
             "new_price": 0,
             "date_effective": 0})
     else:
 
         for item in price:
             pricechanges.append({
+            	"iid":iid,
                 "new_price": item[0],
                 "date_effective": item[1]})
 

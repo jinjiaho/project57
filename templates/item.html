@@ -184,6 +184,9 @@
         <button class="btn btn-danger" style="margin-bottom: 5px; width:100%;" data-toggle="modal" data-target="#remove-modal" id="#remove">{{_('Remove item from system')}}</button>
         {% endif %}
 
+
+        <button class="btn btn-default" style="margin-bottom: 5px; width:100%;" data-toggle="modal" data-target="#price-modal" id="#price">{{_('Change price')}}</button>
+
         <!-- Change item price -->
         <!-- <button class="btn btn-default" style="width:100%; background-color: #e6e6e6;" data-toggle="modal" data-target="#price-settings" id="#price-settings">Price settings</button> -->
 
@@ -193,20 +196,18 @@
         {% endif %}
 
         <!-- Unit price -->
-        <h4 style="line-height:1.5;">{{_('Price')}}:<b style="font-size: 26px"> $ {{item[0].price}}</b></h4>
+        <h4 style="line-height:1.5; margin-bottom: 20px;">{{_('Unit price')}}:<b style="font-size: 26px"> $ {{item[0].price}}</b></h4>
 
     </div>
     <!-- END INFO SIDEBAR -->
 
     <!-- CHART MAIN CONTENT -->
 	<div class="col-md-9">
-    <h4>{{_('Quantity remaining')}}</h4>
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div id="chart" style="height: 400px; margin: 0 auto"></div>
-            <!-- <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}"> -->
+        <h4>{{_('Quantity remaining')}}</h4>
+        <div class="panel panel-default"><div class="panel-body">
+            <div id="chart" style="height: 400px;"></div>
             {% if item[0].reorder >= 0 %}
-            <div class="col-sm-12"><button  data-toggle="modal" data-target="#stock-update-modal" class="btn btn-default" style="width:100%;" id="btn_stockUpdate">Update Stock</button></div>
+            <button data-toggle="modal" data-target="#stock-update-modal" class="btn btn-default col-sm-12" style="background-color: #e6e6e6;">Update Stock</button>
             {% endif %}
             <!-- <div class="col-sm-4"><button class="btn btn-default " style="width:100%;;" id="btn_getData">Get Data</button></div>
     		<div class="col-sm-4">
@@ -218,8 +219,8 @@
                     <i class="fa fa-history"></i> Last stock movement &mdash; 3 minutes ago
                 </div>
             </div> -->
-        </div>
-    </div></div>
+        </div></div>
+    </div>
     <!-- END Chart display -->
 
 
@@ -253,31 +254,29 @@
 
     <!-- Reorder point modal display -->
     <div id="reorder-modal" class="modal fade" role="dialog" tabindex="-1"><div class="modal-dialog" role="document"><div class="modal-content">
-                <div class="modal-body">
-                    <form id="reorder-form">
-                        <div id="pred" style="display:{% if item[0].reorder == 0 %}none{% endif %};">
-                        <b>Choose between automatic reordering prediction or manual input:</b>
-                        <div class="radio">
-                          <label>
-                            <input type="radio" name="manual-auto" id="pred-auto" value="auto" {% if item[0].reorder != 0 %}checked{% endif %}>
-                            Automatic reordering prediction
-                          </label>
-                        </div>
-                        <div class="radio">
-                          <label>
-                            <input type="radio" name="manual-auto" id="pred-manual" value="manual" {% if item[0].reorder == 0 %}checked{% endif %}>
-                            Manual input: <input type="text" class="form-control" id="pred-manual-qty" placeholder="Custom reorder point">
-                          </label>
-                        </div></div>
-                    </form>
+        <div class="modal-body">
+            <form id="reorder-form">
+                <div id="pred">
+                <b>Choose minimum stock level for {{item[0].name}}</b>
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="manual-auto" id="pred-auto" value="auto" {% if item[0].reorder != 0 %}checked{% endif %}>
+                    Automatic reordering prediction
+                  </label>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" class="btn btn-default">Discard changes</button>
-                    <button type="button" class="btn btn-default" id="submit-reorder" style="background-color: #e6e6e6;">Apply changes</button>
-                </div>
-            </div>
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="manual-auto" id="pred-manual" value="manual" {% if item[0].reorder == 0 %}checked{% endif %}>
+                    Manual input: <input type="text" class="form-control" id="pred-manual-qty" placeholder="Custom reorder point">
+                  </label>
+                </div></div>
+            </form>
         </div>
-    </div>
+        <div class="modal-footer">
+            <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+            <button type="button" class="btn btn-default" id="submit-reorder" style="background-color: #e6e6e6;">Apply changes</button>
+        </div>
+    </div></div></div>
     <!-- END Reorder point modal display -->
 
     <!-- Discontinue item modal -->
@@ -397,7 +396,59 @@
     <!-- END Update Stock Modal -->
 
 
+
+    <!-- Price change Modal -->
+    <div id="price-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="pricechange-form">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Price settings</h4>
+                    </div>
+                    <div class="modal-body">
+
+                    <p><b>Incoming new price for item: {% if pricechanges[0].new_price != 0 %} ${{pricechanges[0].new_price}} {% endif %}</b>
+                    </p>
+                    <p><b>With effect from: {% if pricechanges[0].date_effective != 0 %} {{pricechanges[0].date_effective}} {% endif %}</b>
+                    </p>
+
+                    <p><b>Change current price?</b>&nbsp;&nbsp;&nbsp;<label class="radio-inline" id="turn-on-par">
+                        <input type="radio" name="on-off" id="turn-on-price" value="on" {% if pricechanges[0].new_price == 0 %}checked{% endif %}> Yes
+                        </label>
+                        <label class="radio-inline" id="turn-off-par">
+                        <input type="radio" name="on-off" id="turn-off-price" value="off" {% if pricechanges[0].new_price != 0 %}checked{% endif %}> No
+                        </label></p>
+
+                        <div id="price" style="display:{% if pricechanges[0].new_price != 0 %}none{% endif %};">
+                            <div>                    
+                            <label> New price($):  
+                            <input type="text" id="new-price" placeholder="New Price">
+                            </label>
+                            </div>
+
+                            <div>
+                            <label> With effect from: 
+                            <input type="text" id="date">
+                            </label>
+                            </div>
+                        </div>
+                    </div>
+               
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default" value="Apply changes" id="submit-price">Apply changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- END Price change Modal -->
+
+
+
+
     <!-- Error: If ItemID not in system -->
+
     {% else %}
     <div class="col-md-12 text-center">
         <h3 class="text-info">{{_('Item ID not in system')}}</h3>
@@ -438,6 +489,34 @@ function editReorder(form) {
         }
     });
 }
+
+// function editPrice(form) {
+//     $.ajax({
+//         type: "POST",
+//         url: "/api/editPrice",
+//         data: JSON.stringify(form),
+//         dataType: "json",
+//         contentType: "application/json",
+//         async: false,
+//         success: function(response, status, jqXHR) {
+//             // empty function
+//         }
+//     });
+// }
+
+// $('#submit-price').click(function(event) {
+//     var new_price = {
+//         "iid": "{% if item %}{{pricechanges[0].iid}}{% endif %}",
+//         "oldprice": "{% if item %}{{item[0].price}}{% endif %}"
+//         "newprice": $('input[id="new-price"]').val(),
+//         "effectdate": $('input[id="date"]').val()
+//         // "newprice": 1,
+//         // "effectdate": 0
+//     };
+//     event.preventDefault();
+//     editPrice(new_price);
+//     location.reload();
+// });
 
 $('#reorder-form').submit(function(event) {
     var reorder = {
@@ -501,22 +580,6 @@ function initChart(dataSources) {
         chart: {
             type: 'area'
         },
-        // title: {
-        //     text: '{% if item %}{{item[0].name}}{% endif %}'
-        // },
-        // subtitle: {
-        //     text: 'Quantity remaining'
-        // },
-        // xAxis: {
-        //     type: 'datetime',
-        //     dateTimeLabelFormats: { // don't display the dummy year
-        //         month: '%e. %b',
-        //         year: '%b'
-        //     },
-        //     title: {
-        //         text: 'Date'
-        //     }
-        // },
         tooltip: {
             // headerFormat: '<b>Quantity</b><br>',
             pointFormat: '<b>Quantity:</b> {point.y:.2f}'
@@ -581,7 +644,14 @@ getData(initChart);
 $(document).ready(function(){
     // insert any required code here
 
-    $( "#datepicker" ).datepicker({ minDate: 0});
+    $( "#date" ).datepicker({ minDate: 0});
+
+    $("#turn-on-price").click(function(){
+        $("#price").show();
+    });
+    $("#turn-off-price").click(function(){
+        $("#price").hide();
+    });
 
 
 });
