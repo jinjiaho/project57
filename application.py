@@ -344,6 +344,7 @@ def editReorder():
     print "request.json: ", request.json
 
     data = request.get_json()
+    print(data)
     name = data["name"].encode('ascii')
     reorder = data["reorder"]
 
@@ -368,6 +369,44 @@ def editReorder():
         # responseData = cursor.fetchall()
 
         return jsonify("")
+
+# @application.route('/api/editPrice', methods=["POST"])
+# def editPrice():
+
+#     print "content_type: ", request.content_type
+#     print "request.json: ", request.json
+
+#     data = request.get_json()
+#     # print(data)
+#     iid = data["iid"]
+#     newprice = data["price"]
+#     effectdate = data["effectdate"]
+
+#     # print(iid)
+#     # print(newprice)
+#     # print(effectdate)
+
+
+#     if not request.json:
+#         print "Bad json format"
+#         page_not_found(400)
+#     else:
+#         conn = mysql.connect()
+#         cursor = conn.cursor()
+
+#         cursor.execute(
+#             "UPDATE Ascott_InvMgmt.PriceChange SET new_price='{}' AND date_effective='{}' WHERE (item = '{}');".format(newprice, effectdate, iid))
+#         conn.commit()
+#         # idItem = cursor.fetchone()
+
+#         # # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
+#         # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
+#         # # TODO: string parameterisation
+#         # # query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
+#         # cursor.execute(query)
+#         # responseData = cursor.fetchall()
+
+#         return jsonify("")
 
 # true if user is authenticated, else false
 def auth():
@@ -838,17 +877,21 @@ def item(iid):
             "unit": i[7].encode('ascii'),
             "price": round(i[8],2)})
 
+
     cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.PriceChange WHERE item = '{}';".format(iid))
+
     price = cursor.fetchall()
     pricechanges = []
     if price == ():
         pricechanges.append({
+        	"iid":iid,
             "new_price": 0,
             "date_effective": 0})
     else:
 
         for item in price:
             pricechanges.append({
+            	"iid":iid,
                 "new_price": item[0],
                 "date_effective": item[1]})
 
