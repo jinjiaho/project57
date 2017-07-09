@@ -1,9 +1,5 @@
 from PIL import Image
 
-items = ["flowers.jpg",
-        "soap.jpg",
-        "kettle.jpg"]
-
 def cropImg(file):
     
     img = Image.open(file)
@@ -22,7 +18,7 @@ def cropImg(file):
         img2 = img.crop((0, b[0], img.size[0], b[1]))
         img2.save(file)
 
-def resize(file, height=500):
+def resizeImg(file, height=200):
     img = Image.open(file)
     if img.size[0] > height:
         hpercent = (height / float(img.size[1]))
