@@ -193,20 +193,18 @@
         {% endif %}
 
         <!-- Unit price -->
-        <h4 style="line-height:1.5;">{{_('Price')}}:<b style="font-size: 26px"> $ {{item[0].price}}</b></h4>
+        <h4 style="line-height:1.5; margin-bottom: 20px;">{{_('Unit price')}}:<b style="font-size: 26px"> $ {{item[0].price}}</b></h4>
 
     </div>
     <!-- END INFO SIDEBAR -->
 
     <!-- CHART MAIN CONTENT -->
 	<div class="col-md-9">
-    <h4>{{_('Quantity remaining')}}</h4>
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div id="chart" style="height: 400px; margin: 0 auto"></div>
-            <!-- <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}"> -->
+        <h4>{{_('Quantity remaining')}}</h4>
+        <div class="panel panel-default"><div class="panel-body">
+            <div id="chart" style="height: 400px;"></div>
             {% if item[0].reorder >= 0 %}
-            <div class="col-sm-12"><button  data-toggle="modal" data-target="#stock-update-modal" class="btn btn-default" style="width:100%;" id="btn_stockUpdate">Update Stock</button></div>
+            <button data-toggle="modal" data-target="#stock-update-modal" class="btn btn-default col-sm-12" style="background-color: #e6e6e6;">Update Stock</button>
             {% endif %}
             <!-- <div class="col-sm-4"><button class="btn btn-default " style="width:100%;;" id="btn_getData">Get Data</button></div>
     		<div class="col-sm-4">
@@ -218,8 +216,8 @@
                     <i class="fa fa-history"></i> Last stock movement &mdash; 3 minutes ago
                 </div>
             </div> -->
-        </div>
-    </div></div>
+        </div></div>
+    </div>
     <!-- END Chart display -->
 
 
@@ -253,31 +251,29 @@
 
     <!-- Reorder point modal display -->
     <div id="reorder-modal" class="modal fade" role="dialog" tabindex="-1"><div class="modal-dialog" role="document"><div class="modal-content">
-                <div class="modal-body">
-                    <form id="reorder-form">
-                        <div id="pred" style="display:{% if item[0].reorder == 0 %}none{% endif %};">
-                        <b>Choose between automatic reordering prediction or manual input:</b>
-                        <div class="radio">
-                          <label>
-                            <input type="radio" name="manual-auto" id="pred-auto" value="auto" {% if item[0].reorder != 0 %}checked{% endif %}>
-                            Automatic reordering prediction
-                          </label>
-                        </div>
-                        <div class="radio">
-                          <label>
-                            <input type="radio" name="manual-auto" id="pred-manual" value="manual" {% if item[0].reorder == 0 %}checked{% endif %}>
-                            Manual input: <input type="text" class="form-control" id="pred-manual-qty" placeholder="Custom reorder point">
-                          </label>
-                        </div></div>
-                    </form>
+        <div class="modal-body">
+            <form id="reorder-form">
+                <div id="pred">
+                <b>Choose minimum stock level for {{item[0].name}}</b>
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="manual-auto" id="pred-auto" value="auto" {% if item[0].reorder != 0 %}checked{% endif %}>
+                    Automatic reordering prediction
+                  </label>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" class="btn btn-default">Discard changes</button>
-                    <button type="button" class="btn btn-default" id="submit-reorder" style="background-color: #e6e6e6;">Apply changes</button>
-                </div>
-            </div>
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="manual-auto" id="pred-manual" value="manual" {% if item[0].reorder == 0 %}checked{% endif %}>
+                    Manual input: <input type="text" class="form-control" id="pred-manual-qty" placeholder="Custom reorder point">
+                  </label>
+                </div></div>
+            </form>
         </div>
-    </div>
+        <div class="modal-footer">
+            <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+            <button type="button" class="btn btn-default" id="submit-reorder" style="background-color: #e6e6e6;">Apply changes</button>
+        </div>
+    </div></div></div>
     <!-- END Reorder point modal display -->
 
     <!-- Discontinue item modal -->

@@ -828,10 +828,7 @@ def item(iid):
             "reorder": i[5],
             "batch_size": i[6],
             "unit": i[7].encode('ascii'),
-            "price": i[8]})
-
-
-    print(type(r[0]))
+            "price": round(i[8],2)})
 
     cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.PriceChange WHERE item = '{}';".format(iid))
     price = cursor.fetchall()
