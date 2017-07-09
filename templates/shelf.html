@@ -11,7 +11,7 @@
 </span>
 
 
-<a class="navbar-brand" href="#">{{location}}</a>
+<a class="navbar-brand" href="#">{{tagName}}</a>
 {% endblock %}
 
 {% block content%}
@@ -42,14 +42,14 @@ a:focus {
                 {% if role == 'supervisor' %}
                 <a href="/{{g.current_lang}}/inventory/{{item.iid}}">
                 {% else %}
-                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.sku}}">
+                <a class="openModal" href="" data-toggle="modal" data-target="#qtyModal" id="{{item.iid}}">
                 {% endif %}
                     <div class="card col-lg-3 col-md-5 col-sm-5 col-xs-12">
                         <div class="content all-icons">
                             <div class="row">
                                 <div class="mobile-icon-list col-lg-12 col-md-12 col-sm-12 col-xs-12" align='center'>
                                     <div class="mobile-icon-detail">
-                                        <img src="/static/img/items/{{item.category}}/{{item.picture}}"/>
+                                        <img src="/static/img/items/{{item.picture}}"/>
                                         <div class="name">{{item.name}}</div>
                                     </div>
                                 </div>
@@ -77,7 +77,7 @@ a:focus {
                     <div class="qty-display form-fields">
                         <input id="modal-input-name" type="hidden" name="item" value="" />
                         <input id="modal-input-qty" type="number" name="qty" value="" class="num-input" placeholder="Enter quantity"/>
-                        <input id="modal-input-sku" type="hidden" name="sku" value="" />
+                        <input id="modal-input-iid" type="hidden" name="iid" value="" />
                         {% if role == 'runner' %}
                         <input type="radio" name="action" value="in" />In
                         {% endif %}

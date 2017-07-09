@@ -143,11 +143,8 @@ def inventoryQuick(location):
                 "reorder": d[5]
                 })
     else:
-    	cursor.execute("""SELECT tname FROM TagInfo
-        				WHERE tid='{}';""".format(location))
-    	tagID = cursor.fetchone()
         cursor.execute("""SELECT iid, name, category, picture FROM view_item_locations
-        				WHERE tag='{}' AND reorder_pt >= 0;""".format(tagID))
+        				WHERE tag='{}' AND reorder_pt >= 0;""".format(location))
         data = cursor.fetchall()
     	conn.commit()
         for d in data:
@@ -166,10 +163,12 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
+        print("SELECT qty_left FROM view_item_locations WHERE iid={} AND tag={};".format(iid, tagId))
         cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid={} AND tag={};".format(iid, tagId))
+        print('not this one')
         data = cursor.fetchall()
         old_qty = data[0][0]
-        print(old_qty)
+
         if action == 'out':
             qty_left = old_qty  - inputQty
             qty_diff = inputQty * (-1)     # make qty_input negative to reflect taking qty OUT of store.
@@ -595,7 +594,7 @@ def admin():
 
                 # TODO: string parameterisation
                 query = "INSERT INTO User VALUES ('{}','{}','{}','{}');".format(newuser[0],newuser[1],newuser[2],newuser[3])
-                cursor.commit()
+                conn.commit()
                 # query = "INSERT INTO User (username,password,role,name) VALUES ();"
 
                 cursor.execute(query)
@@ -670,7 +669,7 @@ def admin():
                 # TODO: string parameterisation
                 query = "INSERT INTO TagInfo ('tname', 'storeroom', 'remarks') VALUES ('{}','{}','{}');".format(tname, location, remarks)
                 cursor.execute(query)
-                cursor.commit()
+                conn.commit()
                 flash("New Location is Added!", "success")
 
                 return redirect(url_for('admin', lang_code=get_locale()))
@@ -804,7 +803,11 @@ def item(iid):
         qty = int(request.form['qty'])
         action = request.form['action']
 
-        updateSuccess = stockUpdate(iid, location, qty, user, action, now)
+        cursor = mysql.connect().cursor()
+        cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(location))
+        tagId = cursor.fetchall()[0][0]
+
+        updateSuccess = stockUpdate(iid, tagId, qty, user, action, now)
         if updateSuccess:
             flash('Stock updated!', 'success')
             return redirect(url_for("item", lang_code=get_locale(), iid=iid))
@@ -937,7 +940,10 @@ def shelf(tag_id):
     if not session["logged_in"]:
         return redirect(url_for("login", lang_code=session["lang_code"]))
 
+    cursor = mysql.connect().cursor()
     items = inventoryQuick(tag_id)
+    cursor.execute("""SELECT tname FROM TagInfo WHERE tid={};""".format(tag_id))
+    tagName = cursor.fetchone()[0].encode('ascii')
 
     if request.method == 'POST':
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -947,10 +953,10 @@ def shelf(tag_id):
         try:
             conn = mysql.connect()
             cursor = conn.cursor()
-            updateSuccess = True
+            updateSuccess = False
             for item, info in form_data.iterlists():
                 iid = item
-                inputQty = info[0]
+                inputQty = int(info[0])
                 action = info[1]
 
                 updateSuccess = stockUpdate(iid, tag_id, inputQty, user, action, now)
@@ -962,7 +968,8 @@ def shelf(tag_id):
     return render_template('shelf.html', things=items,
         role = session['role'],
         user = session['username'],
-        location = tag_id)
+        location = tag_id,
+        tagName = tagName)
 
 
 
