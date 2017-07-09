@@ -668,7 +668,12 @@ def admin():
 
 
                 if 'photo' in request.files:
-                    filename = photos.save(request.files['photo'])
+                    try:
+                        filename = photos.save(request.files['photo'])
+                    except:
+                        filename = "default.thumb"
+                        flash('Photo selected is not a valid file', "danger")
+
                     thumbnail = imaging.Imaging().thumb(filename)
 
                 item = [itemname, category, thumbnail, price, reorderpt, out_by, in_by, in_out_ratio]

@@ -203,15 +203,14 @@
             </div>
         </div>
 
-        <div class="row form-group">
-          <b>{{_('Upload Picture')}}</b>
-
-          <div class="form-group">
-
-          <input type=file name=photo>
-          </div>
+        <div class="input-group" style="margin-bottom: 20px;">
+            <label class="input-group-btn">
+                <span class="btn btn-default">
+                    Upload photo&hellip;<input type="file" name="photo" style="display: none;">
+                </span>
+            </label>
+            <input type="text" class="form-control" disabled>
         </div>
-
 
         <div class="row form-group">
             {{ form2.reorderpt.label }}
@@ -447,6 +446,37 @@
 </div>
 
 </div>
+
+<script>
+$(function() {
+
+  // Attach the `fileselect` event to all file inputs on the page
+  $(document).on('change', ':file', function() {
+    var input = $(this),
+        numFiles = input.get(0).files ? input.get(0).files.length : 1,
+        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+    input.trigger('fileselect', [numFiles, label]);
+  });
+
+  // Watch for our custom `fileselect` event
+  $(document).ready( function() {
+      $(':file').on('fileselect', function(event, numFiles, label) {
+
+          var input = $(this).parents('.input-group').find(':text'),
+              log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+          if( input.length ) {
+              input.val(log);
+          } else {
+              if( log ) alert(log);
+          }
+
+      });
+  });
+  
+});
+</script>
+
 
 <script>
 var substringMatcher = function(strs) {

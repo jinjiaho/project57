@@ -1,5 +1,5 @@
 from PIL import Image
-import os, sys
+import os
 
 ## A library for all your image manipulation needs!
 ## Requires Pillow for Python 2.7/3.3+
@@ -8,9 +8,10 @@ class Imaging(object):
 
     # set proposed dimension of thumbnail
     # assume max height/width of 255
-    def __init__(self, dim=255, path="static/img/items/"):
+    def __init__(self, dim=255, path="static/img/items/", fallback="default.thumb"):
         self.dim = dim
         self.path = path
+        self.fallback = fallback
 
     # create thumbnail of size `dim` for file args
     def thumb(self, *args):
@@ -28,6 +29,7 @@ class Imaging(object):
                     return outfile
                 except IOError:
                     print("PYTHON: Cannot create thumbnail for '%s'" % infile)
+                    return self.fallback
 
     def __str__(self):
         return "Dimension: %d\nPath: %s" % self.dim, self.path
