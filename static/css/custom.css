@@ -188,3 +188,27 @@ div.modal .modal-header h4 {
   max-width: 40px;
   margin-right: 5px;
 }
+
+.row.form-group .form-group,
+.form-group, .form-control {
+  max-width: 250px;
+}
+
+.tab-content {
+  padding-bottom: 40px;
+}
+
+/* styling for admin page panels */
+.tab-content {
+  padding: 2em;
+}
+
+.tab-content .panel-group .panel {
+  margin-bottom: 1em;
+}
+
+.tab-content .panel-group .panel .panel-collapse.collapse,
+.tab-content .panel-group .panel .panel-collapse.collapsing,
+.tab-content .panel-group .panel .panel-collapse.collapse.in {
+  padding: 0 2em;
+}
