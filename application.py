@@ -21,6 +21,7 @@ import os, copy, re, csv, json_decode
 # pip2 install scipy
 # pip2 install statsmodels
 # pip2 install pandas
+# pip2 install PIL
 # eb init -p python2.7 aim
 # eb init
 # eb create flask-env
@@ -387,6 +388,10 @@ def lang_strip(s):
     if l:
         return l.group()
     return None
+
+@application.template_filter('curr_time')
+def curr_time(s):
+    return s+datetime.now().strftime('%I:%M %p')
 
 # case query for mobile input
 def input_handler(qty, user):
