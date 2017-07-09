@@ -206,9 +206,7 @@
         <h4>{{_('Quantity remaining')}}</h4>
         <div class="panel panel-default"><div class="panel-body">
             <div id="chart" style="height: 400px;"></div>
-            {% if item[0].reorder >= 0 %}
             <button data-toggle="modal" data-target="#stock-update-modal" class="btn btn-default col-sm-12" style="background-color: #e6e6e6;">Update Stock</button>
-            {% endif %}
             <!-- <div class="col-sm-4"><button class="btn btn-default " style="width:100%;;" id="btn_getData">Get Data</button></div>
     		<div class="col-sm-4">
     			<button class="btn btn-default" style="width:100%;" id="btn_delItem" data-toggle="modal" data-target="#delModal">Delete</button>
@@ -252,6 +250,7 @@
     </div>
     <!-- END Modal #1 display -->
 
+    {% if item[0].reorder >= 0 %}
     <!-- Reorder point modal display -->
     <div id="reorder-modal" class="modal fade" role="dialog" tabindex="-1"><div class="modal-dialog" role="document"><div class="modal-content">
         <div class="modal-body">
@@ -304,6 +303,7 @@
     </div>
     <!-- END Discontinue item modal -->
 
+    {% else %}
     <!-- Reinstate item modal -->
     <div id="reinstate-modal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -351,7 +351,7 @@
         </div>
     </div>
     <!-- END Remove item modal -->
-
+    {% endif %}
     
 
     <!-- Update Stock Modal -->
@@ -447,8 +447,7 @@
 
 
 
-    <!-- Error: If ItemID not in system -->
-
+    <!-- Display error if Item ID not in system -->
     {% else %}
     <div class="col-md-12 text-center">
         <h3 class="text-info">{{_('Item ID not in system')}}</h3>
@@ -573,7 +572,7 @@ function getData(callback) {
 }
 
 function initChart(dataSources) {
-    Highcharts.stockChart('chart', {
+    var chart = Highcharts.stockChart('chart', {
         rangeSelector: {
             selected: 1
         },
@@ -581,8 +580,8 @@ function initChart(dataSources) {
             type: 'area'
         },
         tooltip: {
-            // headerFormat: '<b>Quantity</b><br>',
-            pointFormat: '<b>Quantity:</b> {point.y:.2f}'
+            // headerFormat: '',
+            pointFormat: '<b>{{_("Remaining")}}:</b> {point.y:.0f}'
         },
         credits: {
             enabled: false
@@ -590,7 +589,10 @@ function initChart(dataSources) {
         scrollbar: {
             enabled: false
         },
-
+        legend: {
+            enabled: true
+            // align: 'right'
+        },
         plotOptions: {
             area: {
                 fillColor: {
@@ -618,28 +620,26 @@ function initChart(dataSources) {
             },
             series: {
                 events: {
-                  afterAnimate: function (ev) {
+                  afterAnimate: function (e) {
                     // console.log(data)
-                    // console.log(ev)
+                    // console.log(e)
                     // console.log('fired only once for each series');
                     // $("#update").css("display", "inline");
                     $("#update").fadeIn();
                   }
                 }
             }
-        },
+        }
+    });
 
-        series: [{
-            name: '{% if item %}{{item[0].name}}{% endif %}',
-            // Define the data points. All series have a dummy year
-            // of 1970/71 in order to be compared on the same x axis. Note
-            // that in JavaScript, months start at 0 for January, 1 for February etc.
-            data: dataSources
-        }]
+    chart.addSeries({
+        name: '{% if item %}{{item[0].location}}{% endif %}',
+        // Define the data points. All series have a dummy year
+        // of 1970/71 in order to be compared on the same x axis. Note
+        // that in JavaScript, months start at 0 for January, 1 for February etc.
+        data: dataSources
     });
 }
-
-getData(initChart);
 
 $(document).ready(function(){
     // insert any required code here
@@ -652,6 +652,9 @@ $(document).ready(function(){
     $("#turn-off-price").click(function(){
         $("#price").hide();
     });
+
+    // draw chart
+    getData(initChart);
 
 
 });
