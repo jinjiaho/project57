@@ -1,30 +1,38 @@
 from PIL import Image
+import os
 
-def cropImg(file):
-    
-    img = Image.open(file)
+## A library for all your image manipulation needs!
+## Requires Pillow for Python 2.7/3.3+
 
-    # if width > height
-    if img.size[0] > img.size[1]:
-        b = ((img.size[0] - img.size[1])/2,
-             img.size[0] - ((img.size[0] - img.size[1])/2))
-        img2 = img.crop((b[0], 0, b[1], img.size[1]))
-        img2.save(file)
-    
-    # if width < height
-    elif img.size[0] < img.size[1]:
-        b = ((img.size[1] - img.size[0])/2,
-             img.size[1] - ((img.size[1] - img.size[0])/2))
-        img2 = img.crop((0, b[0], img.size[0], b[1]))
-        img2.save(file)
+class Imaging(object):
 
-def resizeImg(file, height=200):
-    img = Image.open(file)
-    if img.size[0] > height:
-        hpercent = (height / float(img.size[1]))
-        wsize = int((float(img.size[0]) * float(hpercent)))
-        img = img.resize((wsize, height), PIL.Image.ANTIALIAS)
-        img.save(file)
+    # set proposed dimension of thumbnail
+    # assume max height/width of 255
+    def __init__(self, dim=255, path="static/img/items/", fallback="default.thumb"):
+        self.dim = dim
+        self.path = path
+        self.fallback = fallback
+
+    # create thumbnail of size `dim` for file args
+    def thumb(self, *args):
+        for infile in args:
+
+            infile_abs = self.path + infile
+            outfile = os.path.splitext(infile)[0] + ".thumb"
+            outfile_abs = self.path + outfile
+
+            if infile != outfile:
+                try:
+                    im = Image.open(infile_abs)
+                    im.thumbnail((self.dim, self.dim), Image.ANTIALIAS)
+                    im.save(outfile_abs, "JPEG")
+                    return outfile
+                except IOError:
+                    print("PYTHON: Cannot create thumbnail for '%s'" % infile)
+                    return self.fallback
+
+    def __str__(self):
+        return "Dimension: %d\nPath: %s" % self.dim, self.path
 
 if __name__ == '__main__':
-    print(">>> This is an imaging library and is not meant to be executed directly")
+    print("PYTHON: `Imaging.py` is not meant to be executed directly")

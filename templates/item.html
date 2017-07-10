@@ -204,11 +204,9 @@
     <!-- CHART MAIN CONTENT -->
 	<div class="col-md-9">
         <h4>{{_('Quantity remaining')}}</h4>
-        <div class="panel panel-default"><div class="panel-body">
+        <div class="panel panel-default"><div class="panel-body" style="padding-top: 0px;">
             <div id="chart" style="height: 400px;"></div>
-            {% if item[0].reorder >= 0 %}
-            <button data-toggle="modal" data-target="#stock-update-modal" class="btn btn-default col-sm-12" style="background-color: #e6e6e6;">Update Stock</button>
-            {% endif %}
+            <button data-toggle="modal" data-target="#stock-update-modal" class="btn btn-default col-xs-12" style="background-color: #e6e6e6;">Update Stock</button>
             <!-- <div class="col-sm-4"><button class="btn btn-default " style="width:100%;;" id="btn_getData">Get Data</button></div>
     		<div class="col-sm-4">
     			<button class="btn btn-default" style="width:100%;" id="btn_delItem" data-toggle="modal" data-target="#delModal">Delete</button>
@@ -252,6 +250,7 @@
     </div>
     <!-- END Modal #1 display -->
 
+    {% if item[0].reorder >= 0 %}
     <!-- Reorder point modal display -->
     <div id="reorder-modal" class="modal fade" role="dialog" tabindex="-1"><div class="modal-dialog" role="document"><div class="modal-content">
         <div class="modal-body">
@@ -304,6 +303,7 @@
     </div>
     <!-- END Discontinue item modal -->
 
+    {% else %}
     <!-- Reinstate item modal -->
     <div id="reinstate-modal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -351,7 +351,7 @@
         </div>
     </div>
     <!-- END Remove item modal -->
-
+    {% endif %}
     
 
     <!-- Update Stock Modal -->
@@ -447,8 +447,7 @@
 
 
 
-    <!-- Error: If ItemID not in system -->
-
+    <!-- Display error if Item ID not in system -->
     {% else %}
     <div class="col-md-12 text-center">
         <h3 class="text-info">{{_('Item ID not in system')}}</h3>
@@ -573,16 +572,14 @@ function getData(callback) {
 }
 
 function initChart(dataSources) {
-    Highcharts.stockChart('chart', {
+    var chart = Highcharts.stockChart('chart', {
         rangeSelector: {
             selected: 1
         },
-        chart: {
-            type: 'area'
-        },
         tooltip: {
-            // headerFormat: '<b>Quantity</b><br>',
-            pointFormat: '<b>Quantity:</b> {point.y:.2f}'
+            borderRadius: 6
+            // headerFormat: '',
+            // pointFormat: '<b>Remaining:</b> {point.y:.0f}'
         },
         credits: {
             enabled: false
@@ -590,25 +587,77 @@ function initChart(dataSources) {
         scrollbar: {
             enabled: false
         },
-
+        colors: [
+            // "#0086B2",
+            // "#B25A26",
+            // "#C4F0FF",
+            // "#FFB364",
+            // "#64D8FF",
+            "#ECD078",
+            "#D95B43",
+            "#C02942",
+            "#542437",
+            "#53777A"
+        ],
+        legend: {
+            enabled: true,
+            verticalAlign: "top",
+            itemStyle: {
+                color: '#333',
+                fontWeight: 'bold',
+                fontSize: '14px'
+            }
+        },
+        xAxis: {
+            type: "datetime",
+            ordinal: false,
+            categories: [],
+            labels: {
+                style: {
+                    fontSize:'14px'
+                }
+            }
+        },
+        yAxis: {
+            gridLineDashStyle: 'longdash',
+            labels: {
+                style: {
+                    fontSize:'14px'
+                }
+            }
+        },
+        chart: {
+            type: 'area',
+            style: {
+                fontFamily: "-apple-system,system-ui,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif",
+                fontSize: "14px"
+            }
+        },
         plotOptions: {
             area: {
-                fillColor: {
-                    linearGradient: {
-                        x1: 0,
-                        y1: 0,
-                        x2: 0,
-                        y2: 1
-                    },
-                    stops: [
-                        [0, Highcharts.getOptions().colors[0]],
-                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                    ]
-                },
+                stacking: "normal",
+                connectNulls: false,
+                // lineColor: "#666666",
+                // lineWidth: 1,
+                // marker: {
+                //     lineWidth: 1,
+                //     lineColor: "#666666"
+                // }
+                // fillColor: {
+                //     linearGradient: {
+                //         x1: 0,
+                //         y1: 0,
+                //         x2: 0,
+                //         y2: 1
+                //     },
+                //     stops: [
+                //         [0, Highcharts.getOptions().colors[0]],
+                //         [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                //     ]
+                // },
                 marker: {
                     enabled: false
                 },
-                lineWidth: 1,
                 states: {
                     hover: {
                         lineWidth: 1
@@ -618,28 +667,33 @@ function initChart(dataSources) {
             },
             series: {
                 events: {
-                  afterAnimate: function (ev) {
+                  afterAnimate: function (e) {
                     // console.log(data)
-                    // console.log(ev)
+                    // console.log(e)
                     // console.log('fired only once for each series');
                     // $("#update").css("display", "inline");
                     $("#update").fadeIn();
                   }
                 }
             }
-        },
+        }
+    });
 
-        series: [{
-            name: '{% if item %}{{item[0].name}}{% endif %}',
-            // Define the data points. All series have a dummy year
-            // of 1970/71 in order to be compared on the same x axis. Note
-            // that in JavaScript, months start at 0 for January, 1 for February etc.
-            data: dataSources
-        }]
+    chart.addSeries({
+        name: '{% if item %}{{item[0].location}}{% endif %}',
+        // Define the data points. All series have a dummy year
+        // of 1970/71 in order to be compared on the same x axis. Note
+        // that in JavaScript, months start at 0 for January, 1 for February etc.
+        data: dataSources
+    });
+    chart.addSeries({
+        name: 'Level7',
+        // Define the data points. All series have a dummy year
+        // of 1970/71 in order to be compared on the same x axis. Note
+        // that in JavaScript, months start at 0 for January, 1 for February etc.
+        data: dataSources
     });
 }
-
-getData(initChart);
 
 $(document).ready(function(){
     // insert any required code here
@@ -652,6 +706,9 @@ $(document).ready(function(){
     $("#turn-off-price").click(function(){
         $("#price").hide();
     });
+
+    // draw chart
+    getData(initChart);
 
 
 });

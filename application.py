@@ -5,14 +5,14 @@ from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation
-import os, copy, re, csv, json_decode
+import os, copy, re, csv, json_decode, imaging
 # from flask.ext.cache import Cache
 
 
 # pip2 install flask
 # pip2 install mysql-python
 # pip2 install mysqlclient
-# pip2 install SQLAlchemy
+# pip2 install flask-SQLAlchemy
 # pip2 install flask-babel
 # pip2 install flask-wtf
 # pip2 install flask-mysql
@@ -21,7 +21,7 @@ import os, copy, re, csv, json_decode
 # pip2 install scipy
 # pip2 install statsmodels
 # pip2 install pandas
-# pip2 install PIL
+# pip2 install Pillow
 # eb init -p python2.7 aim
 # eb init
 # eb create flask-env
@@ -668,9 +668,15 @@ def admin():
 
 
                 if 'photo' in request.files:
-                    filename =photos.save(request.files['photo'])
+                    try:
+                        filename = photos.save(request.files['photo'])
+                    except:
+                        filename = "default.thumb"
+                        flash('Photo selected is not a valid file', "danger")
 
-                item = [itemname, category,filename, price, reorderpt, out_by,in_by,in_out_ratio]
+                    thumbnail = imaging.Imaging().thumb(filename)
+
+                item = [itemname, category, thumbnail, price, reorderpt, out_by, in_by, in_out_ratio]
                 print(item)
                 try:
                     # TODO: string parameterisation
