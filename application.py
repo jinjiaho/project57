@@ -5,7 +5,7 @@ from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation
-import os, copy, re, csv, json_decode, imaging
+import os, copy, re, csv, json_decode, imaging, pytz
 # from flask.ext.cache import Cache
 
 
@@ -55,6 +55,10 @@ role = ""
 # Configure the image uploading via Flask-Uploads
 photos = UploadSet('images', IMAGES)
 configure_uploads(application, photos)
+
+# Ascott Property Information
+TIMEZONE = "Singapore"
+PROP = "Ascott Raffles Place Singapore"
 
 
 ###########################
@@ -430,7 +434,8 @@ def lang_strip(s):
 
 @application.template_filter('curr_time')
 def curr_time(s):
-    return s+datetime.now().strftime('%I:%M %p')
+    tz = pytz.timezone(TIMEZONE)
+    return s+datetime.now(tz).strftime('%I:%M %p')
 
 # case query for mobile input
 def input_handler(qty, user):
