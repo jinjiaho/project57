@@ -57,7 +57,7 @@ photos = UploadSet('images', IMAGES)
 configure_uploads(application, photos)
 
 # Ascott Property Information
-TIMEZONE = "Singapore"
+TIMEZONE = "Asia/Singapore"
 PROP = "Ascott Raffles Place Singapore"
 
 
