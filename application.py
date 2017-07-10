@@ -696,7 +696,7 @@ def admin():
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
-# ------------------Add Location form ----------------------
+# ------------------Add Tag form ----------------------
         # TODO: Change form to get appropriate values
         elif request.form['name-form'] =='form3':
             if form3.validate() == False:
@@ -710,17 +710,18 @@ def admin():
             else:
                 tname = form3.tname.data
                 location = form3.location.data
-                remarks = form3.description.data
+                remarks = form3.remarks.data
 
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
 
                 # TODO: string parameterisation
-                query = "INSERT INTO TagInfo ('tname', 'storeroom', 'remarks') VALUES ('{}','{}','{}');".format(tname, location, remarks)
+                query = "INSERT INTO TagInfo (`tname`, `storeroom`, `remarks`) VALUES ('{}','{}','{}');".format(tname, location, remarks)
+                print(query)
                 cursor.execute(query)
                 conn.commit()
-                flash("New Location is Added!", "success")
+                flash("New Tag Added!", "success")
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
