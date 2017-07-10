@@ -17,6 +17,7 @@ import os, copy, re, csv, json_decode, imaging, pytz
 # pip2 install flask-wtf
 # pip2 install flask-mysql
 # pip2 install flask-uploads
+# pip2 install pytz
 # pip2 install numpy
 # pip2 install scipy
 # pip2 install statsmodels
@@ -36,13 +37,12 @@ import os, copy, re, csv, json_decode, imaging, pytz
 
 application = Flask(__name__, instance_relative_config=True)
 application.config.from_object('config.DevConfig') # default configurations
-application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
-#application.config.from_pyfile('myConfig1.cfg')
-#application.config.from_pyfile('myConfig2.cfg')
+application.config.from_pyfile('amazonRDS.py') # override with instanced configuration (in "/instance"), if any
+#application.config.from_pyfile('myConfig1.py')
+#application.config.from_pyfile('myConfig2.py')
 
 # Babel init
 babel = Babel(application)
-languages = ('en', 'zh', 'ms', 'ta')
 
 # mysql init
 mysql = MySQL()
@@ -55,11 +55,6 @@ role = ""
 # Configure the image uploading via Flask-Uploads
 photos = UploadSet('images', IMAGES)
 configure_uploads(application, photos)
-
-# Ascott Property Information
-TIMEZONE = "Asia/Singapore"
-PROP = "Ascott Raffles Place Singapore"
-
 
 ###########################
 ##        METHODS        ##
@@ -434,7 +429,7 @@ def lang_strip(s):
 
 @application.template_filter('curr_time')
 def curr_time(s):
-    tz = pytz.timezone(TIMEZONE)
+    tz = pytz.timezone(application.config["TIMEZONE"])
     return s+datetime.now(tz).strftime('%I:%M %p')
 
 # case query for mobile input
