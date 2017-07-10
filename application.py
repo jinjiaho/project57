@@ -701,7 +701,7 @@ def admin():
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
-# ------------------Add Location form ----------------------
+# ------------------Add Tag form ----------------------
         # TODO: Change form to get appropriate values
         elif request.form['name-form'] =='form3':
             if form3.validate() == False:
@@ -715,17 +715,18 @@ def admin():
             else:
                 tname = form3.tname.data
                 location = form3.location.data
-                remarks = form3.description.data
+                remarks = form3.remarks.data
 
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
 
                 # TODO: string parameterisation
-                query = "INSERT INTO TagInfo ('tname', 'storeroom', 'remarks') VALUES ('{}','{}','{}');".format(tname, location, remarks)
+                query = "INSERT INTO TagInfo (`tname`, `storeroom`, `remarks`) VALUES ('{}','{}','{}');".format(tname, location, remarks)
+                print(query)
                 cursor.execute(query)
                 conn.commit()
-                flash("New Location is Added!", "success")
+                flash("New Tag Added!", "success")
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
@@ -875,13 +876,18 @@ def item(iid):
     cursor.execute(query)
     data = cursor.fetchall()
     # d = [[s.encode('ascii') for s in list] for list in data]
-
     r = []
     for i in data:
+        cursor.execute("SELECT tname, storeroom FROM TagInfo WHERE tid={};".format(i[3]))
+        taginfo = cursor.fetchall()[0]
+        tname = taginfo[0].encode('ascii')
+        storeroom = taginfo[1].encode('ascii')
+
         r.append({"name": i[0].encode('ascii'),
             "category": i[1].encode('ascii'),
             "picture": i[2].encode('ascii'),
-            "location": i[3],
+            "tag": tname,
+            "location": storeroom,
             "qty_left": i[4],
             "reorder": i[5],
             "batch_size": i[6],
