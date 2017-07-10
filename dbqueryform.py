@@ -2,11 +2,12 @@ from flask import Flask, render_template, request, session, redirect, url_for, f
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
+# from application import application
 
 application = Flask(__name__, instance_relative_config=True)
 # application.config.from_object('config.Config') # default configurations
-application.config.from_pyfile('amazonRDS.cfg')
-# application.config.from_pyfile('myConfig1.cfg')
+application.config.from_pyfile('amazonRDS.py')
+# application.config.from_pyfile('myConfig1.py')
 
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.

@@ -163,9 +163,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
-        print("SELECT qty_left FROM view_item_locations WHERE iid={} AND tag={};".format(iid, tagId))
-        cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid={} AND tag={};".format(iid, tagId))
-        print('not this one')
+        cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid='{}' AND tag='{}';".format(iid, tagId))
         data = cursor.fetchall()
         old_qty = data[0][0]
 
@@ -178,7 +176,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
 
         elif action == 'in':
             qty_left = old_qty + inputQty
-            qty_diff = qty
+            qty_diff = qty_left - old_qty
         else:
             qty_left = inputQty
             qty_diff = qty_left - old_qty # change the value of qty to the difference
@@ -187,7 +185,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
         update_items_query = "UPDATE TagItems SET qty_left={} WHERE iid={} AND tag={};".format(qty_left, iid, tagId)
 
         # general query for all actions
-        print(update_items_query)
+        # print(update_items_query)
         cursor.execute(update_items_query)
         conn.commit()
 
@@ -200,14 +198,14 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
         # cursor = conn.cursor()
         update_logs_query = """INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location)
                                 VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');""".format(user, time, action, qty_diff, qty_left, iid, location)
-        print(update_logs_query)
+        # print(update_logs_query)
         cursor.execute(update_logs_query)
         conn.commit()
 
         return True
 
     except Exception as e:
-        print e
+        print("STOCK UPDATE ERROR: %s" % e)
         return False
 
 
@@ -307,65 +305,53 @@ def getDailyLogs():
 @application.route('/api/getChartData', methods=["POST"])
 def getChartData():
 
-    print "content_type: ", request.content_type
-    print "request.json: ", request.json
-
-    data = str(request.get_json())
-    # print(data, type(data))
+    print "CHART: content_type - ", request.content_type
+    print "CHART: request.json - ", request.json
 
     if not request.json:
-        print "Bad json format"
+        print "CHART: Bad JSON format, aborting chart creation..."
         page_not_found(400)
     else:
+        items = request.get_json()
+        iid = items[0]["iid"]
+        r = []
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        # TODO: string parameterisation
-        query = "SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(request.json)
+        for i in items:
+            # get transaction logs per tag
+            tag = i["tag"]
+            query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {} AND location = '{}'".format(iid, tag)
+            cursor.execute(query)
+            data = cursor.fetchall()
+            r.append({
+                "loc": i["location"], 
+                "val": data})
 
-        cursor.execute(query)
-        idItem = cursor.fetchone()[0]
-        # print(idItem)
-
-        query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {}".format(idItem)
-        # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
-        # TODO: string parameterisation
-        cursor.execute(query)
-        responseData = cursor.fetchall()
-
-        return jsonify(responseData)
+        return jsonify(r)
 
 # POST for getting chart data
 @application.route('/api/editReorder', methods=["POST"])
 def editReorder():
 
-    print "content_type: ", request.content_type
-    print "request.json: ", request.json
-
-    data = request.get_json()
-    print(data)
-    name = data["name"].encode('ascii')
-    reorder = data["reorder"]
-
+    print "REORDER: content_type - ", request.content_type
+    print "REORDER: request.json - ", request.json
 
     if not request.json:
-        print "Bad json format"
+        print "REORDER: Bad JSON format, aborting reorder modification..."
         page_not_found(400)
     else:
+        data = request.get_json()
+        name = data["name"].encode('ascii')
+        reorder = data["reorder"]
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
         cursor.execute(
             "UPDATE Ascott_InvMgmt.Items SET reorder_pt={} WHERE (name='{}' AND iid > 0);".format(reorder, name))
         conn.commit()
-        # idItem = cursor.fetchone()
-
-        # # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
-        # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
-        # # TODO: string parameterisation
-        # # query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
-        # cursor.execute(query)
-        # responseData = cursor.fetchall()
 
         return jsonify("")
 
@@ -432,6 +418,10 @@ def curr_time(s):
     tz = pytz.timezone(application.config["TIMEZONE"])
     return s+datetime.now(tz).strftime('%I:%M %p')
 
+@application.template_filter('prop_name')
+def prop_name(s):
+    return s+application.config["PROP_NAME"]
+
 # case query for mobile input
 def input_handler(qty, user):
     query = 'UPDATE TagItems SET qty_left = CASE WHERE iid={} WHEN action'
@@ -442,15 +432,15 @@ def input_handler(qty, user):
 def before():
     # localization setting
     if request.view_args and 'lang_code' in request.view_args:
-        if request.view_args['lang_code'] not in languages:
-            g.current_lang = "en" # default localisation
+        if request.view_args['lang_code'] not in application.config["BABEL_LOCALES"]:
+            g.current_lang = application.config["BABEL_DEFAULT_LOCALE"]
         else:
             g.current_lang = request.view_args['lang_code']
             session["lang_code"] = g.current_lang
             request.view_args.pop('lang_code')
     else:
-        session["lang_code"] = "en" # default localisation
-        g.current_lang = "en"
+        session["lang_code"] = application.config["BABEL_DEFAULT_LOCALE"]
+        g.current_lang = session["lang_code"]
 
     # user authentication
     if u'logged_in' not in session:
@@ -845,20 +835,21 @@ def item(iid):
         return redirect(url_for("login", lang_code=session["lang_code"]))
 
     if request.method == 'POST':
-        print("form received")
+
+        print "STOCK UPDATE: content_type - ", request.content_type
+
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         user = session['username']
 
         # form data
-        location = request.form['location']
-        qty = int(request.form['qty'])
-        action = request.form['action']
+        tid = int(request.form.get('location'))
+        qty = int(request.form.get('qty'))
+        action = request.form.get('action')
+        print("STOCK UPDATE: Form received - (iid: %s ,tid: %s, qty: %s , action: %s, user: %s)" % 
+            (iid, tid, qty, action, user))
 
-        cursor = mysql.connect().cursor()
-        cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(location))
-        tagId = cursor.fetchall()[0][0]
-
-        updateSuccess = stockUpdate(iid, tagId, qty, user, action, now)
+        # process changes
+        updateSuccess = stockUpdate(iid, tid, qty, user, action, now)
         if updateSuccess:
             flash('Stock updated!', 'success')
             return redirect(url_for("item", lang_code=get_locale(), iid=iid))
@@ -887,7 +878,9 @@ def item(iid):
             "reorder": i[5],
             "batch_size": i[6],
             "unit": i[7].encode('ascii'),
-            "price": round(i[8],2)})
+            "price": round(i[8],2),
+            "tid": i[3],
+            "iid": iid})
 
 
     cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.PriceChange WHERE item = '{}';".format(iid))

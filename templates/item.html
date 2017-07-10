@@ -4,7 +4,7 @@
 
 <style>
 .ui-widget {
-    font-family: "Helvetica Neue","Trebuchet MS",Tahoma,Verdana,Arial,sans-serif;
+    font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
     background: #fff;
 }
 
@@ -13,7 +13,8 @@
     width: 233px;
     height: auto;
     margin: 5px auto 0;
-    font: 9pt Arial, sans-serif;
+    font-size: 9pt;
+    font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 
 .ui-datepicker-header {
@@ -223,7 +224,7 @@
 
 
     <!-- Modal #1 display -->
-    <div id="delModal" class="modal fade" role="dialog">
+    <!-- <div id="delModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form method="POST">
@@ -247,28 +248,18 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> -->
     <!-- END Modal #1 display -->
 
     {% if item[0].reorder >= 0 %}
     <!-- Reorder point modal display -->
     <div id="reorder-modal" class="modal fade" role="dialog" tabindex="-1"><div class="modal-dialog" role="document"><div class="modal-content">
         <div class="modal-body">
-            <form id="reorder-form">
-                <div id="pred">
-                <b>Choose minimum stock level for {{item[0].name}}</b>
-                <div class="radio">
-                  <label>
-                    <input type="radio" name="manual-auto" id="pred-auto" value="auto" {% if item[0].reorder != 0 %}checked{% endif %}>
-                    Automatic reordering prediction
-                  </label>
+            <form id="reorder-form-2">
+                <div class="form-group">
+                    <label>Choose minimum stock level for {{item[0].name}}</label>
+                    <input type="number" class="form-control" name="reorder" id="reorder-field" placeholder="Reorder point" value="{{item[0].reorder}}" min="0">
                 </div>
-                <div class="radio">
-                  <label>
-                    <input type="radio" name="manual-auto" id="pred-manual" value="manual" {% if item[0].reorder == 0 %}checked{% endif %}>
-                    Manual input: <input type="text" class="form-control" id="pred-manual-qty" placeholder="Custom reorder point">
-                  </label>
-                </div></div>
             </form>
         </div>
         <div class="modal-footer">
@@ -368,7 +359,7 @@
                     <div class="text-center">
                         <select name="location" class="form-control" style="width:50%; margin:0 auto;">
                             {% for l in item %}
-                            <option value={{l.location}}>{{l.location}}</option>
+                            <option value='{{l.tid}}'>{{l.location}}</option>
                             {% endfor %}
                         </select><br>                    
                         <input type="number" class="form-control" name="qty" id="qty" min="0" placeholder="{{_('Quantity')}}" style="width:50%; margin:0 auto;">
@@ -407,11 +398,12 @@
                         <h4 class="modal-title">Price settings</h4>
                     </div>
                     <div class="modal-body">
-
-                    <p><b>Incoming new price for item: {% if pricechanges[0].new_price != 0 %} ${{pricechanges[0].new_price}} {% endif %}</b>
-                    </p>
-                    <p><b>With effect from: {% if pricechanges[0].date_effective != 0 %} {{pricechanges[0].date_effective}} {% endif %}</b>
-                    </p>
+                    {% if pricechanges[0].new_price != 0 %}
+                    <b>Incoming new price for item: $ {{pricechanges[0].new_price}}</b>
+                    {% endif %}
+                    {% if pricechanges[0].date_effective != 0 %}
+                    <b>With effect from: {{pricechanges[0].date_effective}}</b>
+                    {% endif %}
 
                     <p><b>Change current price?</b>&nbsp;&nbsp;&nbsp;<label class="radio-inline" id="turn-on-par">
                         <input type="radio" name="on-off" id="turn-on-price" value="on" {% if pricechanges[0].new_price == 0 %}checked{% endif %}> Yes
@@ -423,13 +415,13 @@
                         <div id="price" style="display:{% if pricechanges[0].new_price != 0 %}none{% endif %};">
                             <div>                    
                             <label> New price($):  
-                            <input type="text" id="new-price" placeholder="New Price">
+                            <input class="form-control" type="text" id="new-price" placeholder="New Price">
                             </label>
                             </div>
 
                             <div>
                             <label> With effect from: 
-                            <input type="text" id="date">
+                            <input class="form-control" type="date" id="date" placeholder="dd/mm/yyyy">
                             </label>
                             </div>
                         </div>
@@ -472,7 +464,16 @@ $(function() {
         }
     }
 })
-
+$(function() {
+    var number = $("#reorder-form-2 #reorder-field");
+    number.onkeydown = function(e) {
+        if(!((e.keyCode > 95 && e.keyCode < 106)
+          || (e.keyCode > 47 && e.keyCode < 58)
+          || e.keyCode == 8)) {
+            return false;
+        }
+    }
+})
 
 
 function editReorder(form) {
@@ -517,15 +518,15 @@ function editReorder(form) {
 //     location.reload();
 // });
 
-$('#reorder-form').submit(function(event) {
-    var reorder = {
-        "name": "{% if item %}{{item[0].name}}{% endif %}",
-        "tracking": $('input[name="on-off"]:checked').val(),
-        "prediction": $('input[name="manual-auto"]:checked').val(),
-        "qty": $('input[id="pred-manual-qty"]').val()
-    };
+$('#submit-reorder').click(function(event) {
+    var form = {};
+    form["name"] = "{% if item %}{{item[0].name}}{% endif %}";
+    $.each($('#reorder-form-2').serializeArray(), function(i, field) {
+        form[field.name] = field.value;
+    });
+
     event.preventDefault();
-    console.log(editReorder(reorder));
+    editReorder(form);
     location.reload();
 });
 
@@ -554,19 +555,26 @@ $('#reinstate-button').click(function(event) {
 });
 
 
+var item = {{item | safe}};
+var response1;
 function getData(callback) {
     $.ajax({
         type: "POST",
         url: "/api/getChartData",
-        data: JSON.stringify("{% if item %}{{item[0].name}}{% endif %}"),
+        data: JSON.stringify(item),
         dataType: "json",
         contentType: "application/json",
         success: function(response, status, jqXHR) {
-            var filtered = [];
-            for (var c = 0; c < response.length; ++c) {
-                filtered.push([new Date(response[c][0]).getTime(), response[c][1]]);
+            var top = [];
+            for (var i = 0; i < response.length; ++i) {
+                var bottom = [];
+                for (var row = 0; row < response[i].val.length; ++row) {
+                    bottom.push([new Date(response[i].val[row][0]).getTime(), response[i].val[row][1]]);
+                }
+                top.push({"loc": response[i].loc, "val": bottom});
             }
-            callback(filtered);
+            response1 = top;
+            callback(top);
         }
     });
 }
@@ -610,7 +618,7 @@ function initChart(dataSources) {
         },
         xAxis: {
             type: "datetime",
-            ordinal: false,
+            // ordinal: false,
             categories: [],
             labels: {
                 style: {
@@ -619,6 +627,7 @@ function initChart(dataSources) {
             }
         },
         yAxis: {
+            min : 0,
             gridLineDashStyle: 'longdash',
             labels: {
                 style: {
@@ -627,18 +636,18 @@ function initChart(dataSources) {
             }
         },
         chart: {
-            type: 'area',
+            type: 'line',
             style: {
                 fontFamily: "-apple-system,system-ui,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif",
                 fontSize: "14px"
             }
         },
         plotOptions: {
-            area: {
+            line: {
                 stacking: "normal",
                 connectNulls: false,
                 // lineColor: "#666666",
-                // lineWidth: 1,
+                lineWidth: 2,
                 // marker: {
                 //     lineWidth: 1,
                 //     lineColor: "#666666"
@@ -660,7 +669,7 @@ function initChart(dataSources) {
                 },
                 states: {
                     hover: {
-                        lineWidth: 1
+                        lineWidth: 3
                     }
                 },
                 threshold: null
@@ -679,20 +688,17 @@ function initChart(dataSources) {
         }
     });
 
+
+for (var i=0; i < dataSources.length; i++) {
     chart.addSeries({
-        name: '{% if item %}{{item[0].location}}{% endif %}',
+        name: dataSources[i].loc,
         // Define the data points. All series have a dummy year
         // of 1970/71 in order to be compared on the same x axis. Note
         // that in JavaScript, months start at 0 for January, 1 for February etc.
-        data: dataSources
+        data: dataSources[i].val
     });
-    chart.addSeries({
-        name: 'Level7',
-        // Define the data points. All series have a dummy year
-        // of 1970/71 in order to be compared on the same x axis. Note
-        // that in JavaScript, months start at 0 for January, 1 for February etc.
-        data: dataSources
-    });
+}
+
 }
 
 $(document).ready(function(){
