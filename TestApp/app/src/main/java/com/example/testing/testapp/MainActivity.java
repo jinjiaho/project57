@@ -33,15 +33,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // allows WebView to return to previous webpage instead of previous activity
-    @Override
-    public boolean onKeyDown(final int keyCode, final KeyEvent event){
-        if((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack()){
-            myWebView.goBack();
-            // if there is history, .canGoBack() will return true
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    public boolean onKeyDown(final int keyCode, final KeyEvent event){
+//        if((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack()){
+//            myWebView.goBack();
+//            // if there is history, .canGoBack() will return true
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 
     // upon detecting new intent from NFC tag, load the URL from tag in the WebView
     @Override
