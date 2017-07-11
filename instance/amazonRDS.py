@@ -10,3 +10,9 @@ UPLOADS_DEFAULT_URL = 'http://localhost:5000/static/img/items/'
 
 UPLOADED_IMAGES_DEST = 'static/img/items/'
 UPLOADED_IMAGES_URL = 'http://localhost:5000/static/img/items/'
+
+BABEL_LOCALES = ('en', 'zh', 'ms', 'ta')
+BABEL_DEFAULT_LOCALE = "en"
+
+TIMEZONE = "Asia/Singapore"
+PROP_NAME = "Ascott Raffles Place Singapore"
