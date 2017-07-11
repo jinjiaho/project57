@@ -4,7 +4,7 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
-from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation
+from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation, RemoveItem, RemoveTag
 import os, copy, re, csv, json_decode, imaging, pytz
 # from flask.ext.cache import Cache
 
@@ -553,9 +553,12 @@ def login():
 def admin():
 
     form = AddUserForm()
-    form2 =CreateNewItem()
-    form3 =AddNewLocation()
-    form4 =ExistingItemsLocation()
+    form2 = CreateNewItem()
+    form3 = AddNewLocation()
+    form4 = ExistingItemsLocation()
+    removeItemForm = RemoveItem()
+    removeTagForm = RemoveTag()
+
 
     #--------------users table-------------------------
     conn = mysql.connect()
@@ -612,6 +615,8 @@ def admin():
             form2=form2,
             form3=form3,
             form4=form4,
+            removeItemForm=removeItemForm,
+            removeTagForm=removeTagForm,
             users=things,
             group=group,
             item_list=flat_items)
@@ -627,6 +632,8 @@ def admin():
                     form2=form2,
                     form3=form3,
                     form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
                     users=things,
                     group=group)
             else:
@@ -659,6 +666,8 @@ def admin():
                     form2=form2,
                     form3=form3,
                     form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
                     users=things,
                     group=group)
             else:
@@ -701,6 +710,45 @@ def admin():
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
+# ------------------Remove Item Form ----------------------
+        elif request.form['name-form'] == 'removeItemForm':
+            if removeItemForm.validate() == False:
+                return render_template('admin.html',
+                    form=form,
+                    form2=form2,
+                    form3=form3,
+                    form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
+                    users=things,
+                    group=group)
+
+            else:
+                iname = removeItemForm.iname.data
+
+                conn = mysql.connect()
+                cursor = conn.cursor()
+                cursor.execute("SELECT iid FROM Items WHERE name='{}';".format(iname))
+                iid = cursor.fetchall()[0][0]
+
+                try:
+
+                    removeFromItems = "DELETE FROM Items WHERE name='{}';".format(iname)
+                    print removeFromItems
+                    cursor.execute(removeFromItems)
+                    conn.commit()
+
+                    removeFromTagItems = "DELETE FROM TagItems WHERE iid='{}';".format(iid)
+                    print removeFromTagItems
+                    cursor.execute(removeFromTagItems)
+                    conn.commit()
+
+                    flash('Item deleted!', 'success')
+                except:
+                    flash('Couldn\'t delete item', 'danger')
+            return redirect(url_for('admin', lang_code=get_locale()))
+
+
 # ------------------Add Tag form ----------------------
         # TODO: Change form to get appropriate values
         elif request.form['name-form'] =='form3':
@@ -710,6 +758,8 @@ def admin():
                     form2=form2,
                     form3=form3,
                     form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
                     users=things,
                     group=group)
             else:
@@ -720,14 +770,45 @@ def admin():
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
+                try:
+                    # TODO: string parameterisation
+                    query = "INSERT INTO TagInfo (`tname`, `storeroom`, `remarks`) VALUES ('{}','{}','{}');".format(tname, location, remarks)
+                    print(query)
+                    cursor.execute(query)
+                    conn.commit()
+                    flash("New Tag Added!", "success")
+                except:
+                    flash("Couldn't add tag.", "danger")
 
-                # TODO: string parameterisation
-                query = "INSERT INTO TagInfo (`tname`, `storeroom`, `remarks`) VALUES ('{}','{}','{}');".format(tname, location, remarks)
-                print(query)
-                cursor.execute(query)
-                conn.commit()
-                flash("New Tag Added!", "success")
+                return redirect(url_for('admin', lang_code=get_locale()))
 
+# ------------------Delete Tag form ----------------------
+
+        elif request.form['name-form'] == 'removeTagForm':
+            if removeTagForm.validate() == False:
+                return render_template('admin.html',
+                    form=form,
+                    form2=form2,
+                    form3=form3,
+                    form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
+                    users=things,
+                    group=group)
+            else:
+                tname = removeTagForm.tname.data
+
+                conn = mysql.connect()
+                cursor = conn.cursor()
+
+                query = "DELETE FROM TagInfo WHERE tname = '{}';".format(tname)
+                print query
+                try:
+                    cursor.execute(query)
+                    conn.commit()
+                    flash('Tag deleted!', 'success')
+                except:
+                    flash('Could\'t delete tag', 'danger')
                 return redirect(url_for('admin', lang_code=get_locale()))
 
 # ------------------Add Existing Items to New Locations form ----------------------
@@ -739,6 +820,8 @@ def admin():
                     form2=form2,
                     form3=form3,
                     form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
                     users=things,
                     group=group)
             else:
