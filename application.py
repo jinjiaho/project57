@@ -355,43 +355,74 @@ def editReorder():
 
         return jsonify("")
 
-# @application.route('/api/editPrice', methods=["POST"])
-# def editPrice():
+@application.route('/api/editPrice', methods=["POST"])
+def editPrice():
 
-#     print "content_type: ", request.content_type
-#     print "request.json: ", request.json
+    print "PRICECHANGE: content_type - ", request.content_type
+    print "PRICECHANGE: request.json - ", request.json
 
-#     data = request.get_json()
-#     # print(data)
-#     iid = data["iid"]
-#     newprice = data["price"]
-#     effectdate = data["effectdate"]
+    if not request.json:
+        print "PRICECHANGE: Bad json format, aborting reorder modification..."
+        page_not_found(400)
+    
+    else:
+    	data = request.get_json()
+    	print(data)
+    	iid = data["iid"].encode('ascii')
+    	# oldprice = data["oldprice"].encode('ascii')
+    	newprice = data["newprice"].encode('ascii')
+    	effectdate = data["effectdate"].encode('ascii')
 
-#     # print(iid)
-#     # print(newprice)
-#     # print(effectdate)
+    	# print(effectdate)
 
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute(
+        	"SELECT COUNT(*) FROM Ascott_InvMgmt.PriceChange WHERE item = '{}'".format(iid))
+        price_changed=cursor.fetchall()
 
-#     if not request.json:
-#         print "Bad json format"
-#         page_not_found(400)
-#     else:
-#         conn = mysql.connect()
-#         cursor = conn.cursor()
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        if price_changed[0][0] == 1:
 
-#         cursor.execute(
-#             "UPDATE Ascott_InvMgmt.PriceChange SET new_price='{}' AND date_effective='{}' WHERE (item = '{}');".format(newprice, effectdate, iid))
-#         conn.commit()
-#         # idItem = cursor.fetchone()
+        	cursor.execute(
+            	"UPDATE Ascott_InvMgmt.PriceChange SET new_price= '{}' , date_effective= STR_TO_DATE( '{} 00:00:00', '%Y/%m/%d %H:%i:%s') WHERE (item = '{}');".format(newprice, effectdate, iid))
+        	conn.commit()
 
-#         # # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
-#         # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
-#         # # TODO: string parameterisation
-#         # # query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
-#         # cursor.execute(query)
-#         # responseData = cursor.fetchall()
+        elif price_changed[0][0] == 0:
 
-#         return jsonify("")
+        	cursor.execute(
+            	"INSERT INTO Ascott_InvMgmt.PriceChange (item, new_price, date_effective) VALUES ('{}' ,'{}' ,'{}');".format(iid, newprice, effectdate))
+        	conn.commit()
+
+        # idItem = cursor.fetchone()
+
+        # # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
+        # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
+        # # TODO: string parameterisation
+        # # query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
+        # cursor.execute(query)
+        # responseData = cursor.fetchall()
+
+        return jsonify("")
+
+def priceChangenow():
+        cursor = mysql.connect().cursor()
+        cursor.execute("SELECT item, new_price FROM Ascott_InvMgmt.PriceChange WHERE date_effective < NOW();")
+        data=cursor.fetchall()
+        for row in data:
+        	conn = mysql.connect()
+        	cursor = conn.cursor()
+        	cursor.execute("UPDATE Ascott_InvMgmt.Items SET price='{}' WHERE (iid = '{}';".format(row[1],row[0]))
+        	conn.commit()
+
+        conn = mysql.connect()
+        cursor=conn.cursor()
+        cursor.execute("DELETE FROM Ascott_InvMgmt.PriceChange WHERE date_effective < NOW();")
+        conn.commit()
+
+        return jsonify("")
+
 
 # true if user is authenticated, else false
 def auth():
