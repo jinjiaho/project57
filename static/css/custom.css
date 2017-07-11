@@ -93,9 +93,6 @@
   text-align:center;
 }
 
-.alert-success {
-  background-color: #65e82c;
-}
 
 .btn-wrapper {
   width: 100%;
@@ -158,11 +155,6 @@ span.cart-group img {
   margin-bottom: 20px;
 }
 
-div.modal .modal-header h4 {
-  m/*argin: 0px;
-  co*/lor: #1d4262;
-}
-
 .qty-display.form-group label, 
 .qty-display.form-group input {
   float:left;
@@ -187,4 +179,23 @@ div.modal .modal-header h4 {
   margin-bottom: 5px;
   max-width: 40px;
   margin-right: 5px;
+}
+
+.tab-content {
+  padding-bottom: 40px;
+}
+
+/* styling for admin page panels */
+.tab-content {
+  padding: 2em;
+}
+
+.tab-content .panel-group .panel {
+  margin-bottom: 1em;
+}
+
+.tab-content .panel-group .panel .panel-collapse.collapse,
+.tab-content .panel-group .panel .panel-collapse.collapsing,
+.tab-content .panel-group .panel .panel-collapse.collapse.in {
+  padding: 0 2em;
 }

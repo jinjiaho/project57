@@ -5,7 +5,7 @@ from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation
-import os, copy, re, csv, json_decode, imaging
+import os, copy, re, csv, json_decode, imaging, pytz
 # from flask.ext.cache import Cache
 
 
@@ -17,6 +17,7 @@ import os, copy, re, csv, json_decode, imaging
 # pip2 install flask-wtf
 # pip2 install flask-mysql
 # pip2 install flask-uploads
+# pip2 install pytz
 # pip2 install numpy
 # pip2 install scipy
 # pip2 install statsmodels
@@ -36,13 +37,12 @@ import os, copy, re, csv, json_decode, imaging
 
 application = Flask(__name__, instance_relative_config=True)
 application.config.from_object('config.DevConfig') # default configurations
-application.config.from_pyfile('amazonRDS.cfg') # override with instanced configuration (in "/instance"), if any
-#application.config.from_pyfile('myConfig1.cfg')
-#application.config.from_pyfile('myConfig2.cfg')
+application.config.from_pyfile('amazonRDS.py') # override with instanced configuration (in "/instance"), if any
+#application.config.from_pyfile('myConfig1.py')
+#application.config.from_pyfile('myConfig2.py')
 
 # Babel init
 babel = Babel(application)
-languages = ('en', 'zh', 'ms', 'ta')
 
 # mysql init
 mysql = MySQL()
@@ -55,7 +55,6 @@ role = ""
 # Configure the image uploading via Flask-Uploads
 photos = UploadSet('images', IMAGES)
 configure_uploads(application, photos)
-
 
 ###########################
 ##        METHODS        ##
@@ -164,9 +163,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
-        print("SELECT qty_left FROM view_item_locations WHERE iid={} AND tag={};".format(iid, tagId))
-        cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid={} AND tag={};".format(iid, tagId))
-        print('not this one')
+        cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid='{}' AND tag='{}';".format(iid, tagId))
         data = cursor.fetchall()
         old_qty = data[0][0]
 
@@ -179,7 +176,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
 
         elif action == 'in':
             qty_left = old_qty + inputQty
-            qty_diff = qty
+            qty_diff = qty_left - old_qty
         else:
             qty_left = inputQty
             qty_diff = qty_left - old_qty # change the value of qty to the difference
@@ -188,7 +185,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
         update_items_query = "UPDATE TagItems SET qty_left={} WHERE iid={} AND tag={};".format(qty_left, iid, tagId)
 
         # general query for all actions
-        print(update_items_query)
+        # print(update_items_query)
         cursor.execute(update_items_query)
         conn.commit()
 
@@ -201,14 +198,14 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
         # cursor = conn.cursor()
         update_logs_query = """INSERT INTO Logs (user, date_time, action, qty_moved, qty_left, item, location)
                                 VALUES ('{}', '{}', '{}', {}, {}, {}, '{}');""".format(user, time, action, qty_diff, qty_left, iid, location)
-        print(update_logs_query)
+        # print(update_logs_query)
         cursor.execute(update_logs_query)
         conn.commit()
 
         return True
 
     except Exception as e:
-        print e
+        print("STOCK UPDATE ERROR: %s" % e)
         return False
 
 
@@ -308,65 +305,53 @@ def getDailyLogs():
 @application.route('/api/getChartData', methods=["POST"])
 def getChartData():
 
-    print "content_type: ", request.content_type
-    print "request.json: ", request.json
-
-    data = str(request.get_json())
-    # print(data, type(data))
+    print "CHART: content_type - ", request.content_type
+    print "CHART: request.json - ", request.json
 
     if not request.json:
-        print "Bad json format"
+        print "CHART: Bad JSON format, aborting chart creation..."
         page_not_found(400)
     else:
+        items = request.get_json()
+        iid = items[0]["iid"]
+        r = []
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        # TODO: string parameterisation
-        query = "SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(request.json)
+        for i in items:
+            # get transaction logs per tag
+            tag = i["tag"]
+            query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {} AND location = '{}'".format(iid, tag)
+            cursor.execute(query)
+            data = cursor.fetchall()
+            r.append({
+                "loc": i["location"], 
+                "val": data})
 
-        cursor.execute(query)
-        idItem = cursor.fetchone()[0]
-        # print(idItem)
-
-        query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {}".format(idItem)
-        # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
-        # TODO: string parameterisation
-        cursor.execute(query)
-        responseData = cursor.fetchall()
-
-        return jsonify(responseData)
+        return jsonify(r)
 
 # POST for getting chart data
 @application.route('/api/editReorder', methods=["POST"])
 def editReorder():
 
-    print "content_type: ", request.content_type
-    print "request.json: ", request.json
-
-    data = request.get_json()
-    print(data)
-    name = data["name"].encode('ascii')
-    reorder = data["reorder"]
-
+    print "REORDER: content_type - ", request.content_type
+    print "REORDER: request.json - ", request.json
 
     if not request.json:
-        print "Bad json format"
+        print "REORDER: Bad JSON format, aborting reorder modification..."
         page_not_found(400)
     else:
+        data = request.get_json()
+        name = data["name"].encode('ascii')
+        reorder = data["reorder"]
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
         cursor.execute(
             "UPDATE Ascott_InvMgmt.Items SET reorder_pt={} WHERE (name='{}' AND iid > 0);".format(reorder, name))
         conn.commit()
-        # idItem = cursor.fetchone()
-
-        # # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
-        # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
-        # # TODO: string parameterisation
-        # # query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
-        # cursor.execute(query)
-        # responseData = cursor.fetchall()
 
         return jsonify("")
 
@@ -430,7 +415,12 @@ def lang_strip(s):
 
 @application.template_filter('curr_time')
 def curr_time(s):
-    return s+datetime.now().strftime('%I:%M %p')
+    tz = pytz.timezone(application.config["TIMEZONE"])
+    return s+datetime.now(tz).strftime('%I:%M %p')
+
+@application.template_filter('prop_name')
+def prop_name(s):
+    return s+application.config["PROP_NAME"]
 
 # case query for mobile input
 def input_handler(qty, user):
@@ -442,15 +432,15 @@ def input_handler(qty, user):
 def before():
     # localization setting
     if request.view_args and 'lang_code' in request.view_args:
-        if request.view_args['lang_code'] not in languages:
-            g.current_lang = "en" # default localisation
+        if request.view_args['lang_code'] not in application.config["BABEL_LOCALES"]:
+            g.current_lang = application.config["BABEL_DEFAULT_LOCALE"]
         else:
             g.current_lang = request.view_args['lang_code']
             session["lang_code"] = g.current_lang
             request.view_args.pop('lang_code')
     else:
-        session["lang_code"] = "en" # default localisation
-        g.current_lang = "en"
+        session["lang_code"] = application.config["BABEL_DEFAULT_LOCALE"]
+        g.current_lang = session["lang_code"]
 
     # user authentication
     if u'logged_in' not in session:
@@ -696,7 +686,7 @@ def admin():
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
-# ------------------Add Location form ----------------------
+# ------------------Add Tag form ----------------------
         # TODO: Change form to get appropriate values
         elif request.form['name-form'] =='form3':
             if form3.validate() == False:
@@ -710,17 +700,18 @@ def admin():
             else:
                 tname = form3.tname.data
                 location = form3.location.data
-                remarks = form3.description.data
+                remarks = form3.remarks.data
 
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
 
                 # TODO: string parameterisation
-                query = "INSERT INTO TagInfo ('tname', 'storeroom', 'remarks') VALUES ('{}','{}','{}');".format(tname, location, remarks)
+                query = "INSERT INTO TagInfo (`tname`, `storeroom`, `remarks`) VALUES ('{}','{}','{}');".format(tname, location, remarks)
+                print(query)
                 cursor.execute(query)
                 conn.commit()
-                flash("New Location is Added!", "success")
+                flash("New Tag Added!", "success")
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
@@ -844,20 +835,21 @@ def item(iid):
         return redirect(url_for("login", lang_code=session["lang_code"]))
 
     if request.method == 'POST':
-        print("form received")
+
+        print "STOCK UPDATE: content_type - ", request.content_type
+
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         user = session['username']
 
         # form data
-        location = request.form['location']
-        qty = int(request.form['qty'])
-        action = request.form['action']
+        tid = int(request.form.get('location'))
+        qty = int(request.form.get('qty'))
+        action = request.form.get('action')
+        print("STOCK UPDATE: Form received - (iid: %s ,tid: %s, qty: %s , action: %s, user: %s)" % 
+            (iid, tid, qty, action, user))
 
-        cursor = mysql.connect().cursor()
-        cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(location))
-        tagId = cursor.fetchall()[0][0]
-
-        updateSuccess = stockUpdate(iid, tagId, qty, user, action, now)
+        # process changes
+        updateSuccess = stockUpdate(iid, tid, qty, user, action, now)
         if updateSuccess:
             flash('Stock updated!', 'success')
             return redirect(url_for("item", lang_code=get_locale(), iid=iid))
@@ -870,18 +862,25 @@ def item(iid):
     cursor.execute(query)
     data = cursor.fetchall()
     # d = [[s.encode('ascii') for s in list] for list in data]
-
     r = []
     for i in data:
+        cursor.execute("SELECT tname, storeroom FROM TagInfo WHERE tid={};".format(i[3]))
+        taginfo = cursor.fetchall()[0]
+        tname = taginfo[0].encode('ascii')
+        storeroom = taginfo[1].encode('ascii')
+
         r.append({"name": i[0].encode('ascii'),
             "category": i[1].encode('ascii'),
             "picture": i[2].encode('ascii'),
-            "location": i[3],
+            "tag": tname,
+            "location": storeroom,
             "qty_left": i[4],
             "reorder": i[5],
             "batch_size": i[6],
             "unit": i[7].encode('ascii'),
-            "price": round(i[8],2)})
+            "price": round(i[8],2),
+            "tid": i[3],
+            "iid": iid})
 
 
     cursor.execute("SELECT new_price, date_effective FROM Ascott_InvMgmt.PriceChange WHERE item = '{}';".format(iid))
