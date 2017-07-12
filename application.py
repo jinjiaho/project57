@@ -5,6 +5,7 @@ from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation, RemoveItem, RemoveTag
+from threading import Thread
 import os, copy, re, csv, json_decode, imaging, pytz
 # from flask.ext.cache import Cache
 
@@ -55,6 +56,7 @@ role = ""
 # Configure the image uploading via Flask-Uploads
 photos = UploadSet('images', IMAGES)
 configure_uploads(application, photos)
+
 
 ###########################
 ##        METHODS        ##
@@ -367,13 +369,9 @@ def editPrice():
     
     else:
     	data = request.get_json()
-    	print(data)
     	iid = data["iid"].encode('ascii')
-    	# oldprice = data["oldprice"].encode('ascii')
     	newprice = data["newprice"].encode('ascii')
     	effectdate = data["effectdate"].encode('ascii')
-
-    	# print(effectdate)
 
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -413,7 +411,7 @@ def priceChangenow():
         for row in data:
         	conn = mysql.connect()
         	cursor = conn.cursor()
-        	cursor.execute("UPDATE Ascott_InvMgmt.Items SET price='{}' WHERE (iid = '{}';".format(row[1],row[0]))
+        	cursor.execute("UPDATE Ascott_InvMgmt.Items SET price='{}' WHERE (iid = '{}');".format(row[1],row[0]))
         	conn.commit()
 
         conn = mysql.connect()
@@ -421,7 +419,10 @@ def priceChangenow():
         cursor.execute("DELETE FROM Ascott_InvMgmt.PriceChange WHERE date_effective < NOW();")
         conn.commit()
 
-        return jsonify("")
+        return
+
+background_thread = Thread(target=priceChangenow,args=())
+background_thread.start()
 
 
 # true if user is authenticated, else false
