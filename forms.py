@@ -18,7 +18,7 @@ class AddUserForm(FlaskForm):
 class CreateNewItem(FlaskForm):
 
 	itemname = StringField('Item Name', validators=[DataRequired("Please enter the name of the new item.")])
-	category = SelectField('Category of Item', choices = myDetails('category'), validators = [DataRequired()])
+	category = SelectField('Category of Item', validators = [DataRequired()])
 	price = DecimalField('Unit Price', places=4, rounding=None, validators = [DataRequired()])
 	reorderpt = IntegerField('Reorder point', validators = [DataRequired()])
 	count_unit = StringField('Unit for counting', validators = [DataRequired()])
@@ -29,8 +29,8 @@ class CreateNewItem(FlaskForm):
 class ExistingItemsLocation(FlaskForm):
 
 	itemname = StringField('Item Name', validators=[DataRequired("Please insert the name of the item")])
-	location = SelectField('Location of the Item', choices = myLocation('storeroom'), validators = [DataRequired()])
-	tname = SelectField('Tag Name', choices=myLocation('tname'), validators=[DataRequired("Please select a tag")])
+	location = SelectField('Location of the Item', validators = [DataRequired()])
+	tname = SelectField('Tag Name', validators=[DataRequired("Please select a tag")])
 	qty = IntegerField('Available Amount', validators = [DataRequired()])
 	submitFour = SubmitField('Add Location')
 
@@ -48,7 +48,8 @@ class RetrievalForm(FlaskForm):
 
 class AddNewLocation(FlaskForm):
 	tname = StringField('Name of new tag', validators=[DataRequired("Please enter the name of the tag without spaces.")])
-	location = SelectField('Location of the Item', choices = myLocation('storeroom'), validators = [DataRequired()])
+	location = SelectField('Select Storeroom', validators = [DataRequired()])
+	newLocation = StringField('Add a New Storeroom')
 	remarks = StringField('Remarks')
 	submitThree = SubmitField("Enter")
 
@@ -60,9 +61,9 @@ class TrackingForm(FlaskForm):
 	submit = SubmitField()
 
 class RemoveItem(FlaskForm):
-	iname = SelectField('Item name', choices=myDetails('name'))
+	iname = SelectField('Item name')
 	submit = SubmitField()
 
 class RemoveTag(FlaskForm):
-	tname = SelectField('Tag Name', choices=myLocation('tname'))
+	tname = SelectField('Tag Name')
 	submit = SubmitField()
