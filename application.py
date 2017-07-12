@@ -545,15 +545,22 @@ def login():
                     session.permanent = True
 
                 # check role
-                if data[2] == "supervisor":
-                    return redirect(url_for("dashboard", lang_code=get_locale()))
-                elif data[2] =="attendant":
-                    return redirect(url_for("scanner", lang_code=get_locale()))
+                if session['role'] == "supervisor":
+                    print session['next']
+                    if session['next']:
+                        return redirect(session.pop('next'))
+                    else:
+                        return redirect(url_for("dashboard", lang_code=get_locale()))
+                elif session['role'] == "attendant":
+                    if session['next']:
+                        return redirect(session.pop('next'))
+                    else:
+                        return redirect(url_for("dashboard", lang_code=get_locale()))
 
     elif request.method == "GET":
 
         # user authentication
-        if not session["logged_in"]:
+        if not auth():
             return render_template("login.html", form=form)
         else:
             # user already logged_in previously
@@ -620,8 +627,9 @@ def admin():
     if request.method =="GET":
 
         # user authentication
-        if not session["logged_in"]:
-            return redirect(url_for("login", lang_code=session["lang_code"]))
+        if not auth():
+            session['next'] = request.url
+            return redirect(url_for("login", lang_code=get_locale()))
 
         cursor.execute("SELECT DISTINCT name FROM Ascott_InvMgmt.Items;")
         items = cursor.fetchall()
@@ -878,8 +886,8 @@ def admin():
 def dashboard():
 
     # user authentication
-    logged_in = auth()
-    if not logged_in:
+    if not auth():
+        session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
 
     i = getInventoryLow()
@@ -899,8 +907,9 @@ def dashboard():
 def inventory():
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT DISTINCT category FROM Items;")
@@ -946,8 +955,9 @@ def inventory():
 def item(iid):
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     if request.method == 'POST':
 
@@ -1028,8 +1038,9 @@ def item(iid):
 def category(category):
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     category = category
     itemtype = getAllInventory(category)
@@ -1042,9 +1053,11 @@ def category(category):
 
 @application.route('/<lang_code>/storeroom/<storeroom>')
 def storeroom(storeroom):
+
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(storeroom))
@@ -1079,8 +1092,9 @@ def storeroom(storeroom):
 def logs():
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     logs=getAllLogs()
     # names=getUniqueNames()
@@ -1095,8 +1109,9 @@ def logs():
 def scanner():
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     return render_template('scanner.html')
 
@@ -1105,8 +1120,9 @@ def scanner():
 def shelf(tag_id):
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     items = inventoryQuick(tag_id)
