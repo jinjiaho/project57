@@ -554,7 +554,7 @@ def login():
                     if "next" in session:
                         return redirect(session.pop('next'))
                     else:
-                        return redirect(url_for("dashboard", lang_code=get_locale()))
+                        return redirect(url_for("scanner", lang_code=get_locale()))
 
     elif request.method == "GET":
 
