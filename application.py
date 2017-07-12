@@ -5,6 +5,7 @@ from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation, RemoveItem, RemoveTag
+from threading import Thread
 import os, copy, re, csv, json_decode, imaging, pytz
 # from flask.ext.cache import Cache
 
@@ -55,6 +56,7 @@ role = ""
 # Configure the image uploading via Flask-Uploads
 photos = UploadSet('images', IMAGES)
 configure_uploads(application, photos)
+
 
 ###########################
 ##        METHODS        ##
@@ -399,13 +401,9 @@ def editPrice():
     
     else:
     	data = request.get_json()
-    	print(data)
     	iid = data["iid"].encode('ascii')
-    	# oldprice = data["oldprice"].encode('ascii')
     	newprice = data["newprice"].encode('ascii')
     	effectdate = data["effectdate"].encode('ascii')
-
-    	# print(effectdate)
 
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -445,7 +443,7 @@ def priceChangenow():
         for row in data:
         	conn = mysql.connect()
         	cursor = conn.cursor()
-        	cursor.execute("UPDATE Ascott_InvMgmt.Items SET price='{}' WHERE (iid = '{}';".format(row[1],row[0]))
+        	cursor.execute("UPDATE Ascott_InvMgmt.Items SET price='{}' WHERE (iid = '{}');".format(row[1],row[0]))
         	conn.commit()
 
         conn = mysql.connect()
@@ -453,7 +451,10 @@ def priceChangenow():
         cursor.execute("DELETE FROM Ascott_InvMgmt.PriceChange WHERE date_effective < NOW();")
         conn.commit()
 
-        return jsonify("")
+        return
+
+background_thread = Thread(target=priceChangenow,args=())
+background_thread.start()
 
 
 # true if user is authenticated, else false
@@ -576,15 +577,21 @@ def login():
                     session.permanent = True
 
                 # check role
-                if data[2] == "supervisor":
-                    return redirect(url_for("dashboard", lang_code=get_locale()))
-                elif data[2] =="attendant":
-                    return redirect(url_for("scanner", lang_code=get_locale()))
+                if session['role'] == "supervisor":
+                    if "next" in session:
+                        return redirect(session.pop('next'))
+                    else:
+                        return redirect(url_for("dashboard", lang_code=get_locale()))
+                elif session['role'] == "attendant":
+                    if "next" in session:
+                        return redirect(session.pop('next'))
+                    else:
+                        return redirect(url_for("scanner", lang_code=get_locale()))
 
     elif request.method == "GET":
 
         # user authentication
-        if not session["logged_in"]:
+        if not auth():
             return render_template("login.html", form=form)
         else:
             # user already logged_in previously
@@ -660,8 +667,9 @@ def admin():
     if request.method =="GET":
 
         # user authentication
-        if not session["logged_in"]:
-            return redirect(url_for("login", lang_code=session["lang_code"]))
+        if not auth():
+            session['next'] = request.url
+            return redirect(url_for("login", lang_code=get_locale()))
 
         cursor.execute("SELECT DISTINCT name FROM Ascott_InvMgmt.Items;")
         items = cursor.fetchall()
@@ -930,8 +938,8 @@ def admin():
 def dashboard():
 
     # user authentication
-    logged_in = auth()
-    if not logged_in:
+    if not auth():
+        session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
 
     i = getInventoryLow()
@@ -951,8 +959,9 @@ def dashboard():
 def inventory():
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT DISTINCT category FROM Items;")
@@ -998,8 +1007,9 @@ def inventory():
 def item(iid):
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     if request.method == 'POST':
 
@@ -1080,8 +1090,9 @@ def item(iid):
 def category(category):
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     category = category
     itemtype = getAllInventory(category)
@@ -1094,9 +1105,11 @@ def category(category):
 
 @application.route('/<lang_code>/storeroom/<storeroom>')
 def storeroom(storeroom):
+
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(storeroom))
@@ -1131,8 +1144,9 @@ def storeroom(storeroom):
 def logs():
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     logs=getAllLogs()
     # names=getUniqueNames()
@@ -1147,8 +1161,9 @@ def logs():
 def scanner():
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     return render_template('scanner.html')
 
@@ -1157,8 +1172,9 @@ def scanner():
 def shelf(tag_id):
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     items = inventoryQuick(tag_id)

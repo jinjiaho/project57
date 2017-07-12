@@ -14,5 +14,7 @@ UPLOADED_IMAGES_URL = 'http://localhost:5000/static/img/items/'
 BABEL_LOCALES = ('en', 'zh', 'ms', 'ta')
 BABEL_DEFAULT_LOCALE = "en"
 
+# Property-specific info
+# Timezone string follows TZ format (see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 TIMEZONE = "Asia/Singapore"
 PROP_NAME = "Ascott Raffles Place Singapore"
