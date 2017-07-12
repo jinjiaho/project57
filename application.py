@@ -801,6 +801,7 @@ def admin():
                 cursor.execute("SELECT iid, picture FROM Items WHERE name='{}';".format(iname))
                 response = cursor.fetchall()[0]
                 iid, picture = response[0], response[1].encode("ascii")
+                pictures = os.path.splitext("static/img/items/"+picture)[0]+".*"
                 print "ADMIN: Deleting item #%s with thumbnail '%s' ..." % (iid, picture)
 
                 try:
@@ -816,10 +817,10 @@ def admin():
                     conn.commit()
 
                     try:
-                        purge("static/img/items/", os.path.splitext([picture])[0]+"*")
+                        purge("static/img/items/", pictures)
                         print("ADMIN: Item successfuly deleted!")
                     except Exception as e:
-                        print("DELETE THUMBNAIL: %s" % e)
+                            print("DELETE THUMBNAIL: %s" % e)
 
                     flash('Item deleted!', 'success')
 
