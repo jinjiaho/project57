@@ -546,13 +546,12 @@ def login():
 
                 # check role
                 if session['role'] == "supervisor":
-                    print session['next']
-                    if session['next']:
+                    if "next" in session:
                         return redirect(session.pop('next'))
                     else:
                         return redirect(url_for("dashboard", lang_code=get_locale()))
                 elif session['role'] == "attendant":
-                    if session['next']:
+                    if "next" in session:
                         return redirect(session.pop('next'))
                     else:
                         return redirect(url_for("dashboard", lang_code=get_locale()))
