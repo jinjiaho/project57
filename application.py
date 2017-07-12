@@ -5,7 +5,9 @@ from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation, RemoveItem, RemoveTag
-from threading import Thread
+from apscheduler.schedulers.background import BackgroundScheduler
+# from apscheduler.jobstores.mongodb import MongoDBJobStore
+# from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 import os, copy, re, csv, json_decode, imaging, pytz
 # from flask.ext.cache import Cache
 
@@ -56,6 +58,13 @@ role = ""
 # Configure the image uploading via Flask-Uploads
 photos = UploadSet('images', IMAGES)
 configure_uploads(application, photos)
+sched = BackgroundScheduler()
+
+# jobstores = {
+#     'mongo': MongoDBJobStore(),
+#     'default': SQLAlchemyJobStore(url='sqlite:///jobs.sqlite')
+# }
+
 
 
 ###########################
@@ -97,6 +106,7 @@ def tagsByStore():
 
 
 # Returns all the items based on category and amount in or out within the last month for each item
+# Called by category()
 def getAllInventory(category):
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -262,6 +272,7 @@ def getFromLevels(location):
 
 
 # Returns the logs that occurred within the current month.
+# Called by logs()
 def getAllLogs():
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -289,6 +300,7 @@ def getAllLogs():
 
 
 # Returns inventory items that are below threshold levels
+# Called by dashboard()
 def getInventoryLow():
 
     THRESHOLD = 1.2
@@ -309,7 +321,8 @@ def getInventoryLow():
             "category": i[5].encode('ascii')})
 
     return r
-
+    
+# Called by dashboard()
 def getDailyLogs():
 
     conn = mysql.connect()
@@ -404,26 +417,39 @@ def editPrice():
     	iid = data["iid"].encode('ascii')
     	newprice = data["newprice"].encode('ascii')
     	effectdate = data["effectdate"].encode('ascii')
+    	effectdate1 = datetime.strptime(effectdate , '%Y-%m-%d')
+    	# print(type(effectdate1))
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        cursor.execute(
-        	"SELECT COUNT(*) FROM Ascott_InvMgmt.PriceChange WHERE item = '{}'".format(iid))
-        price_changed=cursor.fetchall()
+        # conn = mysql.connect()
+        # cursor = conn.cursor()
+        # cursor.execute(
+        # 	"SELECT COUNT(*) FROM Ascott_InvMgmt.PriceChange WHERE item = '{}'".format(iid))
+        # price_changed=cursor.fetchall()
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        if price_changed[0][0] == 1:
+        # conn = mysql.connect()
+        # cursor = conn.cursor()
+        # if price_changed[0][0] == 1:
 
-        	cursor.execute(
-            	"UPDATE Ascott_InvMgmt.PriceChange SET new_price= '{}' , date_effective= STR_TO_DATE( '{} 00:00:00', '%Y/%m/%d %H:%i:%s') WHERE (item = '{}');".format(newprice, effectdate, iid))
-        	conn.commit()
+        # 	cursor.execute(
+        #     	"UPDATE Ascott_InvMgmt.PriceChange SET new_price= '{}' , date_effective= STR_TO_DATE( '{} 00:00:00', '%Y-%m-%d %H:%i:%s') WHERE (item = '{}');".format(newprice, effectdate, iid))
+        # 	conn.commit()
 
-        elif price_changed[0][0] == 0:
+        # elif price_changed[0][0] == 0:
 
-        	cursor.execute(
-            	"INSERT INTO Ascott_InvMgmt.PriceChange (item, new_price, date_effective) VALUES ('{}' ,'{}' ,'{}');".format(iid, newprice, effectdate))
-        	conn.commit()
+        # 	cursor.execute(
+        #     	"INSERT INTO Ascott_InvMgmt.PriceChange (item, new_price, date_effective) VALUES ('{}' ,'{}' ,'{}');".format(iid, newprice, effectdate))
+        # 	conn.commit()
+
+        try:
+        	sched.remove_job(iid, jobstore=None)
+        except:
+        	pass
+        # The job will be executed on effectdate
+        sched.add_job(priceChangenow, 'date', run_date=effectdate1, args=[iid,newprice], id=iid)
+        sched.print_jobs(jobstore=None)
+        
+        # sched.start()
+        # print(sched.jobstores)
 
         # idItem = cursor.fetchone()
 
@@ -436,25 +462,25 @@ def editPrice():
 
         return jsonify("")
 
-def priceChangenow():
-        cursor = mysql.connect().cursor()
-        cursor.execute("SELECT item, new_price FROM Ascott_InvMgmt.PriceChange WHERE date_effective < NOW();")
-        data=cursor.fetchall()
-        for row in data:
-        	conn = mysql.connect()
-        	cursor = conn.cursor()
-        	cursor.execute("UPDATE Ascott_InvMgmt.Items SET price='{}' WHERE (iid = '{}');".format(row[1],row[0]))
-        	conn.commit()
-
+def priceChangenow(iid,price):
         conn = mysql.connect()
-        cursor=conn.cursor()
-        cursor.execute("DELETE FROM Ascott_InvMgmt.PriceChange WHERE date_effective < NOW();")
+        cursor = conn.cursor()
+        cursor.execute("UPDATE Ascott_InvMgmt.Items SET price='{}' WHERE (iid = '{}');".format(iid,price))
         conn.commit()
+
+        # conn = mysql.connect()
+        # cursor=conn.cursor()
+        # cursor.execute("DELETE FROM Ascott_InvMgmt.PriceChange WHERE (item = '{}');".format(iid))
+        # conn.commit()
+
 
         return
 
-background_thread = Thread(target=priceChangenow,args=())
-background_thread.start()
+# delete files with same name, regardless of file ext
+def purge(dir, pattern):
+    for f in os.listdir(dir):
+        if re.search(pattern, f):
+            os.remove(os.path.join(dir, f))
 
 
 # true if user is authenticated, else false
@@ -561,14 +587,13 @@ def login():
                 return redirect(url_for("login", lang_code=get_locale()))
 
             # elif password != hashpass:
-            elif check_password_hash(data[1],password) ==False:
+            elif check_password_hash(data[1], password) == False:
                 # password does not match records
                 flash('Incorrect password')
                 return redirect(url_for("login", lang_code=get_locale()))
 
             else:
                 # username & password match
-                print(data[2])
                 session['username'] = data[0]
                 session['role'] = data[2]
                 session['name'] = data[3]
@@ -599,9 +624,6 @@ def login():
                 return redirect(url_for("dashboard", lang_code=get_locale()))
             elif session['role'] == "attendant":
                 return redirect(url_for("scanner", lang_code=get_locale()))
-
-    else:
-        return redirect(url_for("hello"))
 
 
 @application.route('/<lang_code>/admin', methods=["GET","POST"])
@@ -797,24 +819,36 @@ def admin():
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
-                cursor.execute("SELECT iid FROM Items WHERE name='{}';".format(iname))
-                iid = cursor.fetchall()[0][0]
+                cursor.execute("SELECT iid, picture FROM Items WHERE name='{}';".format(iname))
+                response = cursor.fetchall()[0]
+                iid, picture = response[0], response[1].encode("ascii")
+                pictures = os.path.splitext("static/img/items/"+picture)[0]+".*"
+                print "ADMIN: Deleting item #%s with thumbnail '%s' ..." % (iid, picture)
 
                 try:
 
                     removeFromItems = "DELETE FROM Items WHERE name='{}';".format(iname)
-                    print removeFromItems
+                    print "SQL: %s" % removeFromItems
                     cursor.execute(removeFromItems)
                     conn.commit()
 
                     removeFromTagItems = "DELETE FROM TagItems WHERE iid='{}';".format(iid)
-                    print removeFromTagItems
+                    print "SQL: %s" % removeFromTagItems
                     cursor.execute(removeFromTagItems)
                     conn.commit()
 
+                    try:
+                        purge("static/img/items/", pictures)
+                        print("ADMIN: Item successfuly deleted!")
+                    except Exception as e:
+                            print("DELETE THUMBNAIL: %s" % e)
+
                     flash('Item deleted!', 'success')
-                except:
+
+                except Exception as e:
+                    print("DELETE ITEM: %s" % e)
                     flash('Couldn\'t delete item', 'danger')
+
             return redirect(url_for('admin', lang_code=get_locale()))
 
 
@@ -1211,8 +1245,6 @@ def shelf(tag_id):
 
 @application.route('/logout')
 def logout():
-    session.pop['username']
-    session.pop['role']
     session.clear()
     return redirect(url_for("login", lang_code=get_locale()))
 

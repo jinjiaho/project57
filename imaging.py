@@ -24,6 +24,7 @@ class Imaging(object):
             if infile != outfile:
                 try:
                     im = Image.open(infile_abs)
+                    im = im.convert("RGB")
                     im.thumbnail((self.dim, self.dim), Image.ANTIALIAS)
                     im.save(outfile_abs, "JPEG")
                     return outfile
