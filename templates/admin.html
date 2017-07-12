@@ -499,7 +499,7 @@
             {% endif %}
 
             <div class="form-group">
-            {{ form4.tname(class="form-control", id="tagSelect")}}
+            {{ form4.tname(class="form-control", id="tagSelect"}}
             </div>
         </div>
 
@@ -531,6 +531,7 @@
 
 <script>
 $(function() {
+    filterTags();
 
   // Attach the `fileselect` event to all file inputs on the page
   $(document).on('change', ':file', function() {
@@ -558,23 +559,42 @@ $(function() {
   
 });
 
+function fixEncoding(str) {
+    s = str.replace(/&amp;/g, "&").replace(/&#(\d+);/g, function(match, number) {
+        return String.fromCharCode(number);
+    });
+    return s;
+}
 // ADD ITEM TO TAG FUNCTION: Shortlists tags according to storeroom selected
-// $("#storeroomSelect").change(function() {
-//     var storeroom = $("#storeroomSelect option:selected");
-//     var tagList = [];
-//     var storeDict = '{{ storeDict }}';
-//     for(store in storeDict) {
-//         if(store===storeroom) {
-//             taglist = storeDict[store];
-//         }
-//     }
-//     $("#tagSelect option").each(function() {
-//         $(this).hide();
-//         if($(this) in tagList) {
-//             $(this).show();
-//         }
-//     })
-// })
+function filterTags() {
+    var storeroom = $("#storeroomSelect option:selected").val();
+    var stores = fixEncoding("{{ tagsByStore }}");
+    var sd = JSON.parse(stores);
+    var tagList = [];
+    tagList = sd[storeroom];
+    for(var store in sd) {
+        console.log(store);
+        if(store===storeroom) {
+            taglist = sd[store];
+        }
+    }
+    var index = 0;
+    $("#tagSelect option").each(function() {
+        $(this).selected = false;
+        $(this).hide();
+        for (var t in tagList) {
+            $("#tagSelect option[value='"+tagList[t]+"']").show();
+            index = t;
+        }
+    });
+    $("#tagSelect ").value = tagList[0];
+    console.log($("#tagSelect").val());
+    console.log("default supposedly changed");
+}
+
+$("#storeroomSelect").change(function() {
+    filterTags();
+})
 
 var substringMatcher = function(strs) {
   return function findMatches(q, cb) {

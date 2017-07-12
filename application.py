@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, g
+from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, g, json
 from flask_babel import Babel
 from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flaskext.mysql import MySQL
@@ -682,7 +682,7 @@ def admin():
             form4=form4,
             removeItemForm=removeItemForm,
             removeTagForm=removeTagForm,
-            tagsByStore = tagsDict,
+            tagsByStore = json.dumps(tagsDict),
             users=things,
             group=group,
             item_list=flat_items)
@@ -700,7 +700,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = tagsDict,
+                    tagsByStore = json.dumps(tagsDict),
                     users=things,
                     group=group)
             else:
@@ -735,7 +735,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = tagsDict,
+                    tagsByStore = json.dumps(tagsDict),
                     users=things,
                     group=group)
             else:
@@ -788,7 +788,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = tagsDict,
+                    tagsByStore = json.dumps(tagsDict),
                     users=things,
                     group=group)
 
@@ -829,7 +829,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = tagsDict,
+                    tagsByStore = json.dumps(tagsDict),
                     users=things,
                     group=group)
             else:
@@ -868,7 +868,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = tagsDict,
+                    tagsByStore = json.dumps(tagsDict),
                     users=things,
                     group=group)
             else:
@@ -898,7 +898,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = tagsDict,
+                    tagsByStore = json.dumps(tagsDict),
                     users=things,
                     group=group)
             else:
