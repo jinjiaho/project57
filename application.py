@@ -62,6 +62,38 @@ configure_uploads(application, photos)
 
 # TODO: encapsulate all methods in separate classes and .py files
 
+# Query for form select fields. 
+# Called by admin()
+def choices(table, column):
+    choices = []
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    query = "SELECT {} FROM {};".format(column, table)
+    cursor.execute(query)
+    data1 = cursor.fetchall()
+    data2 = sorted(set(list(data1)))
+    for i in data2:
+        y=str(i[0])
+        x=(y,y)
+        choices.append(x)
+    return choices
+
+# get tags by storeroom
+def tagsByStore():
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT tname, storeroom FROM TagInfo;")
+    data = cursor.fetchall()
+    storeDict = {}
+    for d in data:
+        s = d[1].encode('ascii')
+        t = d[0].encode('ascii')
+        if s not in storeDict.keys():
+            storeDict[s] = [t]
+        else:
+            storeDict[s].append(t)
+    return storeDict
+
+
 # Returns all the items based on category and amount in or out within the last month for each item
 def getAllInventory(category):
     conn = mysql.connect()
@@ -575,6 +607,15 @@ def admin():
     removeItemForm = RemoveItem()
     removeTagForm = RemoveTag()
 
+    # Initialize options for all select fields
+    form2.category.choices = choices('Items', 'category')
+    form4.location.choices = choices('TagInfo', 'storeroom')
+    form4.tname.choices = choices('TagInfo', 'tname') # tags filtered by store with js
+    form3.location.choices = choices('TagInfo', 'storeroom')
+    removeItemForm.iname.choices = choices('Items', 'name')
+    removeTagForm.tname.choices = choices('TagInfo', 'tname')
+    tagsDict = tagsByStore()
+
 
     #--------------users table-------------------------
     conn = mysql.connect()
@@ -633,6 +674,7 @@ def admin():
             form4=form4,
             removeItemForm=removeItemForm,
             removeTagForm=removeTagForm,
+            tagsByStore = tagsDict,
             users=things,
             group=group,
             item_list=flat_items)
@@ -650,6 +692,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
             else:
@@ -684,6 +727,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
             else:
@@ -736,6 +780,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
 
@@ -776,13 +821,19 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
             else:
                 tname = form3.tname.data
-                location = form3.location.data
+                oldLocation = form3.location.data
+                newLocation = form3.newLocation.data
                 remarks = form3.remarks.data
 
+                if newLocation:
+                    location = newLocation
+                else:
+                    location = oldLocation
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
@@ -809,6 +860,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
             else:
@@ -838,6 +890,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
             else:
@@ -1142,6 +1195,8 @@ def shelf(tag_id):
 
 @application.route('/logout')
 def logout():
+    session.pop['username']
+    session.pop['role']
     session.clear()
     return redirect(url_for("login", lang_code=get_locale()))
 
