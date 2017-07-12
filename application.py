@@ -1223,8 +1223,6 @@ def shelf(tag_id):
 
 @application.route('/logout')
 def logout():
-    session.pop['username']
-    session.pop['role']
     session.clear()
     return redirect(url_for("login", lang_code=get_locale()))
 
