@@ -424,6 +424,11 @@ def priceChangenow():
 background_thread = Thread(target=priceChangenow,args=())
 background_thread.start()
 
+# delete files with same name, regardless of file ext
+def purge(dir, pattern):
+    for f in os.listdir(dir):
+        if re.search(pattern, f):
+            os.remove(os.path.join(dir, f))
 
 # true if user is authenticated, else false
 def auth():
@@ -529,14 +534,13 @@ def login():
                 return redirect(url_for("login", lang_code=get_locale()))
 
             # elif password != hashpass:
-            elif check_password_hash(data[1],password) ==False:
+            elif check_password_hash(data[1], password) == False:
                 # password does not match records
                 flash('Incorrect password')
                 return redirect(url_for("login", lang_code=get_locale()))
 
             else:
                 # username & password match
-                print(data[2])
                 session['username'] = data[0]
                 session['role'] = data[2]
                 session['name'] = data[3]
@@ -567,9 +571,6 @@ def login():
                 return redirect(url_for("dashboard", lang_code=get_locale()))
             elif session['role'] == "attendant":
                 return redirect(url_for("scanner", lang_code=get_locale()))
-
-    else:
-        return redirect(url_for("hello"))
 
 
 @application.route('/<lang_code>/admin', methods=["GET","POST"])
@@ -752,24 +753,35 @@ def admin():
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
-                cursor.execute("SELECT iid FROM Items WHERE name='{}';".format(iname))
-                iid = cursor.fetchall()[0][0]
+                cursor.execute("SELECT iid, picture FROM Items WHERE name='{}';".format(iname))
+                response = cursor.fetchall()[0]
+                iid, picture = response[0], response[1].encode("ascii")
+                print "ADMIN: Deleting item #%s with thumbnail '%s' ..." % (iid, picture)
 
                 try:
 
                     removeFromItems = "DELETE FROM Items WHERE name='{}';".format(iname)
-                    print removeFromItems
+                    print "SQL: %s" % removeFromItems
                     cursor.execute(removeFromItems)
                     conn.commit()
 
                     removeFromTagItems = "DELETE FROM TagItems WHERE iid='{}';".format(iid)
-                    print removeFromTagItems
+                    print "SQL: %s" % removeFromTagItems
                     cursor.execute(removeFromTagItems)
                     conn.commit()
 
+                    try:
+                        purge("static/img/items/", os.path.splitext([picture])[0]+"*")
+                        print("ADMIN: Item successfuly deleted!")
+                    except Exception as e:
+                        print("DELETE THUMBNAIL: %s" % e)
+
                     flash('Item deleted!', 'success')
-                except:
+
+                except Exception as e:
+                    print("DELETE ITEM: %s" % e)
                     flash('Couldn\'t delete item', 'danger')
+
             return redirect(url_for('admin', lang_code=get_locale()))
 
 
