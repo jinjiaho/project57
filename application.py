@@ -73,6 +73,38 @@ sched = BackgroundScheduler()
 
 # TODO: encapsulate all methods in separate classes and .py files
 
+# Query for form select fields. 
+# Called by admin()
+def choices(table, column):
+    choices = []
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    query = "SELECT {} FROM {};".format(column, table)
+    cursor.execute(query)
+    data1 = cursor.fetchall()
+    data2 = sorted(set(list(data1)))
+    for i in data2:
+        y=str(i[0])
+        x=(y,y)
+        choices.append(x)
+    return choices
+
+# get tags by storeroom
+def tagsByStore():
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT tname, storeroom FROM TagInfo;")
+    data = cursor.fetchall()
+    storeDict = {}
+    for d in data:
+        s = d[1].encode('ascii')
+        t = d[0].encode('ascii')
+        if s not in storeDict.keys():
+            storeDict[s] = [t]
+        else:
+            storeDict[s].append(t)
+    return storeDict
+
+
 # Returns all the items based on category and amount in or out within the last month for each item
 def getAllInventory(category):
     conn = mysql.connect()
@@ -437,7 +469,15 @@ def priceChangenow(iid,price):
         # cursor.execute("DELETE FROM Ascott_InvMgmt.PriceChange WHERE (item = '{}');".format(iid))
         # conn.commit()
 
+
         return
+
+# delete files with same name, regardless of file ext
+def purge(dir, pattern):
+    for f in os.listdir(dir):
+        if re.search(pattern, f):
+            os.remove(os.path.join(dir, f))
+
 
 # true if user is authenticated, else false
 def auth():
@@ -543,14 +583,13 @@ def login():
                 return redirect(url_for("login", lang_code=get_locale()))
 
             # elif password != hashpass:
-            elif check_password_hash(data[1],password) ==False:
+            elif check_password_hash(data[1], password) == False:
                 # password does not match records
                 flash('Incorrect password')
                 return redirect(url_for("login", lang_code=get_locale()))
 
             else:
                 # username & password match
-                print(data[2])
                 session['username'] = data[0]
                 session['role'] = data[2]
                 session['name'] = data[3]
@@ -559,15 +598,21 @@ def login():
                     session.permanent = True
 
                 # check role
-                if data[2] == "supervisor":
-                    return redirect(url_for("dashboard", lang_code=get_locale()))
-                elif data[2] =="attendant":
-                    return redirect(url_for("scanner", lang_code=get_locale()))
+                if session['role'] == "supervisor":
+                    if "next" in session:
+                        return redirect(session.pop('next'))
+                    else:
+                        return redirect(url_for("dashboard", lang_code=get_locale()))
+                elif session['role'] == "attendant":
+                    if "next" in session:
+                        return redirect(session.pop('next'))
+                    else:
+                        return redirect(url_for("scanner", lang_code=get_locale()))
 
     elif request.method == "GET":
 
         # user authentication
-        if not session["logged_in"]:
+        if not auth():
             return render_template("login.html", form=form)
         else:
             # user already logged_in previously
@@ -575,9 +620,6 @@ def login():
                 return redirect(url_for("dashboard", lang_code=get_locale()))
             elif session['role'] == "attendant":
                 return redirect(url_for("scanner", lang_code=get_locale()))
-
-    else:
-        return redirect(url_for("hello"))
 
 
 @application.route('/<lang_code>/admin', methods=["GET","POST"])
@@ -589,6 +631,15 @@ def admin():
     form4 = ExistingItemsLocation()
     removeItemForm = RemoveItem()
     removeTagForm = RemoveTag()
+
+    # Initialize options for all select fields
+    form2.category.choices = choices('Items', 'category')
+    form4.location.choices = choices('TagInfo', 'storeroom')
+    form4.tname.choices = choices('TagInfo', 'tname') # tags filtered by store with js
+    form3.location.choices = choices('TagInfo', 'storeroom')
+    removeItemForm.iname.choices = choices('Items', 'name')
+    removeTagForm.tname.choices = choices('TagInfo', 'tname')
+    tagsDict = tagsByStore()
 
 
     #--------------users table-------------------------
@@ -634,8 +685,9 @@ def admin():
     if request.method =="GET":
 
         # user authentication
-        if not session["logged_in"]:
-            return redirect(url_for("login", lang_code=session["lang_code"]))
+        if not auth():
+            session['next'] = request.url
+            return redirect(url_for("login", lang_code=get_locale()))
 
         cursor.execute("SELECT DISTINCT name FROM Ascott_InvMgmt.Items;")
         items = cursor.fetchall()
@@ -648,6 +700,7 @@ def admin():
             form4=form4,
             removeItemForm=removeItemForm,
             removeTagForm=removeTagForm,
+            tagsByStore = tagsDict,
             users=things,
             group=group,
             item_list=flat_items)
@@ -665,6 +718,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
             else:
@@ -699,6 +753,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
             else:
@@ -751,6 +806,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
 
@@ -759,24 +815,35 @@ def admin():
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
-                cursor.execute("SELECT iid FROM Items WHERE name='{}';".format(iname))
-                iid = cursor.fetchall()[0][0]
+                cursor.execute("SELECT iid, picture FROM Items WHERE name='{}';".format(iname))
+                response = cursor.fetchall()[0]
+                iid, picture = response[0], response[1].encode("ascii")
+                print "ADMIN: Deleting item #%s with thumbnail '%s' ..." % (iid, picture)
 
                 try:
 
                     removeFromItems = "DELETE FROM Items WHERE name='{}';".format(iname)
-                    print removeFromItems
+                    print "SQL: %s" % removeFromItems
                     cursor.execute(removeFromItems)
                     conn.commit()
 
                     removeFromTagItems = "DELETE FROM TagItems WHERE iid='{}';".format(iid)
-                    print removeFromTagItems
+                    print "SQL: %s" % removeFromTagItems
                     cursor.execute(removeFromTagItems)
                     conn.commit()
 
+                    try:
+                        purge("static/img/items/", os.path.splitext([picture])[0]+"*")
+                        print("ADMIN: Item successfuly deleted!")
+                    except Exception as e:
+                        print("DELETE THUMBNAIL: %s" % e)
+
                     flash('Item deleted!', 'success')
-                except:
+
+                except Exception as e:
+                    print("DELETE ITEM: %s" % e)
                     flash('Couldn\'t delete item', 'danger')
+
             return redirect(url_for('admin', lang_code=get_locale()))
 
 
@@ -791,13 +858,19 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
             else:
                 tname = form3.tname.data
-                location = form3.location.data
+                oldLocation = form3.location.data
+                newLocation = form3.newLocation.data
                 remarks = form3.remarks.data
 
+                if newLocation:
+                    location = newLocation
+                else:
+                    location = oldLocation
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
@@ -824,6 +897,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
             else:
@@ -853,6 +927,7 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
+                    tagsByStore = tagsDict,
                     users=things,
                     group=group)
             else:
@@ -892,8 +967,8 @@ def admin():
 def dashboard():
 
     # user authentication
-    logged_in = auth()
-    if not logged_in:
+    if not auth():
+        session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
 
     i = getInventoryLow()
@@ -913,8 +988,9 @@ def dashboard():
 def inventory():
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT DISTINCT category FROM Items;")
@@ -960,8 +1036,9 @@ def inventory():
 def item(iid):
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     if request.method == 'POST':
 
@@ -1042,8 +1119,9 @@ def item(iid):
 def category(category):
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     category = category
     itemtype = getAllInventory(category)
@@ -1056,9 +1134,11 @@ def category(category):
 
 @application.route('/<lang_code>/storeroom/<storeroom>')
 def storeroom(storeroom):
+
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(storeroom))
@@ -1093,8 +1173,9 @@ def storeroom(storeroom):
 def logs():
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     logs=getAllLogs()
     # names=getUniqueNames()
@@ -1109,8 +1190,9 @@ def logs():
 def scanner():
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     return render_template('scanner.html')
 
@@ -1119,8 +1201,9 @@ def scanner():
 def shelf(tag_id):
 
     # user authentication
-    if not session["logged_in"]:
-        return redirect(url_for("login", lang_code=session["lang_code"]))
+    if not auth():
+        session['next'] = request.url
+        return redirect(url_for("login", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     items = inventoryQuick(tag_id)

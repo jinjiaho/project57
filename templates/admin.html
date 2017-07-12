@@ -356,19 +356,38 @@
                             {{ form.hidden_tag() }}
                             <input type="hidden"  name="name-form" value='form3' >
 
-                            <div class="row form-group">
-                                {{ form3.location.label }}
-                                {% if form3.location.errors %}
-                                    {% for error in form3.location.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
+                            <div class="row">
 
-                                <div class="form-group">
-                                {{ form3.location(class="form-control")}}
+                                <div class="row form-group col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                                    {{ form3.location.label }}
+                                    {% if form3.location.errors %}
+                                        {% for error in form3.location.errors %}
+                                        <p class="error-message">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    <div class="form-group">
+                                    {{ form3.location(class="form-control")}}
+                                    </div>
+                                </div>
+
+                                <div class="row form-group col-lg-1 col-md-1 col-sm-12 col-xs-12" style="text-align:center;">
+                                    <strong>or</strong>
+                                </div>
+
+                                <div class="row form-group col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                                    {{ form3.newLocation.label }}
+                                    {% if form3.newLocation.errors %}
+                                        {% for error in form3.newLocation.errors %}
+                                        <p class="error-message">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    <div class="form-group">
+                                    {{ form3.newLocation(class="form-control", placeholder="Name of New Storeroom")}}
+                                    </div>
                                 </div>
                             </div>
-
 
                             <div class="row form-group">
                                 {{ form3.tname.label }}
@@ -452,7 +471,7 @@
             {% endif %}
 
             <div id="add-item-name" class="form-group">
-            {{ form4.itemname(class="form-control typeahead", placeholder="Name of Existing Item")}}
+            {{ form4.itemname(class="form-control typeahead", placeholder="Name of Existing Item", style="width: 100%;")}}
             </div>
         </div>
 
@@ -466,7 +485,7 @@
             {% endif %}
 
             <div class="form-group">
-            {{ form4.location(class="form-control")}}
+            {{ form4.location(class="form-control", id="storeroomSelect")}}
             </div>
         </div>
 
@@ -480,7 +499,7 @@
             {% endif %}
 
             <div class="form-group">
-            {{ form4.tname(class="form-control")}}
+            {{ form4.tname(class="form-control", id="tagSelect")}}
             </div>
         </div>
 
@@ -538,10 +557,25 @@ $(function() {
   });
   
 });
-</script>
 
+// ADD ITEM TO TAG FUNCTION: Shortlists tags according to storeroom selected
+// $("#storeroomSelect").change(function() {
+//     var storeroom = $("#storeroomSelect option:selected");
+//     var tagList = [];
+//     var storeDict = '{{ storeDict }}';
+//     for(store in storeDict) {
+//         if(store===storeroom) {
+//             taglist = storeDict[store];
+//         }
+//     }
+//     $("#tagSelect option").each(function() {
+//         $(this).hide();
+//         if($(this) in tagList) {
+//             $(this).show();
+//         }
+//     })
+// })
 
-<script>
 var substringMatcher = function(strs) {
   return function findMatches(q, cb) {
     var matches, substringRegex;
