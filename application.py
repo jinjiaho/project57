@@ -106,6 +106,7 @@ def tagsByStore():
 
 
 # Returns all the items based on category and amount in or out within the last month for each item
+# Called by category()
 def getAllInventory(category):
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -271,6 +272,7 @@ def getFromLevels(location):
 
 
 # Returns the logs that occurred within the current month.
+# Called by logs()
 def getAllLogs():
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -298,6 +300,7 @@ def getAllLogs():
 
 
 # Returns inventory items that are below threshold levels
+# Called by dashboard()
 def getInventoryLow():
 
     THRESHOLD = 1.2
@@ -318,7 +321,8 @@ def getInventoryLow():
             "category": i[5].encode('ascii')})
 
     return r
-
+    
+# Called by dashboard()
 def getDailyLogs():
 
     conn = mysql.connect()
