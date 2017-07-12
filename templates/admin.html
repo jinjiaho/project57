@@ -16,6 +16,10 @@
     color: #db4437;
 }*/
 
+.error-message {
+    color: red;
+}
+
 </style>
 
 
@@ -174,6 +178,7 @@
 
     <div role="tabpanel" id="item" class="container-fluid tab-pane fade">
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <!-- New Item Form -->
             <div class="panel panel-default">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-newItem" aria-expanded="true" aria-controls="collapse-newItem">
                     <div class="panel-heading text-center" role="tab" id="heading-newItem" style="background-color:#f5f5f5;">
@@ -212,15 +217,17 @@
                                 </div>
                             </div>
 
-                            <div class="input-group" style="margin-bottom: 20px;">
-                                <label class="input-group-btn">
-                                    <span class="btn btn-default">
-                                        Upload photo&hellip;<input type="file" accept="image/*" name="photo" style="display: none;">
-                                    </span>
-                                </label>
-                                <input type="text" class="form-control" readonly>
+                            <div class="row form-group">
+                                <strong>Upload a Photo</strong>
+                                <div class="input-group" style="margin-bottom: 20px;">
+                                    <label class="input-group-btn">
+                                        <span class="btn btn-default">
+                                            Upload photo&hellip;<input type="file" accept="image/*" name="photo" style="display: none;">
+                                        </span>
+                                    </label>
+                                    <input type="text" class="form-control" readonly>
+                                </div>
                             </div>
-
 
                             <div class="row form-group">
                                 {{ form2.reorderpt.label }}
@@ -263,8 +270,6 @@
                                 </div>
                             </div>
 
-
-
                             <div class="row form-group">
                                 {{ form2.order_unit.label }}
                                 {% if form2.order_unit.errors %}
@@ -291,18 +296,6 @@
                                 </div>
                             </div>
 
-                            <div class="row form-group">
-                                {% with messages = get_flashed_messages() %}
-                                    {% if messages %}
-                                    <ul class="error-message">
-                                    {% for message in messages %}
-                                        {{ message }}
-                                    {% endfor %}
-                                     </ul>
-                                    {% endif %}
-                                {% endwith %}
-                            </div>
-
                             {{ form2.submitTwo(class="width-35 pull-right btn btn-sm btn-primary") }}
 
 
@@ -310,6 +303,8 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Delete Item Form -->
             <div class="panel panel-default">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-delItem" aria-expanded="true" aria-controls="collapse-delItem">
                     <div class="panel-heading text-center" role="tab" id="heading-delItem" style="background-color:#f5f5f5;">
@@ -320,14 +315,21 @@
                 </a>
                 <div id="collapse-delItem" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-delItem">
                     <div class="panel-body">
-                        <form method="POST" id="delItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data ><input type="hidden"  name="name-form" value='form2' >
+                        <form method="POST" id="delItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ removeItemForm.hidden_tag() }}<input type="hidden"  name="name-form" value='removeItemForm' >
                         <!-- Just placeholders for future delete group input -->
                             <div class="row form-group">
-                                Item Name
+                                {{ removeItemForm.iname.label }}
+                                {% if removeItemForm.iname.errors %}
+                                    {% for error in removeItemForm.iname.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
                                 <div id="add-item-name" class="form-group">
-                                {{ form2.itemname(class="form-control", placeholder="Name of Item")}}
+                                {{ removeItemForm.iname(class="form-control", placeholder="Name of Item")}}
                                 </div>
                             </div>
+
+                            {{ removeItemForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
                         </form>
                     </div>
                 </div>
@@ -338,65 +340,98 @@
 
 <!--#........................TAB4.............................  -->
     <div role="tabpanel" id="group" class="container-fluid tab-pane fade">
-        <form method="POST" action="/{{g.current_lang}}/admin">
-            {{ form.hidden_tag() }}
-            <input type="hidden"  name="name-form" value='form3' >
-        <h3> Add a New Tag</h3>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <!-- New Tag Form -->
+            <div class="panel panel-default">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-newTag" aria-expanded="true" aria-controls="collapse-newTag">
+                    <div class="panel-heading text-center" role="tab" id="heading-newTag" style="background-color:#f5f5f5;">
+                        <h4 class="panel-title">
+                            Add a New Tag
+                        </h4>
+                    </div>
+                </a>
+                <div id="collapse-newTag" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-newTag">
+                    <div class="panel-body">
+                        <form method="POST" action="/{{g.current_lang}}/admin">
+                            {{ form.hidden_tag() }}
+                            <input type="hidden"  name="name-form" value='form3' >
+
+                            <div class="row form-group">
+                                {{ form3.location.label }}
+                                {% if form3.location.errors %}
+                                    {% for error in form3.location.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <div class="form-group">
+                                {{ form3.location(class="form-control")}}
+                                </div>
+                            </div>
 
 
-        <div class="row form-group">
-            {{ form3.location.label }}
-            {% if form3.location.errors %}
-                {% for error in form3.location.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
+                            <div class="row form-group">
+                                {{ form3.tname.label }}
+                                {% if form3.tname.errors %}
+                                    {% for error in form3.tname.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
 
-            <div class="form-group">
-            {{ form3.location(class="form-control")}}
+                                <div class="form-group">
+                                {{ form3.tname(class="form-control", placeholder="Name of new tag")}}
+                                </div>
+                            </div>
+
+
+
+                            <div class="row form-group">
+                                {{ form3.remarks.label }}
+
+                                <div class="form-group">
+                                {{ form3.remarks(class="form-control", placeholder="Remarks (optional)")}}
+                                </div>
+                            </div>
+
+                            {{ form3.submitThree(class="width-35 pull-right btn btn-sm btn-primary") }}
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Tag Form -->
+            <div class="panel panel-default">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-delTag" aria-expanded="true" aria-controls="collapse-delTag">
+                    <div class="panel-heading text-center" role="tab" id="heading-delTag" style="background-color:#f5f5f5;">
+                        <h4 class="panel-title">
+                            Delete A Tag
+                        </h4>
+                    </div>
+                </a>
+                <div id="collapse-delTag" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-delTag">
+                    <div class="panel-body">
+                        <form method="POST" id="delItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ removeTagForm.hidden_tag() }}<input type="hidden"  name="name-form" value='removeTagForm' >
+                            <div class="row form-group">
+                                {{ removeTagForm.tname.label }}
+                                {% if removeTagForm.tname.errors %}
+                                    {% for error in removeTagForm.tname.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                                <div id="add-item-name" class="form-group">
+                                {{ removeTagForm.tname(class="form-control", placeholder="Name of Item")}}
+                                </div>
+                            </div>
+
+                            {{ removeTagForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-
-
-        <div class="row form-group">
-            {{ form3.tname.label }}
-            {% if form3.tname.errors %}
-                {% for error in form3.tname.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form3.tname(class="form-control", placeholder="Name of new tag")}}
-            </div>
-        </div>
-
-
-
-        <div class="row form-group">
-            {{ form3.remarks.label }}
-
-            <div class="form-group">
-            {{ form3.remarks(class="form-control", placeholder="Remarks (optional)")}}
-            </div>
-        </div>
-
-        <div class="row form-group">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                <ul class="error-message">
-                {% for message in messages %}
-                    {{ message }}
-                {% endfor %}
-                 </ul>
-                {% endif %}
-            {% endwith %}
-        </div>
-
-        {{ form3.submitThree(class="width-35 pull-right btn btn-sm btn-primary") }}
-
-        </form>
-
+                        
     </div>
 
 
@@ -464,19 +499,7 @@
         </div>
 
 
-        <div class="row form-group">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                <ul class="error-message">
-                {% for message in messages %}
-                    {{ message }}
-                {% endfor %}
-                 </ul>
-                {% endif %}
-            {% endwith %}
-        </div>
-
-            {{ form4.submitFour(class="width-35 pull-right btn btn-sm btn-primary") }}
+        {{ form4.submitFour(class="width-35 pull-right btn btn-sm btn-primary") }}
 
         </form>
 

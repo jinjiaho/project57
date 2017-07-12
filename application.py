@@ -4,7 +4,8 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
-from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation
+from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation, RemoveItem, RemoveTag
+from threading import Thread
 import os, copy, re, csv, json_decode, imaging, pytz
 # from flask.ext.cache import Cache
 
@@ -55,6 +56,7 @@ role = ""
 # Configure the image uploading via Flask-Uploads
 photos = UploadSet('images', IMAGES)
 configure_uploads(application, photos)
+
 
 ###########################
 ##        METHODS        ##
@@ -355,43 +357,73 @@ def editReorder():
 
         return jsonify("")
 
-# @application.route('/api/editPrice', methods=["POST"])
-# def editPrice():
+@application.route('/api/editPrice', methods=["POST"])
+def editPrice():
 
-#     print "content_type: ", request.content_type
-#     print "request.json: ", request.json
+    print "PRICECHANGE: content_type - ", request.content_type
+    print "PRICECHANGE: request.json - ", request.json
 
-#     data = request.get_json()
-#     # print(data)
-#     iid = data["iid"]
-#     newprice = data["price"]
-#     effectdate = data["effectdate"]
+    if not request.json:
+        print "PRICECHANGE: Bad json format, aborting reorder modification..."
+        page_not_found(400)
+    
+    else:
+    	data = request.get_json()
+    	iid = data["iid"].encode('ascii')
+    	newprice = data["newprice"].encode('ascii')
+    	effectdate = data["effectdate"].encode('ascii')
 
-#     # print(iid)
-#     # print(newprice)
-#     # print(effectdate)
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute(
+        	"SELECT COUNT(*) FROM Ascott_InvMgmt.PriceChange WHERE item = '{}'".format(iid))
+        price_changed=cursor.fetchall()
 
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        if price_changed[0][0] == 1:
 
-#     if not request.json:
-#         print "Bad json format"
-#         page_not_found(400)
-#     else:
-#         conn = mysql.connect()
-#         cursor = conn.cursor()
+        	cursor.execute(
+            	"UPDATE Ascott_InvMgmt.PriceChange SET new_price= '{}' , date_effective= STR_TO_DATE( '{} 00:00:00', '%Y/%m/%d %H:%i:%s') WHERE (item = '{}');".format(newprice, effectdate, iid))
+        	conn.commit()
 
-#         cursor.execute(
-#             "UPDATE Ascott_InvMgmt.PriceChange SET new_price='{}' AND date_effective='{}' WHERE (item = '{}');".format(newprice, effectdate, iid))
-#         conn.commit()
-#         # idItem = cursor.fetchone()
+        elif price_changed[0][0] == 0:
 
-#         # # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
-#         # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
-#         # # TODO: string parameterisation
-#         # # query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
-#         # cursor.execute(query)
-#         # responseData = cursor.fetchall()
+        	cursor.execute(
+            	"INSERT INTO Ascott_InvMgmt.PriceChange (item, new_price, date_effective) VALUES ('{}' ,'{}' ,'{}');".format(iid, newprice, effectdate))
+        	conn.commit()
 
-#         return jsonify("")
+        # idItem = cursor.fetchone()
+
+        # # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = {0}".format(idItem)
+        # query = "SELECT date_time, qty_left FROM Ascott_InvMgmt.Logs WHERE item = 1"
+        # # TODO: string parameterisation
+        # # query = "SELECT datetime, qtyAfter FROM Ascott_InvMgmt.Logs WHERE idItem = {}".format(idItem)
+        # cursor.execute(query)
+        # responseData = cursor.fetchall()
+
+        return jsonify("")
+
+def priceChangenow():
+        cursor = mysql.connect().cursor()
+        cursor.execute("SELECT item, new_price FROM Ascott_InvMgmt.PriceChange WHERE date_effective < NOW();")
+        data=cursor.fetchall()
+        for row in data:
+        	conn = mysql.connect()
+        	cursor = conn.cursor()
+        	cursor.execute("UPDATE Ascott_InvMgmt.Items SET price='{}' WHERE (iid = '{}');".format(row[1],row[0]))
+        	conn.commit()
+
+        conn = mysql.connect()
+        cursor=conn.cursor()
+        cursor.execute("DELETE FROM Ascott_InvMgmt.PriceChange WHERE date_effective < NOW();")
+        conn.commit()
+
+        return
+
+background_thread = Thread(target=priceChangenow,args=())
+background_thread.start()
+
 
 # true if user is authenticated, else false
 def auth():
@@ -538,9 +570,12 @@ def login():
 def admin():
 
     form = AddUserForm()
-    form2 =CreateNewItem()
-    form3 =AddNewLocation()
-    form4 =ExistingItemsLocation()
+    form2 = CreateNewItem()
+    form3 = AddNewLocation()
+    form4 = ExistingItemsLocation()
+    removeItemForm = RemoveItem()
+    removeTagForm = RemoveTag()
+
 
     #--------------users table-------------------------
     conn = mysql.connect()
@@ -597,6 +632,8 @@ def admin():
             form2=form2,
             form3=form3,
             form4=form4,
+            removeItemForm=removeItemForm,
+            removeTagForm=removeTagForm,
             users=things,
             group=group,
             item_list=flat_items)
@@ -612,6 +649,8 @@ def admin():
                     form2=form2,
                     form3=form3,
                     form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
                     users=things,
                     group=group)
             else:
@@ -644,6 +683,8 @@ def admin():
                     form2=form2,
                     form3=form3,
                     form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
                     users=things,
                     group=group)
             else:
@@ -686,6 +727,45 @@ def admin():
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
+# ------------------Remove Item Form ----------------------
+        elif request.form['name-form'] == 'removeItemForm':
+            if removeItemForm.validate() == False:
+                return render_template('admin.html',
+                    form=form,
+                    form2=form2,
+                    form3=form3,
+                    form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
+                    users=things,
+                    group=group)
+
+            else:
+                iname = removeItemForm.iname.data
+
+                conn = mysql.connect()
+                cursor = conn.cursor()
+                cursor.execute("SELECT iid FROM Items WHERE name='{}';".format(iname))
+                iid = cursor.fetchall()[0][0]
+
+                try:
+
+                    removeFromItems = "DELETE FROM Items WHERE name='{}';".format(iname)
+                    print removeFromItems
+                    cursor.execute(removeFromItems)
+                    conn.commit()
+
+                    removeFromTagItems = "DELETE FROM TagItems WHERE iid='{}';".format(iid)
+                    print removeFromTagItems
+                    cursor.execute(removeFromTagItems)
+                    conn.commit()
+
+                    flash('Item deleted!', 'success')
+                except:
+                    flash('Couldn\'t delete item', 'danger')
+            return redirect(url_for('admin', lang_code=get_locale()))
+
+
 # ------------------Add Tag form ----------------------
         # TODO: Change form to get appropriate values
         elif request.form['name-form'] =='form3':
@@ -695,6 +775,8 @@ def admin():
                     form2=form2,
                     form3=form3,
                     form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
                     users=things,
                     group=group)
             else:
@@ -705,14 +787,45 @@ def admin():
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
+                try:
+                    # TODO: string parameterisation
+                    query = "INSERT INTO TagInfo (`tname`, `storeroom`, `remarks`) VALUES ('{}','{}','{}');".format(tname, location, remarks)
+                    print(query)
+                    cursor.execute(query)
+                    conn.commit()
+                    flash("New Tag Added!", "success")
+                except:
+                    flash("Couldn't add tag.", "danger")
 
-                # TODO: string parameterisation
-                query = "INSERT INTO TagInfo (`tname`, `storeroom`, `remarks`) VALUES ('{}','{}','{}');".format(tname, location, remarks)
-                print(query)
-                cursor.execute(query)
-                conn.commit()
-                flash("New Tag Added!", "success")
+                return redirect(url_for('admin', lang_code=get_locale()))
 
+# ------------------Delete Tag form ----------------------
+
+        elif request.form['name-form'] == 'removeTagForm':
+            if removeTagForm.validate() == False:
+                return render_template('admin.html',
+                    form=form,
+                    form2=form2,
+                    form3=form3,
+                    form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
+                    users=things,
+                    group=group)
+            else:
+                tname = removeTagForm.tname.data
+
+                conn = mysql.connect()
+                cursor = conn.cursor()
+
+                query = "DELETE FROM TagInfo WHERE tname = '{}';".format(tname)
+                print query
+                try:
+                    cursor.execute(query)
+                    conn.commit()
+                    flash('Tag deleted!', 'success')
+                except:
+                    flash('Could\'t delete tag', 'danger')
                 return redirect(url_for('admin', lang_code=get_locale()))
 
 # ------------------Add Existing Items to New Locations form ----------------------
@@ -724,6 +837,8 @@ def admin():
                     form2=form2,
                     form3=form3,
                     form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
                     users=things,
                     group=group)
             else:

@@ -398,21 +398,19 @@
                         <h4 class="modal-title">Price settings</h4>
                     </div>
                     <div class="modal-body">
-                    {% if pricechanges[0].new_price != 0 %}
-                    <b>Incoming new price for item: $ {{pricechanges[0].new_price}}</b>
-                    {% endif %}
-                    {% if pricechanges[0].date_effective != 0 %}
-                    <b>With effect from: {{pricechanges[0].date_effective}}</b>
-                    {% endif %}
+                        <p>{% if pricechanges[0].new_price != 0 %}
+                        <b>Incoming new price for item: $ {{pricechanges[0].new_price}}</b>
+                        {% endif %}
+                        </p>
+                        <p>
+                        {% if pricechanges[0].date_effective != 0 %}
+                        <b>With effect from: {{pricechanges[0].date_effective}}</b>
+                        {% endif %}
+                        </p>
 
-                    <p><b>Change current price?</b>&nbsp;&nbsp;&nbsp;<label class="radio-inline" id="turn-on-par">
-                        <input type="radio" name="on-off" id="turn-on-price" value="on" {% if pricechanges[0].new_price == 0 %}checked{% endif %}> Yes
-                        </label>
-                        <label class="radio-inline" id="turn-off-par">
-                        <input type="radio" name="on-off" id="turn-off-price" value="off" {% if pricechanges[0].new_price != 0 %}checked{% endif %}> No
-                        </label></p>
+                    <p><b>Change current price</b>&nbsp;&nbsp;&nbsp;<label class="radio-inline" id="turn-on-par">
 
-                        <div id="price" style="display:{% if pricechanges[0].new_price != 0 %}none{% endif %};">
+                        <div id="price">
                             <div>                    
                             <label> New price($):  
                             <input class="form-control" type="text" id="new-price" placeholder="New Price">
@@ -453,6 +451,24 @@
 </div>
 <script>
 
+$(document).ready(function(){
+    // insert any required code here
+
+    $( "#date" ).datepicker({ minDate: 0, dateFormat: 'yy/mm/dd'});
+
+    $("#turn-on-price").click(function(){
+        $("#price").show();
+    });
+    $("#turn-off-price").click(function(){
+        $("#price").hide();
+    });
+
+    // draw chart
+    getData(initChart);
+
+
+});
+
 // Function to prevent negative number input
 $(function() {
     var number = $("#stockUpdateForm #qty");
@@ -466,6 +482,17 @@ $(function() {
 })
 $(function() {
     var number = $("#reorder-form-2 #reorder-field");
+    number.onkeydown = function(e) {
+        if(!((e.keyCode > 95 && e.keyCode < 106)
+          || (e.keyCode > 47 && e.keyCode < 58)
+          || e.keyCode == 8)) {
+            return false;
+        }
+    }
+})
+
+$(function() {
+    var number = $("#pricechange-form");
     number.onkeydown = function(e) {
         if(!((e.keyCode > 95 && e.keyCode < 106)
           || (e.keyCode > 47 && e.keyCode < 58)
@@ -490,33 +517,34 @@ function editReorder(form) {
     });
 }
 
-// function editPrice(form) {
-//     $.ajax({
-//         type: "POST",
-//         url: "/api/editPrice",
-//         data: JSON.stringify(form),
-//         dataType: "json",
-//         contentType: "application/json",
-//         async: false,
-//         success: function(response, status, jqXHR) {
-//             // empty function
-//         }
-//     });
-// }
+function editPrice(form) {
+    $.ajax({
+        type: "POST",
+        url: "/api/editPrice",
+        data: JSON.stringify(form),
+        dataType: "json",
+        contentType: "application/json",
+        async: false,
+        success: function(response, status, jqXHR) {
+            // empty function
+        }
+    });
+}
 
-// $('#submit-price').click(function(event) {
-//     var new_price = {
-//         "iid": "{% if item %}{{pricechanges[0].iid}}{% endif %}",
-//         "oldprice": "{% if item %}{{item[0].price}}{% endif %}"
-//         "newprice": $('input[id="new-price"]').val(),
-//         "effectdate": $('input[id="date"]').val()
-//         // "newprice": 1,
-//         // "effectdate": 0
-//     };
-//     event.preventDefault();
-//     editPrice(new_price);
-//     location.reload();
-// });
+$('#submit-price').click(function(event) {
+    var form = {};
+        form["iid"] = "{% if item %}{{pricechanges[0].iid}}{% endif %}",
+        // form["oldprice"] = "{% if item %}{{item[0].price}}{% endif %}"
+        form["newprice"] = $('input[id="new-price"]').val(),
+        form["effectdate"] = $('input[id="date"]').val();
+        $.each($('#pricechange-form').serializeArray(), function(i, field) {
+        form[field.name] = field.value;
+    });
+
+    event.preventDefault();
+    editPrice(form);
+    location.reload();
+});
 
 $('#submit-reorder').click(function(event) {
     var form = {};
@@ -701,23 +729,7 @@ for (var i=0; i < dataSources.length; i++) {
 
 }
 
-$(document).ready(function(){
-    // insert any required code here
 
-    $( "#date" ).datepicker({ minDate: 0});
-
-    $("#turn-on-price").click(function(){
-        $("#price").show();
-    });
-    $("#turn-off-price").click(function(){
-        $("#price").hide();
-    });
-
-    // draw chart
-    getData(initChart);
-
-
-});
 
 </script>
 {% endblock %}
