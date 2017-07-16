@@ -25,6 +25,45 @@
 
 <body>
 
+<!-- Modal for Admin Modification -->
+<div id="modify-modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="modify-form">
+
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modify-label">Reviewing Changes</h3>
+                </div>
+
+                <div class="modal-body">
+                    <div class="container-fluid">
+                      <div class="form-group">
+                        <label for="sel1">Select list:</label>
+                        <select class="form-control" id="sel1">
+                          <option>supervisor</option>
+                          <option>attendant</option>
+                          <option>runner</option>
+
+                        </select>
+                      </div>
+                        <p>You are modifying changes for admin personel: <strong><input type="text" disabled></strong><br><span class="text-info">This action can be reversed at any time</span></p>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="submit" class="btn btn-warning" id="modify-button">Modify</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- END of Modal View for Admin Modification -->
+
+
 <div class="container">
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">
@@ -49,6 +88,7 @@
 
                     <th>{{_('Name')}}</th>
                     <th>{{_('Role')}}</th>
+                    <th>{{_('Modify')}}</th>
                 </thead>
 
                 <tbody>
@@ -56,6 +96,9 @@
                 <tr>
                     <td>{{ user.name }}</td>
                     <td>{{ user.role }}</td>
+                    <td><button class="btn btn-default" style="margin-bottom: 5px; width:50%;" data-toggle="modal" data-target="#modify-modal" data-name="{{ user.name }}" id="#modify">{{_('Modify')}}</button><td>
+
+
 
                 </tr>
                 {% endfor %}
@@ -450,7 +493,7 @@
                 </div>
             </div>
         </div>
-                        
+
     </div>
 
 
@@ -555,7 +598,7 @@ $(function() {
 
       });
   });
-  
+
 });
 
 // ADD ITEM TO TAG FUNCTION: Shortlists tags according to storeroom selected
@@ -609,6 +652,19 @@ $('#add-item-name .typeahead').typeahead({
   name: 'all_items',
   source: substringMatcher(all_items)
 });
+
+// <!-- Modal changes---->
+$('#modify-modal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var admin = button.data('name') // Extract info from data-* attributes
+  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+  var modal = $(this)
+  modal.find('.modal-title').text('Reviewing Changes to ' + admin)
+  modal.find('.modal-body input').val(admin)
+})
+
+
 
 </script>
 
