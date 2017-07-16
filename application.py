@@ -284,6 +284,7 @@ def getAllLogs():
 
     if data != None:
         for row in data:
+            print(row[5])
             cursor.execute("SELECT name FROM Items WHERE iid={};".format(row[5]))
             item_name = cursor.fetchall()[0][0]
 
@@ -476,14 +477,10 @@ def priceChangenow(iid,price):
 
         return
 
-# delete files with same name, regardless of file ext
-def purge(dir, pattern):
-    for f in os.listdir(dir):
-        if re.search(pattern, f):
-            os.remove(os.path.join(dir, f))
 
 
 # true if user is authenticated, else false
+# used in ALL ROUTES
 def auth():
     if u'logged_in' in session:
         return session['logged_in']
@@ -496,6 +493,7 @@ def filter_role(roles_routes):
             return redirect(v)
 
 
+# used as a Jinja template in HTML files
 @application.template_filter('lang_strip')
 def lang_strip(s):
     l = re.search(r"(?m)(?<=(en\/)|(zh\/)|(ms\/)|(ta\/)).*$", str(s.encode('ascii')))
@@ -503,11 +501,13 @@ def lang_strip(s):
         return l.group()
     return None
 
+# used as a Jinja template in HTML files
 @application.template_filter('curr_time')
 def curr_time(s):
     tz = pytz.timezone(application.config["TIMEZONE"])
     return s+datetime.now(tz).strftime('%I:%M %p')
 
+# used as a Jinja template in HTML files
 @application.template_filter('prop_name')
 def prop_name(s):
     return s+application.config["PROP_NAME"]
@@ -517,7 +517,7 @@ def input_handler(qty, user):
     query = 'UPDATE TagItems SET qty_left = CASE WHERE iid={} WHEN action'
     # Issue: Need iid argument.
 
-
+# fires right before each request is delivered to the relevant route
 @application.before_request
 def before():
     # localization setting
@@ -536,7 +536,8 @@ def before():
     if u'logged_in' not in session:
         session["logged_in"] = False
 
-
+# used in setting locale for each route
+# used in ALL ROUTES
 @babel.localeselector
 def get_locale():
     return g.get('current_lang', 'en')
@@ -822,11 +823,11 @@ def admin():
                 cursor.execute("SELECT iid, picture FROM Items WHERE name='{}';".format(iname))
                 response = cursor.fetchall()[0]
                 iid, picture = response[0], response[1].encode("ascii")
-                pictures = os.path.splitext("static/img/items/"+picture)[0]+".*"
                 print "ADMIN: Deleting item #%s with thumbnail '%s' ..." % (iid, picture)
 
                 try:
 
+                    removeFromItems = "DELETE FROM Items WHERE name='{}';".format(iname)
                     removeFromItems = "DELETE FROM Items WHERE name='{}';".format(iname)
                     print "SQL: %s" % removeFromItems
                     cursor.execute(removeFromItems)
@@ -838,7 +839,7 @@ def admin():
                     conn.commit()
 
                     try:
-                        purge("static/img/items/", pictures)
+                        os.remove("static/img/items/"+picture)
                         print("ADMIN: Item successfuly deleted!")
                     except Exception as e:
                             print("DELETE THUMBNAIL: %s" % e)
