@@ -11,5 +11,3 @@ SELECT * FROM Items;
 SELECT * FROM Logs;
 SELECT * FROM Permissions;
 SELECT * FROM PriceChange;
-SELECT * FROM view_itemStoreTags;
-

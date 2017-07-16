@@ -3,10 +3,6 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import StringField, PasswordField, SubmitField, RadioField, validators, IntegerField, SelectField, BooleanField,DecimalField
 from wtforms.validators import DataRequired, Email, Length
 from flaskext.mysql import MySQL
-from dbqueryform import myDetails, myLocation
-
-
-
 
 class AddUserForm(FlaskForm):
 	name = StringField('Name of User:', validators=[DataRequired("Please enter the name of the newcomer.")])
@@ -29,9 +25,16 @@ class CreateNewItem(FlaskForm):
 class ExistingItemsLocation(FlaskForm):
 
 	itemname = StringField('Item Name', validators=[DataRequired("Please insert the name of the item")])
-	tname = SelectField('Tag Name', validators=[DataRequired("Please select a tag")])
+	tid = SelectField('Tag', coerce=int) # Value is tid
 	qty = IntegerField('Available Amount', validators = [DataRequired()])
 	submitFour = SubmitField('Add Location')
+
+class TransferItem(FlaskForm):
+	iname = StringField('Item Name')
+	tagOld = SelectField('Old Tag', coerce=int) # Value is tid
+	tagNew = SelectField('New Tag', coerce=int) # Value is tid
+	qty = IntegerField('Qty to Transfer', [validators.Optional()])
+	submit = SubmitField()
 
 class LoginForm(FlaskForm):
 	username = StringField(validators=[DataRequired("Please enter a username")])
@@ -64,12 +67,6 @@ class RemoveItem(FlaskForm):
 	submit = SubmitField()
 
 class RemoveTag(FlaskForm):
-	tname = SelectField('Tag Name')
+	tid = SelectField('Tag', coerce=int)
 	submit = SubmitField()
 
-class TransferItem(FlaskForm):
-	iname = StringField('Item Name')
-	tagOld = SelectField('Old Tag')
-	tagNew = SelectField('New Tag')
-	qty = IntegerField('Qty to Transfer')
-	submit = SubmitField();

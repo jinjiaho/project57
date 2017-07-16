@@ -6,6 +6,7 @@ from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
 from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation, RemoveItem, RemoveTag, TransferItem
 from apscheduler.schedulers.background import BackgroundScheduler
+# from exceptions import InsufficientQtyError, ContainsItemsError
 # from apscheduler.jobstores.mongodb import MongoDBJobStore
 # from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 import os, copy, re, csv, json_decode, imaging, pytz
@@ -65,7 +66,13 @@ sched = BackgroundScheduler()
 #     'default': SQLAlchemyJobStore(url='sqlite:///jobs.sqlite')
 # }
 
+# Exception classes, feel free to use.
+# Called in admin()
+class InsufficientQtyError(Exception):
+    pass
 
+class ContainsItemsError(Exception):
+    pass
 
 ###########################
 ##        METHODS        ##
@@ -73,8 +80,8 @@ sched = BackgroundScheduler()
 
 # TODO: encapsulate all methods in separate classes and .py files
 
-# Query for form select fields. 
-# Called by admin()
+# Query for form select fields.
+# Currently called by admin()
 def choices(table, column, *args):
     choices = []
     conn = mysql.connect()
@@ -284,6 +291,7 @@ def getAllLogs():
 
     if data != None:
         for row in data:
+            print(row[5])
             cursor.execute("SELECT name FROM Items WHERE iid={};".format(row[5]))
             item_name = cursor.fetchall()[0][0]
 
@@ -321,7 +329,7 @@ def getInventoryLow():
             "category": i[5].encode('ascii')})
 
     return r
-    
+
 # Called by dashboard()
 def getDailyLogs():
 
@@ -373,7 +381,7 @@ def getChartData():
             cursor.execute(query)
             data = cursor.fetchall()
             r.append({
-                "loc": i["location"], 
+                "loc": i["location"],
                 "val": data})
 
         return jsonify(r)
@@ -411,7 +419,7 @@ def editPrice():
     if not request.json:
         print "PRICECHANGE: Bad json format, aborting reorder modification..."
         page_not_found(400)
-    
+
     else:
     	data = request.get_json()
     	iid = data["iid"].encode('ascii')
@@ -447,7 +455,7 @@ def editPrice():
         # The job will be executed on effectdate
         sched.add_job(priceChangenow, 'date', run_date=effectdate1, args=[iid,newprice], id=iid)
         sched.print_jobs(jobstore=None)
-        
+
         # sched.start()
         # print(sched.jobstores)
 
@@ -476,14 +484,10 @@ def priceChangenow(iid,price):
 
         return
 
-# delete files with same name, regardless of file ext
-def purge(dir, pattern):
-    for f in os.listdir(dir):
-        if re.search(pattern, f):
-            os.remove(os.path.join(dir, f))
 
 
 # true if user is authenticated, else false
+# used in ALL ROUTES
 def auth():
     if u'logged_in' in session:
         return session['logged_in']
@@ -496,6 +500,7 @@ def filter_role(roles_routes):
             return redirect(v)
 
 
+# used as a Jinja template in HTML files
 @application.template_filter('lang_strip')
 def lang_strip(s):
     l = re.search(r"(?m)(?<=(en\/)|(zh\/)|(ms\/)|(ta\/)).*$", str(s.encode('ascii')))
@@ -503,11 +508,13 @@ def lang_strip(s):
         return l.group()
     return None
 
+# used as a Jinja template in HTML files
 @application.template_filter('curr_time')
 def curr_time(s):
     tz = pytz.timezone(application.config["TIMEZONE"])
     return s+datetime.now(tz).strftime('%I:%M %p')
 
+# used as a Jinja template in HTML files
 @application.template_filter('prop_name')
 def prop_name(s):
     return s+application.config["PROP_NAME"]
@@ -517,7 +524,7 @@ def input_handler(qty, user):
     query = 'UPDATE TagItems SET qty_left = CASE WHERE iid={} WHEN action'
     # Issue: Need iid argument.
 
-
+# fires right before each request is delivered to the relevant route
 @application.before_request
 def before():
     # localization setting
@@ -536,7 +543,8 @@ def before():
     if u'logged_in' not in session:
         session["logged_in"] = False
 
-
+# used in setting locale for each route
+# used in ALL ROUTES
 @babel.localeselector
 def get_locale():
     return g.get('current_lang', 'en')
@@ -647,11 +655,11 @@ def admin():
     # Initialize options for all select fields
     form2.category.choices = choices('Items', 'category')
     form3.location.choices = choices('TagInfo', 'storeroom')
-    form4.tname.choices = storeTagChoices
+    form4.tid.choices = storeTagChoices
     removeItemForm.iname.choices = choices('Items', 'name')
-    removeTagForm.tname.choices = choices('TagInfo', 'tname')
+    removeTagForm.tid.choices = storeTagChoices
+    transferItemForm.tagOld.choices = storeTagChoices
     transferItemForm.tagNew.choices = storeTagChoices
-
 
 
     #--------------users table-------------------------
@@ -682,17 +690,17 @@ def admin():
         NFCs.append(idNFC[0])
 
     for i in NFCs:
+        try:
+            #fetch all item names pertaining to the tag.
+            cursor.execute("SELECT name, iid FROM Ascott_InvMgmt.view_item_locations WHERE tag = {};".format(i))
+            data3=cursor.fetchall()
 
-        #fetch all item names pertaining to the tag.
-        cursor.execute("SELECT name, iid FROM Ascott_InvMgmt.view_item_locations WHERE tag = {};".format(i))
-        data3=cursor.fetchall()
+            cursor.execute("SELECT tname FROM TagInfo WHERE tid={};".format(i))
+            l_name = cursor.fetchall()[0][0]
 
-        cursor.execute("SELECT tname FROM TagInfo WHERE tid={};".format(i))
-        l_name = cursor.fetchall()[0][0]
-
-        group[l_name] = data3
-
-
+            group[(i, l_name)] = data3
+        except:
+            pass
 
     if request.method =="GET":
 
@@ -725,6 +733,7 @@ def admin():
 
         if request.form['name-form'] =='form':
             if form.validate() == False:
+                flash("Failed to validate form", "danger")
                 return render_template('admin.html',
                     form=form,
                     form2=form2,
@@ -762,6 +771,7 @@ def admin():
 # ------------------Add Item Form ----------------------
         elif request.form['name-form'] =='form2':
             if form2.validate() == False:
+                flash("Failed to validate form", "danger")
                 return render_template('admin.html',
                     form=form,
                     form2=form2,
@@ -817,6 +827,7 @@ def admin():
 # ------------------Remove Item Form ----------------------
         elif request.form['name-form'] == 'removeItemForm':
             if removeItemForm.validate() == False:
+                flash("Failed to validate form", "danger")
                 return render_template('admin.html',
                     form=form,
                     form2=form2,
@@ -838,7 +849,6 @@ def admin():
                 cursor.execute("SELECT iid, picture FROM Items WHERE name='{}';".format(iname))
                 response = cursor.fetchall()[0]
                 iid, picture = response[0], response[1].encode("ascii")
-                pictures = os.path.splitext("static/img/items/"+picture)[0]+".*"
                 print "ADMIN: Deleting item #%s with thumbnail '%s' ..." % (iid, picture)
 
                 try:
@@ -854,7 +864,7 @@ def admin():
                     conn.commit()
 
                     try:
-                        purge("static/img/items/", pictures)
+                        os.remove("static/img/items/"+picture)
                         print("ADMIN: Item successfuly deleted!")
                     except Exception as e:
                             print("DELETE THUMBNAIL: %s" % e)
@@ -867,11 +877,162 @@ def admin():
 
             return redirect(url_for('admin', lang_code=get_locale()))
 
+# ------------------Add Existing Items to New Locations form ----------------------
+
+        elif request.form['name-form'] =='form4':
+            if form4.validate() == False:
+                flash("Failed to validate form", "danger")
+                return render_template('admin.html',
+                    form=form,
+                    form2=form2,
+                    form3=form3,
+                    form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
+                    transferItemForm = transferItemForm,
+                    tagsByStore = json.dumps(storeTagChoices),
+                    itemTags = json.dumps(itemTags),
+                    users=things,
+                    group=group)
+            else:
+                itemname = form4.itemname.data
+                tid = int(form4.tid.data)
+                amt = form4.qty.data
+                try:
+
+                    conn = mysql.connect()
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
+                    iid = cursor.fetchall()[0][0]
+
+                    # TODO: string parameterisation
+
+                    # cursor = mysql.connect().commit();
+                    # Check if item is already assigned to tag
+                    cursor.execute("SELECT * FROM Ascott_InvMgmt.TagItems WHERE iid={} AND tag={};".format(iid, tid))
+                    rowExists = cursor.fetchall()
+
+                    if rowExists:
+                        cursor.execute("UPDATE TagItems SET qty_left={} WHERE iid={} AND tag={};".format(amt, iid, tid))
+                        conn.commit()
+                        flash("Item already in location. Qty updated.", "success")
+
+                    else:
+                        query = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ({},{},{}); COMMIT;".format(iid,tid,amt)
+                        print(query)
+                        cursor.execute(query)
+                        flash("Added Item to Location!", "success")
+
+                except:
+                    flash("Oops! Something went wrong :(", "danger")
+
+                return redirect(url_for('admin', lang_code=get_locale()))
+
+
+# ------------------ Transfer Items Form ----------------------
+
+        elif request.form['name-form'] =='transferItemForm':
+            if transferItemForm.validate() == False:
+                flash("Failed to validate form", "danger")
+                return render_template('admin.html',
+                    form=form,
+                    form2=form2,
+                    form3=form3,
+                    form4=form4,
+                    removeItemForm=removeItemForm,
+                    removeTagForm=removeTagForm,
+                    transferItemForm = transferItemForm,
+                    tagsByStore = json.dumps(storeTagChoices),
+                    itemTags = json.dumps(itemTags),
+                    users=things,
+                    group=group)
+            else:
+                print("form validated")
+                item = transferItemForm.iname.data
+                tagOld = transferItemForm.tagOld.data
+                tagNew = transferItemForm.tagNew.data
+                qty = transferItemForm.qty.data
+                print(item)
+                print(tagOld)
+                print(tagNew)
+                print(qty)
+
+                try:
+                    conn = mysql.connect()
+                    cursor = conn.cursor()
+                    query = "SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(item)
+                    print(query)
+                    cursor.execute(query)
+                    iid = cursor.fetchall()[0][0]
+
+                    query = "SELECT * FROM TagItems WHERE iid={} AND tag={};".format(iid, tagOld)
+                    print(query)
+                    cursor.execute(query)
+
+                    row = cursor.fetchall()[0]
+
+                    # TODO: string parameterisation
+
+
+                    # if user only wants to transfer some of the items over
+                    if qty:
+                        print(row)
+                        # check if there are enough items at the old location to transfer the stated qty.
+                        if qty > row[2]:
+                            raise InsufficientQtyError("Not enough in store to transfer!")
+                        # if sufficient items, deduct items from old location.
+                        qty_left = row[2] - qty
+                        query = "UPDATE TagItems SET qty_left={} WHERE iid={} AND tag={};".format(qty_left, iid, tagOld)
+                        print(query)
+                        cursor.execute(query)
+                        conn.commit()
+
+                    # if user wants to transfer all
+                    else:
+                        qty = row[2]
+                        query = "DELETE FROM TagItems WHERE iid={} AND tag={};".format(iid, tagOld)
+                        print(query)
+                        cursor.execute(query)
+                        conn.commit()
+
+                    # Add the items to the new location.
+                    # Check if there are already instances of the item at the new location.
+                    query = "SELECT * FROM Ascott_InvMgmt.TagItems WHERE iid={} AND tag={};".format(iid, tagNew)
+                    print(query)
+                    cursor.execute(query)
+                    rowExists = cursor.fetchall()[0]
+
+                    if rowExists:
+                        # Update the qty instead of creating a new row.
+                        newQty = rowExists[2] + qty
+                        query = "UPDATE TagItems SET qty_left={} WHERE iid={} AND tag={};".format(newQty, iid, tagNew)
+                        print(query)
+                        cursor.execute(query)
+                        conn.commit()
+                        flash("Item already in location, updated qty.", "success")
+
+                    else:
+                        # Create a new row.
+                        query = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ({},{},{});".format(iid, tagNew, qty)
+                        print(query)
+                        cursor.execute(query)
+                        conn.commit()
+
+                        flash("Transferred item to location!", "success")
+
+                except InsufficientQtyError as e:
+                    flash(e.args[0], "danger")
+                except:
+                    flash("Oops! Something went wrong :(", "danger")
+
+                return redirect(url_for('admin', lang_code=get_locale()))
+
 
 # ------------------Add Tag form ----------------------
         # TODO: Change form to get appropriate values
         elif request.form['name-form'] =='form3':
             if form3.validate() == False:
+                flash("Failed to validate form", "danger")
                 return render_template('admin.html',
                     form=form,
                     form2=form2,
@@ -913,6 +1074,7 @@ def admin():
 
         elif request.form['name-form'] == 'removeTagForm':
             if removeTagForm.validate() == False:
+                flash("Failed to validate form", "danger")
                 return render_template('admin.html',
                     form=form,
                     form2=form2,
@@ -926,68 +1088,28 @@ def admin():
                     users=things,
                     group=group)
             else:
-                tname = removeTagForm.tname.data
+                tid = removeTagForm.tid.data
 
                 conn = mysql.connect()
                 cursor = conn.cursor()
-
-                query = "DELETE FROM TagInfo WHERE tname = '{}';".format(tname)
-                print query
+                cursor.execute("SELECT * FROM TagItems WHERE tag={};".format(tid))
+                data = cursor.fetchall()[0]
+                print(data)
                 try:
+                    if data:
+                        print(data)
+                        raise ContainsItemsError("Coudn't delete tag as tag still has items.")
+                    query = "DELETE FROM TagInfo WHERE tid = {};".format(tid)
+                    print query
                     cursor.execute(query)
                     conn.commit()
                     flash('Tag deleted!', 'success')
+                except ContainsItemsError as e:
+                    flash(e.args[0], "danger")
                 except:
                     flash('Could\'t delete tag', 'danger')
                 return redirect(url_for('admin', lang_code=get_locale()))
 
-# ------------------Add Existing Items to New Locations form ----------------------
-
-        elif request.form['name-form'] =='form4':
-            if form4.validate() == False:
-                return render_template('admin.html',
-                    form=form,
-                    form2=form2,
-                    form3=form3,
-                    form4=form4,
-                    removeItemForm=removeItemForm,
-                    removeTagForm=removeTagForm,
-                    transferItemForm = transferItemForm,
-                    tagsByStore = json.dumps(storeTagChoices),
-                    itemTags = json.dumps(itemTags),
-                    users=things,
-                    group=group)
-            else:
-
-                itemname = form4.itemname.data
-                tname = form4.tname.data
-                amt = form4.qty.data
-                location=form4.location.data
-                try:
-
-                    conn = mysql.connect()
-                    cursor = conn.cursor()
-                    cursor.execute("SELECT iid FROM Ascott_InvMgmt.Items WHERE name = '{}';".format(itemname))
-                    info = cursor.fetchall()[0][0]
-                    print(info)
-
-                    # TODO: string parameterisation
-
-                    cursor.execute("SELECT tid FROM TagInfo WHERE tname='{}';".format(tname))
-                    tid = cursor.fetchall()[0][0]
-
-                    # cursor = mysql.connect().commit()
-
-                    query = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ({},{},{}); COMMIT;".format(info,tid,amt)
-                    # query = "INSERT INTO User VALUES ('{}','{}','{}','{}'); COMMIT".format(newuser[0],newuser[1],newuser[2],newuser[3])
-                    print(query)
-                    cursor.execute(query)
-
-                    flash("Added Item to Location!", "success")
-                except:
-                    flash("Oops! Something went wrong :(", "danger")
-
-                return redirect(url_for('admin', lang_code=get_locale()))
 
 
 @application.route('/<lang_code>/dashboard')
@@ -1078,7 +1200,7 @@ def item(iid):
         tid = int(request.form.get('location'))
         qty = int(request.form.get('qty'))
         action = request.form.get('action')
-        print("STOCK UPDATE: Form received - (iid: %s ,tid: %s, qty: %s , action: %s, user: %s)" % 
+        print("STOCK UPDATE: Form received - (iid: %s ,tid: %s, qty: %s , action: %s, user: %s)" %
             (iid, tid, qty, action, user))
 
         # process changes
@@ -1179,7 +1301,7 @@ def storeroom(storeroom):
         for d in data:
             if d[0] in items.keys():
                 items[d[0]]['qty_left'] += d[4]
-            else: 
+            else:
                 items[d[0]] = {
                     'name':d[1].encode('ascii'),
                     'picture':d[2].encode('ascii'),
@@ -1195,7 +1317,7 @@ def storeroom(storeroom):
         items = items,
         user = session['username'],
         role = session['role'])
-                    
+
 @application.route('/<lang_code>/logs')
 def logs():
 

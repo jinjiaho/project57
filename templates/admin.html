@@ -25,6 +25,45 @@
 
 <body>
 
+<!-- Modal for Admin Modification -->
+<div id="modify-modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="modify-form">
+
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modify-label">Reviewing Changes</h3>
+                </div>
+
+                <div class="modal-body">
+                    <div class="container-fluid">
+                      <div class="form-group">
+                        <label for="sel1">Select list:</label>
+                        <select class="form-control" id="sel1">
+                          <option>supervisor</option>
+                          <option>attendant</option>
+                          <option>runner</option>
+
+                        </select>
+                      </div>
+                        <p>You are modifying changes for admin personel: <strong><input type="text" disabled></strong><br><span class="text-info">This action can be reversed at any time</span></p>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="submit" class="btn btn-warning" id="modify-button">Modify</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- END of Modal View for Admin Modification -->
+
+
 <div class="container">
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">
@@ -49,6 +88,7 @@
 
                     <th>{{_('Name')}}</th>
                     <th>{{_('Role')}}</th>
+                    <th>{{_('Modify')}}</th>
                 </thead>
 
                 <tbody>
@@ -56,6 +96,9 @@
                 <tr>
                     <td>{{ user.name }}</td>
                     <td>{{ user.role }}</td>
+                    <td><button class="btn btn-default" style="margin-bottom: 5px; width:50%;" data-toggle="modal" data-target="#modify-modal" data-name="{{ user.name }}" id="#modify">{{_('Modify')}}</button><td>
+
+
 
                 </tr>
                 {% endfor %}
@@ -70,8 +113,8 @@
         {% for key, values in group.iteritems() %}
 
         <!--find a way to create a button-->
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ key }}" aria-expanded="false" aria-controls="collapseExample">{{ key }}</button>
-        <div class="collapse" id="{{ key }}">
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ key[0] }}" aria-expanded="false" aria-controls="collapseExample">{{ key[1] }}</button>
+        <div class="collapse" id="{{ key[0] }}">
 
             <ul class="list-group">
 
@@ -347,7 +390,7 @@
                 <div id="collapse-tagItem" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-tagItem">
                     <div class="panel-body">
                         <form method="POST" action="/{{g.current_lang}}/admin">
-                            {{ form.hidden_tag() }}
+                            {{ form4.hidden_tag() }}
                             <input type="hidden"  name="name-form" value='form4'>
                             <h3> Assign Item to Tag</h3>
 
@@ -367,15 +410,15 @@
 
 
                             <div class="row form-group">
-                                {{ form4.tname.label }}
-                                {% if form4.tname.errors %}
-                                    {% for error in form4.tname.errors %}
+                                {{ form4.tid.label }}
+                                {% if form4.tid.errors %}
+                                    {% for error in form4.tid.errors %}
                                     <p class="error-message">{{ error }}</p>
                                     {% endfor %}
                                 {% endif %}
 
                                 <div class="form-group">
-                                    {{ form4.tname(class="form-control") }}
+                                    {{ form4.tid(class="form-control") }}
                                 </div>
                             </div>
 
@@ -435,8 +478,8 @@
                                     <p class="error-message">{{ error }}</p>
                                     {% endfor %}
                                 {% endif %}
-                                <div class="form-group">
-                                    <select class="form-control" name="tagOld" id="tagOld"></select>
+                                <div class="form-group" id="tagOldDiv">
+                                    {{ transferItemForm.tagOld(class="form-control", placeholder="Select a Tag") }}
                                 </div>
                             </div>
 
@@ -571,14 +614,14 @@
                     <div class="panel-body">
                         <form method="POST" id="delItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ removeTagForm.hidden_tag() }}<input type="hidden"  name="name-form" value='removeTagForm' >
                             <div class="row form-group">
-                                {{ removeTagForm.tname.label }}
-                                {% if removeTagForm.tname.errors %}
-                                    {% for error in removeTagForm.tname.errors %}
+                                {{ removeTagForm.tid.label }}
+                                {% if removeTagForm.tid.errors %}
+                                    {% for error in removeTagForm.tid.errors %}
                                     <p class="error-message">{{ error }}</p>
                                     {% endfor %}
                                 {% endif %}
-                                <div id="add-item-name" class="form-group">
-                                {{ removeTagForm.tname(class="form-control", placeholder="Name of Item")}}
+                                <div class="form-group">
+                                {{ removeTagForm.tid(class="form-control") }}
                                 </div>
                             </div>
 
@@ -588,7 +631,7 @@
                 </div>
             </div>
         </div>
-                        
+
     </div>
 
 
@@ -622,7 +665,7 @@ $(function() {
 
       });
   });
-  
+
 });
 
 // Filter storerooms by item
@@ -645,16 +688,27 @@ $("#itemSelect").change(function(){
         }
     }
 
-    // Creates a new option in tagOld for each tag that the item is associated with.
-    for (var i in tagList) {
-        var newOption = document.createElement("option");
-        newOption.value = tagList[i];
-        newOption.innerHTML = dict[tagList[i]];
-        console.log(newOption)
-        $("#tagOld").append(newOption);
-        console.log(dict[tagList[i]]);
-    }
 
+    $("#tagOldDiv select option").each(function() {
+        $(this).hide();
+        console.log($(this).val());
+        for (var i in tagList) {
+            if ($(this).val() == tagList[i]) {
+                $(this).show();
+                $(this).attr('selected', 'selected');
+            }
+        }
+    })
+    // Creates a new option in tagOld for each tag that the item is associated with.
+    // $("#tagOldDiv select").html('');
+    // for (var i in tagList) {
+    //     var newOption = document.createElement("option");
+    //     newOption.value = tagList[i];
+    //     newOption.innerHTML = dict[tagList[i]];
+    //     console.log(newOption)
+    //     $("#tagOldDiv select").append(newOption);
+    //     console.log(dict[tagList[i]]);
+    // }
 
 });
 
@@ -708,6 +762,19 @@ $('#add-item-name .typeahead').typeahead({
   name: 'all_items',
   source: substringMatcher(all_items)
 });
+
+// <!-- Modal changes---->
+$('#modify-modal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var admin = button.data('name') // Extract info from data-* attributes
+  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+  var modal = $(this)
+  modal.find('.modal-title').text('Reviewing Changes to ' + admin)
+  modal.find('.modal-body input').val(admin)
+})
+
+
 
 </script>
 
