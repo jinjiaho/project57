@@ -73,7 +73,7 @@ sched = BackgroundScheduler()
 
 # TODO: encapsulate all methods in separate classes and .py files
 
-# Query for form select fields. 
+# Query for form select fields.
 # Called by admin()
 def choices(table, column):
     choices = []
@@ -322,7 +322,7 @@ def getInventoryLow():
             "category": i[5].encode('ascii')})
 
     return r
-    
+
 # Called by dashboard()
 def getDailyLogs():
 
@@ -374,7 +374,7 @@ def getChartData():
             cursor.execute(query)
             data = cursor.fetchall()
             r.append({
-                "loc": i["location"], 
+                "loc": i["location"],
                 "val": data})
 
         return jsonify(r)
@@ -412,7 +412,7 @@ def editPrice():
     if not request.json:
         print "PRICECHANGE: Bad json format, aborting reorder modification..."
         page_not_found(400)
-    
+
     else:
     	data = request.get_json()
     	iid = data["iid"].encode('ascii')
@@ -448,7 +448,7 @@ def editPrice():
         # The job will be executed on effectdate
         sched.add_job(priceChangenow, 'date', run_date=effectdate1, args=[iid,newprice], id=iid)
         sched.print_jobs(jobstore=None)
-        
+
         # sched.start()
         # print(sched.jobstores)
 
@@ -684,8 +684,6 @@ def admin():
         l_name = cursor.fetchall()[0][0]
 
         group[l_name] = data3
-
-
 
     if request.method =="GET":
 
@@ -1057,7 +1055,7 @@ def item(iid):
         tid = int(request.form.get('location'))
         qty = int(request.form.get('qty'))
         action = request.form.get('action')
-        print("STOCK UPDATE: Form received - (iid: %s ,tid: %s, qty: %s , action: %s, user: %s)" % 
+        print("STOCK UPDATE: Form received - (iid: %s ,tid: %s, qty: %s , action: %s, user: %s)" %
             (iid, tid, qty, action, user))
 
         # process changes
@@ -1158,7 +1156,7 @@ def storeroom(storeroom):
         for d in data:
             if d[0] in items.keys():
                 items[d[0]]['qty_left'] += d[4]
-            else: 
+            else:
                 items[d[0]] = {
                     'name':d[1].encode('ascii'),
                     'picture':d[2].encode('ascii'),
@@ -1174,7 +1172,7 @@ def storeroom(storeroom):
         items = items,
         user = session['username'],
         role = session['role'])
-                    
+
 @application.route('/<lang_code>/logs')
 def logs():
 
