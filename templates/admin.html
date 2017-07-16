@@ -28,11 +28,11 @@
 <div class="container">
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#summary" aria-controls="home" role="tab" data-toggle="tab">Summary</a></li>
+    <li role="presentation" class="active"><a href="#summary" aria-controls="home" role="tab" data-toggle="tab">Users</a></li>
     <li role="presentation"><a href="#user" aria-controls="user" role="tab" data-toggle="tab">New User</a></li>
-    <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">Manage Items</a></li>
-    <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">Manage Tags/Storerooms</a></li>
-    <li role="presentation"><a href="#existitem" aria-controls="existitem" role="tab" data-toggle="tab">Assign Item to Tag</a></li>
+    <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">Items</a></li>
+    <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">Storerooms & Tags</a></li>
+    <!-- <li role="presentation"><a href="#existitem" aria-controls="existitem" role="tab" data-toggle="tab">Assign Item to Tag</a></li> -->
 
 </ul>
 
@@ -183,7 +183,7 @@
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-newItem" aria-expanded="true" aria-controls="collapse-newItem">
                     <div class="panel-heading text-center" role="tab" id="heading-newItem" style="background-color:#f5f5f5;">
                         <h4 class="panel-title">
-                            Add A New Item
+                            Add a New Item
                         </h4>
                     </div>
                 </a>
@@ -309,7 +309,7 @@
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-delItem" aria-expanded="true" aria-controls="collapse-delItem">
                     <div class="panel-heading text-center" role="tab" id="heading-delItem" style="background-color:#f5f5f5;">
                         <h4 class="panel-title">
-                            Delete An Item
+                            Delete an Item
                         </h4>
                     </div>
                 </a>
@@ -330,6 +330,144 @@
                             </div>
 
                             {{ removeItemForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tag Item Form -->
+            <div class="panel panel-default">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-tagItem" aria-expanded="true" aria-controls="collapse-tagItem">
+                    <div class="panel-heading text-center" role="tab" id="heading-tagItem" style="background-color:#f5f5f5;">
+                        <h4 class="panel-title">
+                            Assign an Item to a Tag
+                        </h4>
+                    </div>
+                </a>
+                <div id="collapse-tagItem" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-tagItem">
+                    <div class="panel-body">
+                        <form method="POST" action="/{{g.current_lang}}/admin">
+                            {{ form.hidden_tag() }}
+                            <input type="hidden"  name="name-form" value='form4'>
+                            <h3> Assign Item to Tag</h3>
+
+
+                            <div class="row form-group">
+                                {{ form4.itemname.label }}
+                                {% if form4.itemname.errors %}
+                                    {% for error in form4.itemname.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <div id="add-item-name" class="form-group">
+                                {{ form4.itemname(class="form-control typeahead", placeholder="Name of Existing Item", style="width: 100%;")}}
+                                </div>
+                            </div>
+
+
+                            <div class="row form-group">
+                                {{ form4.tname.label }}
+                                {% if form4.tname.errors %}
+                                    {% for error in form4.tname.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <div class="form-group">
+                                    {{ form4.tname(class="form-control") }}
+                                </div>
+                            </div>
+
+
+                            <div class="row form-group">
+                                {{ form4.qty.label }}
+                                {% if form4.qty.errors %}
+                                    {% for error in form4.qty.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <div class="form-group">
+                                {{ form4.qty(class="form-control", placeholder="Quantity Available") }}
+                                </div>
+                            </div>
+
+
+                            {{ form4.submitFour(class="width-35 pull-right btn btn-sm btn-primary") }}
+
+                        </form>
+
+                    </div>
+                </div>
+                        
+            </div>
+
+            <!-- Transfer Item Form -->
+            <div class="panel panel-default">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-transItem" aria-expanded="true" aria-controls="collapse-transItem">
+                    <div class="panel-heading text-center" role="tab" id="heading-transItem" style="background-color:#f5f5f5;">
+                        <h4 class="panel-title">
+                            Transfer an Item from One Tag to Another
+                        </h4>
+                    </div>
+                </a>
+                <div id="collapse-transItem" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-transItem">
+                    <div class="panel-body">
+                        <form method="POST" id="transItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ transferItemForm.hidden_tag() }}<input type="hidden"  name="name-form" value='transferItemForm' >
+                        <!-- Just placeholders for future delete group input -->
+                            <div class="row form-group">
+                                {{ transferItemForm.iname.label }}
+                                {% if transferItemForm.iname.errors %}
+                                    {% for error in transferItemForm.iname.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                                <div id="add-item-name" class="form-group">
+                                    <input type="text" class="form-control" name="iname" placeholder="Name of Item" id="itemSelect" value="" />
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                {{ transferItemForm.tagOld.label }}
+                                {% if transferItemForm.tagOld.errors %}
+                                    {% for error in transferItemForm.tagOld.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="form-group">
+                                    <select class="form-control" name="tagOld" id="tagOld"></select>
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                {{ transferItemForm.tagNew.label }}
+                                {% if transferItemForm.tagNew.errors %}
+                                    {% for error in transferItemForm.tagNew.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="form-group">
+                                    {{ transferItemForm.tagNew(class="form-control") }}
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                {{ transferItemForm.qty.label }}
+                                If left blank, all of this item will be transferred.
+                                {% if transferItemForm.qty.errors %}
+                                    {% for error in transferItemForm.qty.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <div class="form-group">
+                                {{ transferItemForm.qty(class="form-control", placeholder="Quantity to Transfer") }}
+                                </div>
+                            </div>
+
+
+                            {{ transferItemForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
                         </form>
                     </div>
                 </div>
@@ -454,84 +592,12 @@
     </div>
 
 
-<!--#........................TAB5.............................  -->
-    <div role="tabpanel" id="existitem" class="container-fluid tab-pane fade">
-        <form method="POST" action="/{{g.current_lang}}/admin">
-            {{ form.hidden_tag() }}
-            <input type="hidden"  name="name-form" value='form4'>
-        <h3> Assign Item to Tag</h3>
-
-
-        <div class="row form-group">
-            {{ form4.itemname.label }}
-            {% if form4.itemname.errors %}
-                {% for error in form4.itemname.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div id="add-item-name" class="form-group">
-            {{ form4.itemname(class="form-control typeahead", placeholder="Name of Existing Item", style="width: 100%;")}}
-            </div>
-        </div>
-
-
-        <div class="row form-group">
-            {{ form4.location.label }}
-            {% if form4.location.errors %}
-                {% for error in form4.location.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form4.location(class="form-control", id="storeroomSelect")}}
-            </div>
-        </div>
-
-
-        <div class="row form-group">
-            {{ form4.tname.label }}
-            {% if form4.tname.errors %}
-                {% for error in form4.tname.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form4.tname(class="form-control", id="tagSelect") }}
-            </div>
-        </div>
-
-
-        <div class="row form-group">
-            {{ form4.qty.label }}
-            {% if form4.qty.errors %}
-                {% for error in form4.qty.errors %}
-                <p class="error-message">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
-            <div class="form-group">
-            {{ form4.qty(class="form-control", placeholder="Quantity Available") }}
-            </div>
-        </div>
-
-
-        {{ form4.submitFour(class="width-35 pull-right btn btn-sm btn-primary") }}
-
-        </form>
-
-    </div>
-
-
 </div>
 
 </div>
 
 <script>
 $(function() {
-    filterTags();
 
   // Attach the `fileselect` event to all file inputs on the page
   $(document).on('change', ':file', function() {
@@ -559,42 +625,55 @@ $(function() {
   
 });
 
+// Filter storerooms by item
+$("#itemSelect").change(function(){
+    var item = $("#itemSelect").val();    
+    var list = JSON.parse(fixEncoding("{{ itemTags }}"));
+    var parseList = JSON.parse(fixEncoding("{{tagsByStore}}"));
+    var dict = {};
+    for (var p in parseList) {
+        dict[parseList[p][0]] = parseList[p][1];
+    }
+    tagList = [];
+    // console.log(list);
+
+    // Makes a list of tag ids that the item is associated with.
+    for(var l in list) {
+        console.log(list[l]);
+        if (list[l][0] == item) {
+            tagList.push(list[l][1]);
+        }
+    }
+
+    // Creates a new option in tagOld for each tag that the item is associated with.
+    for (var i in tagList) {
+        var newOption = document.createElement("option");
+        newOption.value = tagList[i];
+        newOption.innerHTML = dict[tagList[i]];
+        console.log(newOption)
+        $("#tagOld").append(newOption);
+        console.log(dict[tagList[i]]);
+    }
+
+
+});
+
+
+// Fixes .NET 4.0 bug where symbols are replaced with HTML keycodes.
 function fixEncoding(str) {
     s = str.replace(/&amp;/g, "&").replace(/&#(\d+);/g, function(match, number) {
         return String.fromCharCode(number);
     });
     return s;
 }
-// ADD ITEM TO TAG FUNCTION: Shortlists tags according to storeroom selected
-function filterTags() {
-    var storeroom = $("#storeroomSelect option:selected").val();
-    var stores = fixEncoding("{{ tagsByStore }}");
-    var sd = JSON.parse(stores);
-    var tagList = [];
-    tagList = sd[storeroom];
-    for(var store in sd) {
-        console.log(store);
-        if(store===storeroom) {
-            taglist = sd[store];
-        }
-    }
-    var index = 0;
-    $("#tagSelect option").each(function() {
-        $(this).selected = false;
-        $(this).hide();
-        for (var t in tagList) {
-            $("#tagSelect option[value='"+tagList[t]+"']").show();
-            index = t;
-        }
+
+function storeChangeListener(storeroom) {
+     $("#"+storeroom).change(function() {
+        filterTags(storeroom);
     });
-    $("#tagSelect ").value = tagList[0];
-    console.log($("#tagSelect").val());
-    console.log("default supposedly changed");
+
 }
 
-$("#storeroomSelect").change(function() {
-    filterTags();
-})
 
 var substringMatcher = function(strs) {
   return function findMatches(q, cb) {

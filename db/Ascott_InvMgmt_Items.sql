@@ -26,8 +26,8 @@ DROP TABLE IF EXISTS `Items`;
 /*!40101 SET @saved_cs_client = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Items` (
-  `iid` int(11) NOT NULL AUTO_INCREMENT,
-  `name` char(45) NOT NULL,
+  `iid` int(11) NOT NULL UNIQUE AUTO_INCREMENT,
+  `name` char(45) NOT NULL UNIQUE,
   `category` char(25) NOT NULL,
   `picture` char(50) NOT NULL,
   `price` DECIMAL(13,4) CHECK (`price` >= 0.0000),

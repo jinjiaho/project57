@@ -4,7 +4,7 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
-from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation, RemoveItem, RemoveTag
+from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation, RemoveItem, RemoveTag, TransferItem
 from apscheduler.schedulers.background import BackgroundScheduler
 # from apscheduler.jobstores.mongodb import MongoDBJobStore
 # from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -75,11 +75,11 @@ sched = BackgroundScheduler()
 
 # Query for form select fields. 
 # Called by admin()
-def choices(table, column):
+def choices(table, column, *args):
     choices = []
     conn = mysql.connect()
     cursor = conn.cursor()
-    query = "SELECT {} FROM {};".format(column, table)
+    query = "SELECT {} FROM {}".format(column, table)
     cursor.execute(query)
     data1 = cursor.fetchall()
     data2 = sorted(set(list(data1)))
@@ -89,20 +89,20 @@ def choices(table, column):
         choices.append(x)
     return choices
 
-# get tags by storeroom
-def tagsByStore():
+# For populating select fields in admin forms with tags.
+# Called by admin()
+def storeTags():
+    choices = []
     cursor = mysql.connect().cursor()
-    cursor.execute("SELECT tname, storeroom FROM TagInfo;")
-    data = cursor.fetchall()
-    storeDict = {}
+    cursor.execute("SELECT tid, tname, storeroom FROM TagInfo;")
+    data = sorted(set(list(cursor.fetchall())))
     for d in data:
-        s = d[1].encode('ascii')
-        t = d[0].encode('ascii')
-        if s not in storeDict.keys():
-            storeDict[s] = [t]
-        else:
-            storeDict[s].append(t)
-    return storeDict
+        value = d[0]
+        text = str(d[2]) + " - " + str(d[1])
+        pair = (value, text)
+        choices.append(pair)
+    return choices
+
 
 
 # Returns all the items based on category and amount in or out within the last month for each item
@@ -635,15 +635,23 @@ def admin():
     form4 = ExistingItemsLocation()
     removeItemForm = RemoveItem()
     removeTagForm = RemoveTag()
+    transferItemForm = TransferItem()
+
+
+    storeTagChoices = storeTags()
+
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT name, tag FROM view_item_locations;")
+    itemTags = cursor.fetchall()
 
     # Initialize options for all select fields
     form2.category.choices = choices('Items', 'category')
-    form4.location.choices = choices('TagInfo', 'storeroom')
-    form4.tname.choices = choices('TagInfo', 'tname') # tags filtered by store with js
     form3.location.choices = choices('TagInfo', 'storeroom')
+    form4.tname.choices = storeTagChoices
     removeItemForm.iname.choices = choices('Items', 'name')
     removeTagForm.tname.choices = choices('TagInfo', 'tname')
-    tagsDict = tagsByStore()
+    transferItemForm.tagNew.choices = storeTagChoices
+
 
 
     #--------------users table-------------------------
@@ -679,7 +687,7 @@ def admin():
         cursor.execute("SELECT name, iid FROM Ascott_InvMgmt.view_item_locations WHERE tag = {};".format(i))
         data3=cursor.fetchall()
 
-        cursor.execute("SELECT tname FROM TagInfo WHERE tid={}".format(i))
+        cursor.execute("SELECT tname FROM TagInfo WHERE tid={};".format(i))
         l_name = cursor.fetchall()[0][0]
 
         group[l_name] = data3
@@ -704,7 +712,9 @@ def admin():
             form4=form4,
             removeItemForm=removeItemForm,
             removeTagForm=removeTagForm,
-            tagsByStore = json.dumps(tagsDict),
+            transferItemForm = transferItemForm,
+            tagsByStore = json.dumps(storeTagChoices),
+            itemTags = json.dumps(itemTags),
             users=things,
             group=group,
             item_list=flat_items)
@@ -722,7 +732,9 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = json.dumps(tagsDict),
+                    transferItemForm = transferItemForm,
+                    tagsByStore = json.dumps(storeTagChoices),
+                    itemTags = json.dumps(itemTags),
                     users=things,
                     group=group)
             else:
@@ -757,7 +769,9 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = json.dumps(tagsDict),
+                    transferItemForm = transferItemForm,
+                    tagsByStore = json.dumps(storeTagChoices),
+                    itemTags = json.dumps(itemTags),
                     users=things,
                     group=group)
             else:
@@ -810,7 +824,9 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = json.dumps(tagsDict),
+                    transferItemForm = transferItemForm,
+                    tagsByStore = json.dumps(storeTagChoices),
+                    itemTags = json.dumps(itemTags),
                     users=things,
                     group=group)
 
@@ -863,7 +879,9 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = json.dumps(tagsDict),
+                    transferItemForm = transferItemForm,
+                    tagsByStore = json.dumps(storeTagChoices),
+                    itemTags = json.dumps(itemTags),
                     users=things,
                     group=group)
             else:
@@ -902,7 +920,9 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = json.dumps(tagsDict),
+                    transferItemForm = transferItemForm,
+                    tagsByStore = json.dumps(storeTagChoices),
+                    itemTags = json.dumps(itemTags),
                     users=things,
                     group=group)
             else:
@@ -932,7 +952,9 @@ def admin():
                     form4=form4,
                     removeItemForm=removeItemForm,
                     removeTagForm=removeTagForm,
-                    tagsByStore = json.dumps(tagsDict),
+                    transferItemForm = transferItemForm,
+                    tagsByStore = json.dumps(storeTagChoices),
+                    itemTags = json.dumps(itemTags),
                     users=things,
                     group=group)
             else:

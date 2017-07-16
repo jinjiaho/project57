@@ -20,16 +20,15 @@ class CreateNewItem(FlaskForm):
 	itemname = StringField('Item Name', validators=[DataRequired("Please enter the name of the new item.")])
 	category = SelectField('Category of Item', validators = [DataRequired()])
 	price = DecimalField('Unit Price', places=4, rounding=None, validators = [DataRequired()])
-	reorderpt = IntegerField('Reorder point', validators = [DataRequired()])
-	count_unit = StringField('Unit for counting', validators = [DataRequired()])
-	order_unit = StringField('Unit for ordering', validators = [DataRequired()])
-	order_multiplier = DecimalField('Qty in one unit ordered', places=4, rounding=None, validators = [DataRequired()])
+	reorderpt = IntegerField('Reorder Point', validators = [DataRequired()])
+	count_unit = StringField('Unit for Counting', validators = [DataRequired()])
+	order_unit = StringField('Unit for Ordering', validators = [DataRequired()])
+	order_multiplier = DecimalField('Qty in One Unit Ordered', places=4, rounding=None, validators = [DataRequired()])
 	submitTwo = SubmitField('Add New Item')
 
 class ExistingItemsLocation(FlaskForm):
 
 	itemname = StringField('Item Name', validators=[DataRequired("Please insert the name of the item")])
-	location = SelectField('Location of the Item', validators = [DataRequired()])
 	tname = SelectField('Tag Name', validators=[DataRequired("Please select a tag")])
 	qty = IntegerField('Available Amount', validators = [DataRequired()])
 	submitFour = SubmitField('Add Location')
@@ -42,12 +41,12 @@ class LoginForm(FlaskForm):
 
 
 class RetrievalForm(FlaskForm):
-	amount = StringField('Input the amount taken', validators=[validators.input_required()])
+	amount = StringField('Input the Amount Taken', validators=[validators.input_required()])
 	submit4 = SubmitField("Enter Quantity")
 
 
 class AddNewLocation(FlaskForm):
-	tname = StringField('Name of new tag', validators=[DataRequired("Please enter the name of the tag without spaces.")])
+	tname = StringField('Name of New Tag', validators=[DataRequired("Please enter the name of the tag without spaces.")])
 	location = SelectField('Select Storeroom', validators = [DataRequired()])
 	newLocation = StringField('Add a New Storeroom')
 	remarks = StringField('Remarks')
@@ -55,15 +54,22 @@ class AddNewLocation(FlaskForm):
 
 
 class TrackingForm(FlaskForm):
-	enabled = RadioField('Track item quantity? ', choices=[('yes','Yes'),('no','No')])
+	enabled = RadioField('Track Item Quantity? ', choices=[('yes','Yes'),('no','No')])
 	password = PasswordField(validators=[DataRequired('Please enter a password')])
 	remember = BooleanField()
 	submit = SubmitField()
 
 class RemoveItem(FlaskForm):
-	iname = SelectField('Item name')
+	iname = StringField('Item Name')
 	submit = SubmitField()
 
 class RemoveTag(FlaskForm):
 	tname = SelectField('Tag Name')
 	submit = SubmitField()
+
+class TransferItem(FlaskForm):
+	iname = StringField('Item Name')
+	tagOld = SelectField('Old Tag')
+	tagNew = SelectField('New Tag')
+	qty = IntegerField('Qty to Transfer')
+	submit = SubmitField();
