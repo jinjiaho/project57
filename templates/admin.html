@@ -146,7 +146,6 @@
                                 </div>
                             </div>
 
-
                             <div class="row form-group">
                                 {{ form.username.label }}
                                 {% if form.username.errors %}
@@ -187,27 +186,13 @@
                             </div>
                             <br>
 
-                            <div class="row form-group">
-                                {% with messages = get_flashed_messages() %}
-                                    {% if messages %}
-                                    <ul class="error-message">
-                                    {% for message in messages %}
-                                        {{ message }}
-                                    {% endfor %}
-                                     </ul>
-                                    {% endif %}
-                                {% endwith %}
-                            </div>
-
                             {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
-
 
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-
 
     </div>
 
@@ -439,7 +424,7 @@
 
                     </div>
                 </div>
-                        
+
             </div>
 
             <!-- Transfer Item Form -->
@@ -689,7 +674,7 @@ $(function() {
 
 // Filter storerooms by item
 $("#itemSelect").change(function(){
-    var item = $("#itemSelect").val();    
+    var item = $("#itemSelect").val();
     var list = JSON.parse(fixEncoding("{{ itemTags }}"));
     var parseList = JSON.parse(fixEncoding("{{tagsByStore}}"));
     var dict = {};

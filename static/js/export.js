@@ -63,7 +63,7 @@ function exportLogs(tableid, filename) {
     var header1 = ["Logs in current month","","","","","","Month: "+month,"Year:"+year];
     var header2 = ["Property: Ascott Raffles Place Singapore"];//Property is hard coded for now
     var header3 = ["","","","","",""];
-    var header4 = ["Name","Item","Category","In/Out","Quantity change","Quantity remaining","Date-Time","Location"];
+    var header4 = ["Date-Time","User","Item","Category","In/Out","Quantity change","Quantity remaining","Location"];
     var csv = [];
     var rows = $(tableid).find("tbody tr:visible");
     csv.push(header1)
