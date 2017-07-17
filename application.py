@@ -666,7 +666,7 @@ def admin():
     conn = mysql.connect()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT role, name FROM Ascott_InvMgmt.User;")
+    cursor.execute("SELECT role, name, username FROM Ascott_InvMgmt.User;")
 
     data = cursor.fetchall()
     # print(data)
@@ -674,7 +674,8 @@ def admin():
     for item in data:
         things.append(
             {"role": item[0],
-            "name": item[1]})
+            "name": item[1],
+            "username": item[2]})
 
 #-------------NFCID----------------------------------
 
@@ -728,6 +729,7 @@ def admin():
             item_list=flat_items)
 
 # ------------------All the various form tabs----------------------
+
 # ------------------Add User Form ----------------------
     elif request.method == "POST":
 
@@ -760,14 +762,53 @@ def admin():
 
                 # TODO: string parameterisation
                 query = "INSERT INTO User VALUES ('{}','{}','{}','{}');".format(newuser[0],newuser[1],newuser[2],newuser[3])
-                conn.commit()
                 # query = "INSERT INTO User (username,password,role,name) VALUES ();"
-
+                # print(query)
                 cursor.execute(query)
+                conn.commit()
                 # cursor.execute("COMMIT")
                 flash("User has been added!", "success")
                 return redirect(url_for('admin', lang_code=get_locale()))
 
+# ------------------Edit User Form ----------------------
+        elif request.form['name-form'] =='editUser':
+            print('form received')
+            username = request.form["username"]
+            print(username)
+            role = request.form["role"]
+            print(role)
+
+            try:
+                conn = mysql.connect()
+                cursor = conn.cursor()
+                query = "UPDATE User SET role='{}' WHERE username='{}';".format(role, username)
+                print(query)
+                cursor.execute(query)
+                conn.commit()
+                flash("User role updated!", "success")
+            except:
+                flash("Oops! Something went wrong :(", "danger")
+
+            return redirect(url_for('admin', lang_code=get_locale()))
+
+# ------------------Delecte User Form ----------------------
+        elif request.form['name-form'] =='deleteUser':
+            print('form received')
+            username = request.form["username"]
+
+            try:
+                conn = mysql.connect()
+                cursor = conn.cursor()
+                query = "DELETE FROM User WHERE username='{}';".format(username)
+                print(query)
+                cursor.execute(query)
+                conn.commit()
+                flash("User deleted!", "success")
+            except:
+                flash("Oops! Something went wrong :(", "danger")
+
+            return redirect(url_for('admin', lang_code=get_locale()))
+    
 # ------------------Add Item Form ----------------------
         elif request.form['name-form'] =='form2':
             if form2.validate() == False:
@@ -1070,6 +1111,7 @@ def admin():
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
+
 # ------------------Delete Tag form ----------------------
 
         elif request.form['name-form'] == 'removeTagForm':
@@ -1130,7 +1172,6 @@ def dashboard():
         user=session['username'],
         items = i,
         logs = l)
-
 
 
 @application.route('/<lang_code>/inventory')
@@ -1384,7 +1425,6 @@ def shelf(tag_id):
         user = session['username'],
         location = tag_id,
         tagName = tagName)
-
 
 
 @application.route('/logout')

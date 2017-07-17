@@ -11,3 +11,14 @@ SELECT * FROM Items;
 SELECT * FROM Logs;
 SELECT * FROM Permissions;
 SELECT * FROM PriceChange;
+SELECT * FROM User;
+
+CREATE TABLE PriceChange (
+	item INT(11) NOT NULL,
+    old_price DECIMAL(13,4),
+    new_price DECIMAL(13,4),
+    date_effective DATETIME NOT NULL,
+    PRIMARY KEY (item, date_effective)
+);
+
+DELETE FROM User WHERE username='user 2';
