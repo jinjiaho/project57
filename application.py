@@ -666,7 +666,7 @@ def admin():
     conn = mysql.connect()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT role, name FROM Ascott_InvMgmt.User;")
+    cursor.execute("SELECT role, name, username FROM Ascott_InvMgmt.User;")
 
     data = cursor.fetchall()
     # print(data)
@@ -674,7 +674,8 @@ def admin():
     for item in data:
         things.append(
             {"role": item[0],
-            "name": item[1]})
+            "name": item[1],
+            "username": item[2]})
 
 #-------------NFCID----------------------------------
 
@@ -692,7 +693,7 @@ def admin():
     for i in NFCs:
         try:
             #fetch all item names pertaining to the tag.
-            cursor.execute("SELECT name, iid FROM Ascott_InvMgmt.view_item_locations WHERE tag = {};".format(i))
+            cursor.execute("SELECT name, iid, qty_left FROM Ascott_InvMgmt.view_item_locations WHERE tag = {};".format(i))
             data3=cursor.fetchall()
 
             cursor.execute("SELECT tname FROM TagInfo WHERE tid={};".format(i))
@@ -728,6 +729,7 @@ def admin():
             item_list=flat_items)
 
 # ------------------All the various form tabs----------------------
+
 # ------------------Add User Form ----------------------
     elif request.method == "POST":
 
@@ -760,14 +762,53 @@ def admin():
 
                 # TODO: string parameterisation
                 query = "INSERT INTO User VALUES ('{}','{}','{}','{}');".format(newuser[0],newuser[1],newuser[2],newuser[3])
-                conn.commit()
                 # query = "INSERT INTO User (username,password,role,name) VALUES ();"
-
+                # print(query)
                 cursor.execute(query)
+                conn.commit()
                 # cursor.execute("COMMIT")
                 flash("User has been added!", "success")
                 return redirect(url_for('admin', lang_code=get_locale()))
 
+# ------------------Edit User Form ----------------------
+        elif request.form['name-form'] =='editUser':
+            print('form received')
+            username = request.form["username"]
+            print(username)
+            role = request.form["role"]
+            print(role)
+
+            try:
+                conn = mysql.connect()
+                cursor = conn.cursor()
+                query = "UPDATE User SET role='{}' WHERE username='{}';".format(role, username)
+                print(query)
+                cursor.execute(query)
+                conn.commit()
+                flash("User role updated!", "success")
+            except:
+                flash("Oops! Something went wrong :(", "danger")
+
+            return redirect(url_for('admin', lang_code=get_locale()))
+
+# ------------------Delete User Form ----------------------
+        elif request.form['name-form'] =='deleteUser':
+            print('form received')
+            username = request.form["username"]
+
+            try:
+                conn = mysql.connect()
+                cursor = conn.cursor()
+                query = "DELETE FROM User WHERE username='{}';".format(username)
+                print(query)
+                cursor.execute(query)
+                conn.commit()
+                flash("User deleted!", "success")
+            except:
+                flash("Oops! Something went wrong :(", "danger")
+
+            return redirect(url_for('admin', lang_code=get_locale()))
+    
 # ------------------Add Item Form ----------------------
         elif request.form['name-form'] =='form2':
             if form2.validate() == False:
@@ -816,7 +857,7 @@ def admin():
                     cursor.execute(query)
                     conn.commit()
 
-                    flash("Item has been added!", "success")
+                    flash("Item has been added! Next. please assign a tag.", "success")
 
                 except Exception as e:
                     print(e)
@@ -848,10 +889,9 @@ def admin():
                 cursor = conn.cursor()
                 cursor.execute("SELECT iid, picture FROM Items WHERE name='{}';".format(iname))
                 response = cursor.fetchall()[0]
-                iid, picture = response[0], response[1].encode("ascii")
-                print "ADMIN: Deleting item #%s with thumbnail '%s' ..." % (iid, picture)
-
                 try:
+                    iid, picture = response[0], response[1].encode("ascii")
+                    print "ADMIN: Deleting item #%s with thumbnail '%s' ..." % (iid, picture)
 
                     removeFromItems = "DELETE FROM Items WHERE name='{}';".format(iname)
                     print "SQL: %s" % removeFromItems
@@ -870,6 +910,9 @@ def admin():
                             print("DELETE THUMBNAIL: %s" % e)
 
                     flash('Item deleted!', 'success')
+
+                except IndexError:
+                    flash("Item not found!", "warning")
 
                 except Exception as e:
                     print("DELETE ITEM: %s" % e)
@@ -896,7 +939,7 @@ def admin():
                     group=group)
             else:
                 itemname = form4.itemname.data
-                tid = int(form4.tid.data)
+                tid = form4.tid.data
                 amt = form4.qty.data
                 try:
 
@@ -972,53 +1015,60 @@ def admin():
                     row = cursor.fetchall()[0]
 
                     # TODO: string parameterisation
-
+                    queryOut = ""
+                    queryIn = ""
+                    message = ""
 
                     # if user only wants to transfer some of the items over
                     if qty:
+                        if qty == 0:
+                            flash("Qty input was 0, none transferred.", "warning")
+                            return redirect(url_for('admin', lang_code=get_locale()))
                         print(row)
                         # check if there are enough items at the old location to transfer the stated qty.
                         if qty > row[2]:
                             raise InsufficientQtyError("Not enough in store to transfer!")
                         # if sufficient items, deduct items from old location.
                         qty_left = row[2] - qty
-                        query = "UPDATE TagItems SET qty_left={} WHERE iid={} AND tag={};".format(qty_left, iid, tagOld)
-                        print(query)
-                        cursor.execute(query)
-                        conn.commit()
+                        if qty_left == 0:
+                            queryOut = "DELETE FROM TagItems WHERE iid={} AND tag={};".format(iid, tagOld)
+                        else:
+                            queryOut = "UPDATE TagItems SET qty_left={} WHERE iid={} AND tag={};".format(qty_left, iid, tagOld)
 
                     # if user wants to transfer all
                     else:
                         qty = row[2]
-                        query = "DELETE FROM TagItems WHERE iid={} AND tag={};".format(iid, tagOld)
-                        print(query)
-                        cursor.execute(query)
-                        conn.commit()
+                        queryOut = "DELETE FROM TagItems WHERE iid={} AND tag={};".format(iid, tagOld)
+                    
+                    print(queryOut)
 
                     # Add the items to the new location.
                     # Check if there are already instances of the item at the new location.
                     query = "SELECT * FROM Ascott_InvMgmt.TagItems WHERE iid={} AND tag={};".format(iid, tagNew)
                     print(query)
+                    cursor = mysql.connect().cursor()
                     cursor.execute(query)
-                    rowExists = cursor.fetchall()[0]
+                    rowExists = cursor.fetchall()
 
                     if rowExists:
+                        print('row exists!')
                         # Update the qty instead of creating a new row.
-                        newQty = rowExists[2] + qty
-                        query = "UPDATE TagItems SET qty_left={} WHERE iid={} AND tag={};".format(newQty, iid, tagNew)
-                        print(query)
-                        cursor.execute(query)
-                        conn.commit()
-                        flash("Item already in location, updated qty.", "success")
+                        newQty = rowExists[0][2] + qty
+                        queryIn = "UPDATE TagItems SET qty_left={} WHERE iid={} AND tag={};".format(newQty, iid, tagNew)
+                        message = "Item already in location, updated qty."
 
                     else:
+                        print('row does not exist')
                         # Create a new row.
-                        query = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ({},{},{});".format(iid, tagNew, qty)
-                        print(query)
-                        cursor.execute(query)
-                        conn.commit()
+                        queryIn = "INSERT INTO Ascott_InvMgmt.TagItems VALUES ({},{},{});".format(iid, tagNew, qty)
+                        message = "Transferred item to location!"
+                    print(queryIn)
+                    flash(message, "success")
 
-                        flash("Transferred item to location!", "success")
+                    conn = mysql.connect()
+                    cursor = conn.cursor()
+                    cursor.execute(queryIn + queryOut + "COMMIT;")
+
 
                 except InsufficientQtyError as e:
                     flash(e.args[0], "danger")
@@ -1027,6 +1077,25 @@ def admin():
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
+# ------------------Remove Item From Tag Form ----------------------
+        elif request.form['name-form'] =='removeFromTag':
+            print('form received')
+            item = request.form["iid"]
+            tag = request.form["tid"]
+
+            try:
+                conn = mysql.connect()
+                cursor = conn.cursor()
+                query = "DELETE FROM TagItems WHERE iid={} AND tag={};".format(item, tag)
+                print(query)
+                cursor.execute(query)
+                conn.commit()
+                flash("Item removed from tag!", "success")
+            except:
+                flash("Oops! Something went wrong :(", "danger")
+
+            return redirect(url_for('admin', lang_code=get_locale()))
+    
 
 # ------------------Add Tag form ----------------------
         # TODO: Change form to get appropriate values
@@ -1070,6 +1139,7 @@ def admin():
 
                 return redirect(url_for('admin', lang_code=get_locale()))
 
+
 # ------------------Delete Tag form ----------------------
 
         elif request.form['name-form'] == 'removeTagForm':
@@ -1090,12 +1160,11 @@ def admin():
             else:
                 tid = removeTagForm.tid.data
 
-                conn = mysql.connect()
-                cursor = conn.cursor()
-                cursor.execute("SELECT * FROM TagItems WHERE tag={};".format(tid))
-                data = cursor.fetchall()[0]
-                print(data)
                 try:
+                    conn = mysql.connect()
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT * FROM TagItems WHERE tag={};".format(tid))
+                    data = cursor.fetchall()
                     if data:
                         print(data)
                         raise ContainsItemsError("Coudn't delete tag as tag still has items.")
@@ -1130,7 +1199,6 @@ def dashboard():
         user=session['username'],
         items = i,
         logs = l)
-
 
 
 @application.route('/<lang_code>/inventory')
@@ -1384,7 +1452,6 @@ def shelf(tag_id):
         user = session['username'],
         location = tag_id,
         tagName = tagName)
-
 
 
 @application.route('/logout')

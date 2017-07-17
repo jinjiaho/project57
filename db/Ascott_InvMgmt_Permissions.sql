@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS `Permissions`;
 /*!40101 SET @saved_cs_client = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Permissions` (
-  `role` CHAR(50) NOT NULL,
+  `role` VARCHAR(15) NOT NULL,
   `stock_in` BOOLEAN NOT NULL,
   `admin` BOOLEAN NOT NULL,
   PRIMARY KEY (`role`)
