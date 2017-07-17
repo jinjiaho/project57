@@ -140,14 +140,14 @@
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
           <!-- New Item Form -->
           <div class="panel panel-default">
-              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-newItem" aria-expanded="true" aria-controls="collapse-newItem">
-                  <div class="panel-heading text-center" role="tab" id="heading-newItem" style="background-color:#f5f5f5;">
+              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-newUser" aria-expanded="true" aria-controls="collapse-newUser">
+                  <div class="panel-heading text-center" role="tab" id="heading-newUser" style="background-color:#f5f5f5;">
                       <h4 class="panel-title">
                           Add a New User
                       </h4>
                   </div>
               </a>
-              <div id="collapse-newItem" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-newItem">
+              <div id="collapse-newUser" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-newUser">
                   <div class="panel-body">
 
                       <form method="POST" action="/{{g.current_lang}}/admin" >
@@ -228,8 +228,10 @@
                 </div>
             </div>
         </div>
+      </div>
+    </div>
 
-        
+
 
 <!--#........................TAB3.............................  -->
 
@@ -457,7 +459,7 @@
 
                     </div>
                 </div>
-                        
+
             </div>
 
             <!-- Transfer Item Form -->
@@ -684,7 +686,7 @@ $(function() {
 
 // Filter storerooms by item
 $("#itemSelect").change(function(){
-    var item = $("#itemSelect").val();    
+    var item = $("#itemSelect").val();
     var list = JSON.parse(fixEncoding("{{ itemTags }}"));
     var parseList = JSON.parse(fixEncoding("{{tagsByStore}}"));
     var dict = {};
