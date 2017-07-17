@@ -349,7 +349,7 @@
                                     {% endfor %}
                                 {% endif %}
                                 <div id="add-item-name" class="form-group">
-                                {{ removeItemForm.iname(class="form-control", placeholder="Name of Item")}}
+                                {{ removeItemForm.iname(class="form-control typeahead", placeholder="Name of Item")}}
                                 </div>
                             </div>
 
@@ -448,7 +448,7 @@
                                     {% endfor %}
                                 {% endif %}
                                 <div id="add-item-name" class="form-group">
-                                    <input type="text" class="form-control" name="iname" placeholder="Name of Item" id="itemSelect" value="" />
+                                    <input type="text" class="form-control typeahead" name="iname" placeholder="Name of Item" id="itemSelect" value="" />
                                 </div>
                             </div>
 
@@ -477,7 +477,7 @@
                             </div>
 
                             <div class="row form-group">
-                                {{ transferItemForm.qty.label }}
+                                {{ transferItemForm.qty.label }}<br/>
                                 If left blank, all of this item will be transferred.
                                 {% if transferItemForm.qty.errors %}
                                     {% for error in transferItemForm.qty.errors %}
@@ -496,6 +496,30 @@
                     </div>
                 </div>
             </div>
+
+            <!-- List of items by store, Remove from Tag -->
+            <div class="row" style="padding: 1em;">
+                {% for key, values in group.iteritems() %}
+
+                <!--find a way to create a button-->
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ key[0] }}" aria-expanded="false" aria-controls="collapseExample">{{ key[1] }}</button>
+                <div class="collapse" id="{{ key[0] }}">
+
+                    <ul class="list-group">
+
+                        {% for i in values %}
+                            <li class="list-group-item"><a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }}, {{i[2]}} </a><span style="cursor:pointer;" onclick="removeFromTag({{i[1]}}, {{key[0]}})" class="pull-right">Remove from tag</span></li>
+
+                        {% endfor %}
+
+
+                    </ul>
+
+                </div>
+
+                {% endfor %}
+            </div>
+
         </div>
 
     </div>
@@ -613,28 +637,7 @@
             </div>
         </div>
 
-        <div class="row">
-            {% for key, values in group.iteritems() %}
-
-            <!--find a way to create a button-->
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ key[0] }}" aria-expanded="false" aria-controls="collapseExample">{{ key[1] }}</button>
-            <div class="collapse" id="{{ key[0] }}">
-
-                <ul class="list-group">
-
-                    {% for i in values %}
-                        <li class="list-group-item"><a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }} </a></li>
-
-                    {% endfor %}
-
-
-                </ul>
-
-            </div>
-
-            {% endfor %}
-        </div>
-
+        
     </div>
 
         
@@ -792,12 +795,38 @@ function deleteUser(username) {
     form.appendChild(input);
 
     form.method = "POST";
-    form.name = "deleteUser";
 
     document.body.appendChild(form);
     form.submit();
 }
 
+function removeFromTag(item, tag) {
+    console.log(item, tag);
+    var form = document.createElement('form');
+    var input1 = document.createElement('input');
+    var input2 = document.createElement('input');
+    var formName = document.createElement('input');
+
+    formName.value = 'removeFromTag';
+    formName.name = 'name-form';
+    formName.type = "hidden";
+    form.appendChild(formName);
+
+    input1.value = item;
+    input1.name = "iid";
+    input1.type = "hidden";
+    form.appendChild(input1);
+
+    input2.value = tag;
+    input2.name = "tid";
+    input2.type = "hidden";
+    form.appendChild(input2);
+
+    form.method = "POST";
+
+    document.body.appendChild(form);
+    form.submit();
+}
 
 </script>
 
