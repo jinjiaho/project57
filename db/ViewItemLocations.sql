@@ -13,4 +13,5 @@ ON Items.iid = TagItems.iid;
 
 SELECT * FROM view_item_locations;
 
+
 -- UPDATE TagItems SET qty_left=84 WHERE iid=8 AND location='Level5C3';
