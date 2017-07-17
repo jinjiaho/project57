@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS TagItems (
 	iid int(11) NOT NULL,
     tag int(11) NOT NULL,
     qty_left int(8) NOT NULL CHECK (qty >= 0),
-    PRIMARY KEY (iid, tag)
+    PRIMARY KEY (iid, tag),
+    FOREIGN KEY (iid) REFERENCES Items(iid) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 -- iid: item id
 -- tag: tag id

@@ -29,8 +29,8 @@
 <div id="modify-modal" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="modify-form">
-
+            <form id="modify-form" name="editUser" method="POST">
+                <input type="hidden" name="name-form" value="editUser"/>
                 <div class="modal-header">
                     <h3 class="modal-title" id="modify-label">Reviewing Changes</h3>
                 </div>
@@ -39,21 +39,20 @@
                     <div class="container-fluid">
                       <div class="form-group">
                         <label for="sel1">Select list:</label>
-                        <select class="form-control" id="sel1">
-                          <option>supervisor</option>
-                          <option>attendant</option>
-                          <option>runner</option>
+                        <select class="form-control" id="sel1" name="role">
+                          <option value="supervisor">supervisor</option>
+                          <option value="runner">runner</option>
 
                         </select>
                       </div>
-                        <p>You are modifying changes for admin personel: <strong><input type="text" disabled></strong><br><span class="text-info">This action can be reversed at any time</span></p>
+                        <p>You are modifying permissions for: <strong><input type="text" name="username" readonly></strong><br><span class="text-info">This action can be reversed at any time</span></p>
                     </div>
                 </div>
 
 
                 <div class="modal-footer">
 
-                    <button type="submit" class="btn btn-warning" id="modify-button">Modify</button>
+                    <button type="submit" class="btn btn-success" id="modify-button">Apply</button>
                     <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
 
                 </div>
@@ -67,8 +66,7 @@
 <div class="container">
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#summary" aria-controls="home" role="tab" data-toggle="tab">Users</a></li>
-    <li role="presentation"><a href="#user" aria-controls="user" role="tab" data-toggle="tab">New User</a></li>
+    <li role="presentation" class="active"><a href="#users" aria-controls="users" role="tab" data-toggle="tab">Users</a></li>
     <li role="presentation"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">Items</a></li>
     <li role="presentation"><a href="#group" aria-controls="group" role="tab" data-toggle="tab">Storerooms & Tags</a></li>
     <!-- <li role="presentation"><a href="#existitem" aria-controls="existitem" role="tab" data-toggle="tab">Assign Item to Tag</a></li> -->
@@ -77,163 +75,130 @@
 
 <div class="tab-content">
 
-    <div role="tabpanel" id="summary" class="container-fluid tab-pane fade in active">
-        <h3>HOME</h3>
+<!-- ******************* USERS TAB *****************************-->
+    <div role="tabpanel" id="users" class="container-fluid tab-pane fade in active">
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-currentUsers" aria-expanded="true" aria-controls="collapse-currentUsers">
+                    <div class="panel-heading text-center" role="tab" id="heading-currentUsers" style="background-color:#f5f5f5;">
+                        <h4 class="panel-title">
+                            Current Users
+                        </h4>
+                    </div>
+                </a>
+                <div id="collapse-currentUsers" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-currentUsers">
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
 
-        <h4>{{_('Current Users')}}</h4>
+                                    <th>{{_('Username')}}</th>
+                                    <th>{{_('Name')}}</th>
+                                    <th>{{_('Role')}}</th>
+                                    <th>{{_('Edit')}}</th>
+                                    <th>{{_('Delete User')}}</th>
+                                </thead>
 
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
+                                <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.role }}</td>
+                                    <td><button class="btn btn-default" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{ user.username }}" id="#modify">{{_('Edit')}}</button></td>
+                                    <td><button class="btn btn-danger" onclick="deleteUser('{{user.username}}')">&times;</button></td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
 
-                    <th>{{_('Name')}}</th>
-                    <th>{{_('Role')}}</th>
-                    <th>{{_('Modify')}}</th>
-                </thead>
-
-                <tbody>
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.role }}</td>
-                    <td><button class="btn btn-default" style="margin-bottom: 5px; width:50%;" data-toggle="modal" data-target="#modify-modal" data-name="{{ user.name }}" id="#modify">{{_('Modify')}}</button><td>
-
-
-
-                </tr>
-                {% endfor %}
-                </tbody>
-
-            </table>
-        </div>
-
-        <h4>{{_('Storerooms')}}</h4>
-
-
-        {% for key, values in group.iteritems() %}
-
-        <!--find a way to create a button-->
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ key[0] }}" aria-expanded="false" aria-controls="collapseExample">{{ key[1] }}</button>
-        <div class="collapse" id="{{ key[0] }}">
-
-            <ul class="list-group">
-
-                {% for i in values %}
-                    <li class="list-group-item"><a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }} </a></li>
-
-                {% endfor %}
-
-
-            </ul>
-
-        </div>
-
-        {% endfor %}
-
-
-    </div>
-
-
-
-<!-- ******************* NEW USER TAB *****************************-->
-    <div role="tabpanel" id="user" class="container-fluid tab-pane fade">
-      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-          <!-- New Item Form -->
-          <div class="panel panel-default">
-              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-newUser" aria-expanded="true" aria-controls="collapse-newUser">
-                  <div class="panel-heading text-center" role="tab" id="heading-newUser" style="background-color:#f5f5f5;">
-                      <h4 class="panel-title">
-                          Add a New User
-                      </h4>
-                  </div>
-              </a>
-              <div id="collapse-newUser" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-newUser">
-                  <div class="panel-body">
-
-                      <form method="POST" action="/{{g.current_lang}}/admin" >
-                          {{ form.hidden_tag() }}
-                          <input type="hidden" name="name-form" value='form')>
-
-
-                      <div class="row form-group">
-                          {{ form.name.label }}
-                          {% if form.name.errors %}
-                              {% for error in form.name.errors %}
-                              <p class="error-message">{{ error }}</p>
-                              {% endfor %}
-                          {% endif %}
-
-                          <div class="form-group">
-                          {{ form.name(class="form-control", placeholder="Name of User")}}
-                          </div>
-                      </div>
-
-
-                      <div class="row form-group">
-                          {{ form.username.label }}
-                          {% if form.username.errors %}
-                              {% for error in form.username.errors %}
-                              <p class="error-message">{{ error }}</p>
-                              {% endfor %}
-                          {% endif %}
-
-                          <div class="form-group">
-                          {{ form.username(class="form-control", placeholder="Username") }}
-                          </div>
-                      </div>
-
-
-                      <div class="row form-group">
-                          {{ form.password.label }}
-                          {% if form.password.errors %}
-                              {% for error in form.password.errors %}
-                              <p class="error-message">{{ error }}</p>
-                              {% endfor %}
-                          {% endif %}
-
-                          <div class="form-group">
-                          {{ form.password(class="form-control", placeholder="Password") }}
-                          </div>
-                      </div>
-
-
-                      <div class="row form-group">
-                          {{ form.role.label }} <br>
-                          {% for subfield in form.role %}
-                              <tr>
-                                  <td>{{ subfield }}</td>
-                                  <td>{{ subfield.label }}</td>
-                                  <br>
-                              </tr>
-                          {% endfor %}
-                      </div>
-                      <br>
-
-                      <div class="row form-group">
-                          {% with messages = get_flashed_messages() %}
-                              {% if messages %}
-                              <ul class="error-message">
-                              {% for message in messages %}
-                                  {{ message }}
-                              {% endfor %}
-                               </ul>
-                              {% endif %}
-                          {% endwith %}
-                      </div>
-
-                      {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
-
-
-                      </form>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-      </div>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-newUser" aria-expanded="true" aria-controls="collapse-newUser">
+                    <div class="panel-heading text-center" role="tab" id="heading-newUser" style="background-color:#f5f5f5;">
+                        <h4 class="panel-title">
+                            Add a New User
+                        </h4>
+                    </div>
+                </a>
+                <div id="collapse-newUser" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-newUser">
+                    <div class="panel-body">
+                        <form method="POST" action="/{{g.current_lang}}/admin" >
+                            {{ form.hidden_tag() }}
+                            <input type="hidden" name="name-form" value='form')>
+
+
+                            <div class="row form-group">
+                                {{ form.name.label }}
+                                {% if form.name.errors %}
+                                    {% for error in form.name.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <div class="form-group">
+                                {{ form.name(class="form-control", placeholder="Name of User")}}
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                {{ form.username.label }}
+                                {% if form.username.errors %}
+                                    {% for error in form.username.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <div class="form-group">
+                                {{ form.username(class="form-control", placeholder="Username") }}
+                                </div>
+                            </div>
+
+
+                            <div class="row form-group">
+                                {{ form.password.label }}
+                                {% if form.password.errors %}
+                                    {% for error in form.password.errors %}
+                                    <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <div class="form-group">
+                                {{ form.password(class="form-control", placeholder="Password") }}
+                                </div>
+                            </div>
+
+
+                            <div class="row form-group">
+                                {{ form.role.label }} <br>
+                                {% for subfield in form.role %}
+                                    <tr>
+                                        <td>{{ subfield }}</td>
+                                        <td>{{ subfield.label }}</td>
+                                        <br>
+                                    </tr>
+                                {% endfor %}
+                            </div>
+                            <br>
+
+                            {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 
 
-<!--#........................TAB3.............................  -->
+<!--#........................ ITEMS TAB .............................  -->
 
     <div role="tabpanel" id="item" class="container-fluid tab-pane fade">
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -384,7 +349,7 @@
                                     {% endfor %}
                                 {% endif %}
                                 <div id="add-item-name" class="form-group">
-                                {{ removeItemForm.iname(class="form-control", placeholder="Name of Item")}}
+                                {{ removeItemForm.iname(class="form-control typeahead", placeholder="Name of Item")}}
                                 </div>
                             </div>
 
@@ -483,7 +448,7 @@
                                     {% endfor %}
                                 {% endif %}
                                 <div id="add-item-name" class="form-group">
-                                    <input type="text" class="form-control" name="iname" placeholder="Name of Item" id="itemSelect" value="" />
+                                    <input type="text" class="form-control typeahead" name="iname" placeholder="Name of Item" id="itemSelect" value="" />
                                 </div>
                             </div>
 
@@ -512,7 +477,7 @@
                             </div>
 
                             <div class="row form-group">
-                                {{ transferItemForm.qty.label }}
+                                {{ transferItemForm.qty.label }}<br/>
                                 If left blank, all of this item will be transferred.
                                 {% if transferItemForm.qty.errors %}
                                     {% for error in transferItemForm.qty.errors %}
@@ -531,11 +496,35 @@
                     </div>
                 </div>
             </div>
+
+            <!-- List of items by store, Remove from Tag -->
+            <div class="row" style="padding: 1em;">
+                {% for key, values in group.iteritems() %}
+
+                <!--find a way to create a button-->
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ key[0] }}" aria-expanded="false" aria-controls="collapseExample">{{ key[1] }}</button>
+                <div class="collapse" id="{{ key[0] }}">
+
+                    <ul class="list-group">
+
+                        {% for i in values %}
+                            <li class="list-group-item"><a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }}, {{i[2]}} </a><span style="cursor:pointer;" onclick="removeFromTag({{i[1]}}, {{key[0]}})" class="pull-right">Remove from tag</span></li>
+
+                        {% endfor %}
+
+
+                    </ul>
+
+                </div>
+
+                {% endfor %}
+            </div>
+
         </div>
 
     </div>
 
-<!--#........................TAB4.............................  -->
+<!--#........................ TAGS TAB .............................  -->
     <div role="tabpanel" id="group" class="container-fluid tab-pane fade">
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <!-- New Tag Form -->
@@ -648,8 +637,10 @@
             </div>
         </div>
 
+        
     </div>
 
+        
 
 </div>
 
@@ -781,16 +772,61 @@ $('#add-item-name .typeahead').typeahead({
 
 // <!-- Modal changes---->
 $('#modify-modal').on('show.bs.modal', function (event) {
-  var button = $(event.relatedTarget) // Button that triggered the modal
-  var admin = button.data('name') // Extract info from data-* attributes
+  var button = $(event.relatedTarget); // Button that triggered the modal
+  var admin = button.data('name'); // Extract info from data-* attributes
   // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
   // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-  var modal = $(this)
-  modal.find('.modal-title').text('Reviewing Changes to ' + admin)
-  modal.find('.modal-body input').val(admin)
+  var modal = $(this);
+  modal.find('.modal-title').text('Reviewing changes to ' + admin);
+  modal.find('.modal-body input').val(admin);
 })
 
+function deleteUser(username) {
+    var form = document.createElement('form');
+    var input = document.createElement('input');
+    var formName = document.createElement('input');
 
+    formName.value = 'deleteUser';
+    formName.name = 'name-form';
+    form.appendChild(formName);
+
+    input.value = username;
+    input.name = "username";
+    form.appendChild(input);
+
+    form.method = "POST";
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function removeFromTag(item, tag) {
+    console.log(item, tag);
+    var form = document.createElement('form');
+    var input1 = document.createElement('input');
+    var input2 = document.createElement('input');
+    var formName = document.createElement('input');
+
+    formName.value = 'removeFromTag';
+    formName.name = 'name-form';
+    formName.type = "hidden";
+    form.appendChild(formName);
+
+    input1.value = item;
+    input1.name = "iid";
+    input1.type = "hidden";
+    form.appendChild(input1);
+
+    input2.value = tag;
+    input2.name = "tid";
+    input2.type = "hidden";
+    form.appendChild(input2);
+
+    form.method = "POST";
+
+    document.body.appendChild(form);
+    form.submit();
+}
 
 </script>
 
