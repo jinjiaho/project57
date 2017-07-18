@@ -508,7 +508,11 @@
                     <ul class="list-group">
 
                         {% for i in values %}
-                            <li class="list-group-item"><a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }}, {{i[2]}} </a><span style="cursor:pointer;" onclick="removeFromTag({{i[1]}}, {{key[0]}})" class="pull-right">Remove from tag</span></li>
+                            <li class="list-group-item" style="overflow-y: auto;">
+                                <a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }}, {{i[2]}} </a>
+                                <span style="cursor:pointer;color: red;" onclick="removeFromTag({{i[1]}}, {{key[0]}})" class="pull-right hidden-xs">Remove from tag</span>
+                                <span class="pull-right visible-xs" style="color: red;">&times;</span>
+                            </li>
 
                         {% endfor %}
 
