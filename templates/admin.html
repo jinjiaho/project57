@@ -183,13 +183,6 @@
 <!--#........................ ITEMS TAB .............................  -->
 
     <div role="tabpanel" id="item" class="container-fluid tab-pane fade">
-        <div class="row">
-            <a href="#" data-toggle="collapse"><h3></h3></a>
-            <div id="" class="collapse">
-                
-            </div>
-        </div>
-
 
         <div class="row">
             <a href="#newItem" data-toggle="collapse"><h3>Add a New Item</h3></a>
@@ -446,7 +439,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row" style="font-size: medium;">
             <h3>Item List by Storeroom</h3>
             {% for key, values in group.iteritems() %}
 
@@ -471,9 +464,6 @@
             </div>
 
             {% endfor %}
-        </div>
-
-
         </div>
 
     </div>
@@ -571,8 +561,6 @@
         </div>
         
     </div>
-
-        
 
 </div>
 
