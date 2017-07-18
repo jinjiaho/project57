@@ -567,6 +567,8 @@ def hello():
             return redirect(url_for("dashboard", lang_code=session["lang_code"]))
         elif session['role'] == "attendant":
             return redirect(url_for("scanner", lang_code=session["lang_code"]))
+        elif session['role'] == "runner":
+            return redirect(url_for("scanner", lang_code=session["lang_code"]))
 
 @application.route('/<lang_code>/login', methods=["GET", "POST"])
 def login():
@@ -616,7 +618,7 @@ def login():
                         return redirect(session.pop('next'))
                     else:
                         return redirect(url_for("dashboard", lang_code=get_locale()))
-                elif session['role'] == "attendant":
+                elif session['role'] == "attendant" or session['role'] == "runner":
                     if "next" in session:
                         return redirect(session.pop('next'))
                     else:
@@ -632,6 +634,8 @@ def login():
             if session['role'] == "supervisor":
                 return redirect(url_for("dashboard", lang_code=get_locale()))
             elif session['role'] == "attendant":
+                return redirect(url_for("scanner", lang_code=get_locale()))
+            elif session['role'] == "runner":
                 return redirect(url_for("scanner", lang_code=get_locale()))
 
 
