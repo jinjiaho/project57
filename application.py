@@ -654,6 +654,7 @@ def admin():
     itemTags = cursor.fetchall()
 
     # Initialize options for all select fields
+    form.role.choices = choices('Permissions', 'role')
     form2.category.choices = choices('Items', 'category')
     form3.location.choices = choices('TagInfo', 'storeroom')
     form4.tid.choices = storeTagChoices

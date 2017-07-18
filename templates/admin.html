@@ -184,8 +184,8 @@
 
     <div role="tabpanel" id="item" class="container-fluid tab-pane fade">
         <div class="row">
-            <a href="#newItem" data-toggle="collapse"><h3>Add a New Item</h3></a>
-            <div id="newItem" class="collapse">
+            <a href="#" data-toggle="collapse"><h3></h3></a>
+            <div id="" class="collapse">
                 
             </div>
         </div>
@@ -308,7 +308,7 @@
         </div>
 
         <div class="row">
-            <a href="#delItem" data-toggle="collapse"><h3>Add a New Item</h3></a>
+            <a href="#delItem" data-toggle="collapse"><h3>Delete an Item</h3></a>
             <div id="delItem" class="collapse">
                 <form method="POST" id="delItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ removeItemForm.hidden_tag() }}<input type="hidden"  name="name-form" value='removeItemForm' >
                     <!-- Just placeholders for future delete group input -->
@@ -330,224 +330,149 @@
         </div>
 
         <div class="row">
-            <a href="#newItem" data-toggle="collapse"><h3>Add a New Item</h3></a>
-            <div id="newItem" class="collapse">
-                
+            <a href="#tagItem" data-toggle="collapse"><h3>Assign an Item to a Tag</h3></a>
+            <div id="tagItem" class="collapse">
+                <form method="POST" action="/{{g.current_lang}}/admin">
+                    {{ form4.hidden_tag() }}
+                    <input type="hidden"  name="name-form" value='form4'>
+                    <h3> Assign Item to Tag</h3>
+
+
+                    <div class="row form-group">
+                        {{ form4.itemname.label }}
+                        {% if form4.itemname.errors %}
+                            {% for error in form4.itemname.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div id="add-item-name" class="form-group">
+                        {{ form4.itemname(class="form-control typeahead", placeholder="Name of Existing Item", style="width: 100%;")}}
+                        </div>
+                    </div>
+
+
+                    <div class="row form-group">
+                        {{ form4.tid.label }}
+                        {% if form4.tid.errors %}
+                            {% for error in form4.tid.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="form-group">
+                            {{ form4.tid(class="form-control") }}
+                        </div>
+                    </div>
+
+
+                    <div class="row form-group">
+                        {{ form4.qty.label }}
+                        {% if form4.qty.errors %}
+                            {% for error in form4.qty.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="form-group">
+                        {{ form4.qty(class="form-control", placeholder="Quantity Available") }}
+                        </div>
+                    </div>
+
+
+                    {{ form4.submitFour(class="width-35 pull-right btn btn-sm btn-primary") }}
+
+                </form>
             </div>
         </div>
 
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-            <!-- New Item Form -->
-            <div class="panel panel-default">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-newItem" aria-expanded="true" aria-controls="collapse-newItem">
-                    <div class="panel-heading text-center" role="tab" id="heading-newItem" style="background-color:#f5f5f5;">
-                        <h4 class="panel-title">
-                            Add a New Item
-                        </h4>
+        <div class="row">
+            <a href="#transferItem" data-toggle="collapse"><h3>Transfer an Item</h3></a>
+            <div id="transferItem" class="collapse">
+                <form method="POST" id="transItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ transferItemForm.hidden_tag() }}<input type="hidden"  name="name-form" value='transferItemForm' >
+                    <div class="row form-group">
+                        {{ transferItemForm.iname.label }}
+                        {% if transferItemForm.iname.errors %}
+                            {% for error in transferItemForm.iname.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        <div id="add-item-name" class="form-group">
+                            <input type="text" class="form-control typeahead" name="iname" placeholder="Name of Item" id="itemSelect" value="" />
+                        </div>
                     </div>
-                </a>
-                <div id="collapse-newItem" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-newItem">
-                    <div class="panel-body">
-                        
+
+                    <div class="row form-group">
+                        {{ transferItemForm.tagOld.label }}
+                        {% if transferItemForm.tagOld.errors %}
+                            {% for error in transferItemForm.tagOld.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-group" id="tagOldDiv">
+                            {{ transferItemForm.tagOld(class="form-control", placeholder="Select a Tag") }}
+                        </div>
                     </div>
-                </div>
+
+                    <div class="row form-group">
+                        {{ transferItemForm.tagNew.label }}
+                        {% if transferItemForm.tagNew.errors %}
+                            {% for error in transferItemForm.tagNew.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-group">
+                            {{ transferItemForm.tagNew(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        {{ transferItemForm.qty.label }}<br/>
+                        If left blank, all of this item will be transferred.
+                        {% if transferItemForm.qty.errors %}
+                            {% for error in transferItemForm.qty.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="form-group">
+                        {{ transferItemForm.qty(class="form-control", placeholder="Quantity to Transfer") }}
+                        </div>
+                    </div>
+
+
+                    {{ transferItemForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
+                </form>
             </div>
+        </div>
 
-            <!-- Delete Item Form -->
-            <div class="panel panel-default">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-delItem" aria-expanded="true" aria-controls="collapse-delItem">
-                    <div class="panel-heading text-center" role="tab" id="heading-delItem" style="background-color:#f5f5f5;">
-                        <h4 class="panel-title">
-                            Delete an Item
-                        </h4>
-                    </div>
-                </a>
-                <div id="collapse-delItem" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-delItem">
-                    <div class="panel-body">
-                        <form method="POST" id="delItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ removeItemForm.hidden_tag() }}<input type="hidden"  name="name-form" value='removeItemForm' >
-                        <!-- Just placeholders for future delete group input -->
-                            <div class="row form-group">
-                                {{ removeItemForm.iname.label }}
-                                {% if removeItemForm.iname.errors %}
-                                    {% for error in removeItemForm.iname.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-                                <div id="add-item-name" class="form-group">
-                                {{ removeItemForm.iname(class="form-control typeahead", placeholder="Name of Item")}}
-                                </div>
-                            </div>
+        <div class="row">
+            <h3>Item List by Storeroom</h3>
+            {% for key, values in group.iteritems() %}
 
-                            {{ removeItemForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <!--find a way to create a button-->
+            <a href="#{{key[0]}}" data-toggle="collapse" data-target="#{{ key[0] }}" aria-expanded="false" aria-controls="collapseExample"><strong>{{ key[1] }}</strong></a><br/>
+            <div class="collapse" id="{{ key[0] }}">
 
-            <!-- Tag Item Form -->
-            <div class="panel panel-default">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-tagItem" aria-expanded="true" aria-controls="collapse-tagItem">
-                    <div class="panel-heading text-center" role="tab" id="heading-tagItem" style="background-color:#f5f5f5;">
-                        <h4 class="panel-title">
-                            Assign an Item to a Tag
-                        </h4>
-                    </div>
-                </a>
-                <div id="collapse-tagItem" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-tagItem">
-                    <div class="panel-body">
-                        <form method="POST" action="/{{g.current_lang}}/admin">
-                            {{ form4.hidden_tag() }}
-                            <input type="hidden"  name="name-form" value='form4'>
-                            <h3> Assign Item to Tag</h3>
+                <ul class="list-group">
+
+                    {% for i in values %}
+                        <li class="list-group-item" style="overflow-y: auto;">
+                            <a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }}, {{i[2]}} </a>
+                            <span style="cursor:pointer;color: red;" onclick="removeFromTag({{i[1]}}, {{key[0]}})" class="pull-right hidden-xs">Remove from tag</span>
+                            <span class="pull-right visible-xs" style="color: red;">&times;</span>
+                        </li>
+
+                    {% endfor %}
 
 
-                            <div class="row form-group">
-                                {{ form4.itemname.label }}
-                                {% if form4.itemname.errors %}
-                                    {% for error in form4.itemname.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div id="add-item-name" class="form-group">
-                                {{ form4.itemname(class="form-control typeahead", placeholder="Name of Existing Item", style="width: 100%;")}}
-                                </div>
-                            </div>
-
-
-                            <div class="row form-group">
-                                {{ form4.tid.label }}
-                                {% if form4.tid.errors %}
-                                    {% for error in form4.tid.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="form-group">
-                                    {{ form4.tid(class="form-control") }}
-                                </div>
-                            </div>
-
-
-                            <div class="row form-group">
-                                {{ form4.qty.label }}
-                                {% if form4.qty.errors %}
-                                    {% for error in form4.qty.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="form-group">
-                                {{ form4.qty(class="form-control", placeholder="Quantity Available") }}
-                                </div>
-                            </div>
-
-
-                            {{ form4.submitFour(class="width-35 pull-right btn btn-sm btn-primary") }}
-
-                        </form>
-
-                    </div>
-                </div>
+                </ul>
 
             </div>
 
-            <!-- Transfer Item Form -->
-            <div class="panel panel-default">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-transItem" aria-expanded="true" aria-controls="collapse-transItem">
-                    <div class="panel-heading text-center" role="tab" id="heading-transItem" style="background-color:#f5f5f5;">
-                        <h4 class="panel-title">
-                            Transfer an Item from One Tag to Another
-                        </h4>
-                    </div>
-                </a>
-                <div id="collapse-transItem" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-transItem">
-                    <div class="panel-body">
-                        <form method="POST" id="transItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ transferItemForm.hidden_tag() }}<input type="hidden"  name="name-form" value='transferItemForm' >
-                        <!-- Just placeholders for future delete group input -->
-                            <div class="row form-group">
-                                {{ transferItemForm.iname.label }}
-                                {% if transferItemForm.iname.errors %}
-                                    {% for error in transferItemForm.iname.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-                                <div id="add-item-name" class="form-group">
-                                    <input type="text" class="form-control typeahead" name="iname" placeholder="Name of Item" id="itemSelect" value="" />
-                                </div>
-                            </div>
+            {% endfor %}
+        </div>
 
-                            <div class="row form-group">
-                                {{ transferItemForm.tagOld.label }}
-                                {% if transferItemForm.tagOld.errors %}
-                                    {% for error in transferItemForm.tagOld.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-                                <div class="form-group" id="tagOldDiv">
-                                    {{ transferItemForm.tagOld(class="form-control", placeholder="Select a Tag") }}
-                                </div>
-                            </div>
-
-                            <div class="row form-group">
-                                {{ transferItemForm.tagNew.label }}
-                                {% if transferItemForm.tagNew.errors %}
-                                    {% for error in transferItemForm.tagNew.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-                                <div class="form-group">
-                                    {{ transferItemForm.tagNew(class="form-control") }}
-                                </div>
-                            </div>
-
-                            <div class="row form-group">
-                                {{ transferItemForm.qty.label }}<br/>
-                                If left blank, all of this item will be transferred.
-                                {% if transferItemForm.qty.errors %}
-                                    {% for error in transferItemForm.qty.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="form-group">
-                                {{ transferItemForm.qty(class="form-control", placeholder="Quantity to Transfer") }}
-                                </div>
-                            </div>
-
-
-                            {{ transferItemForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- List of items by store, Remove from Tag -->
-            <div class="row" style="padding: 1em;">
-                {% for key, values in group.iteritems() %}
-
-                <!--find a way to create a button-->
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#{{ key[0] }}" aria-expanded="false" aria-controls="collapseExample">{{ key[1] }}</button>
-                <div class="collapse" id="{{ key[0] }}">
-
-                    <ul class="list-group">
-
-                        {% for i in values %}
-                            <li class="list-group-item" style="overflow-y: auto;">
-                                <a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }}, {{i[2]}} </a>
-                                <span style="cursor:pointer;color: red;" onclick="removeFromTag({{i[1]}}, {{key[0]}})" class="pull-right hidden-xs">Remove from tag</span>
-                                <span class="pull-right visible-xs" style="color: red;">&times;</span>
-                            </li>
-
-                        {% endfor %}
-
-
-                    </ul>
-
-                </div>
-
-                {% endfor %}
-            </div>
 
         </div>
 
@@ -555,117 +480,95 @@
 
 <!--#........................ TAGS TAB .............................  -->
     <div role="tabpanel" id="group" class="container-fluid tab-pane fade">
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-            <!-- New Tag Form -->
-            <div class="panel panel-default">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-newTag" aria-expanded="true" aria-controls="collapse-newTag">
-                    <div class="panel-heading text-center" role="tab" id="heading-newTag" style="background-color:#f5f5f5;">
-                        <h4 class="panel-title">
-                            Add a New Tag
-                        </h4>
-                    </div>
-                </a>
-                <div id="collapse-newTag" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-newTag">
-                    <div class="panel-body">
-                        <form method="POST" action="/{{g.current_lang}}/admin">
-                            {{ form.hidden_tag() }}
-                            <input type="hidden"  name="name-form" value='form3' >
+        <div class="row">
+            <a href="#newTag" data-toggle="collapse"><h3>Add a New Tag</h3></a>
+            <div id="newTag" class="collapse">
+                <form method="POST" action="/{{g.current_lang}}/admin">
+                    {{ form.hidden_tag() }}
+                    <input type="hidden"  name="name-form" value='form3' >
 
-                            <div class="row">
+                    <div class="row">
 
-                                <div class="row form-group col-lg-5 col-md-5 col-sm-12 col-xs-12">
-                                    {{ form3.location.label }}
-                                    {% if form3.location.errors %}
-                                        {% for error in form3.location.errors %}
-                                        <p class="error-message">{{ error }}</p>
-                                        {% endfor %}
-                                    {% endif %}
+                        <div class="row form-group col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                            {{ form3.location.label }}
+                            {% if form3.location.errors %}
+                                {% for error in form3.location.errors %}
+                                <p class="error-message">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
 
-                                    <div class="form-group">
-                                    {{ form3.location(class="form-control")}}
-                                    </div>
-                                </div>
-
-                                <div class="row form-group col-lg-1 col-md-1 col-sm-12 col-xs-12" style="text-align:center;">
-                                    <strong>or</strong>
-                                </div>
-
-                                <div class="row form-group col-lg-5 col-md-5 col-sm-12 col-xs-12">
-                                    {{ form3.newLocation.label }}
-                                    {% if form3.newLocation.errors %}
-                                        {% for error in form3.newLocation.errors %}
-                                        <p class="error-message">{{ error }}</p>
-                                        {% endfor %}
-                                    {% endif %}
-
-                                    <div class="form-group">
-                                    {{ form3.newLocation(class="form-control", placeholder="Name of New Storeroom")}}
-                                    </div>
-                                </div>
+                            <div class="form-group">
+                            {{ form3.location(class="form-control")}}
                             </div>
+                        </div>
 
-                            <div class="row form-group">
-                                {{ form3.tname.label }}
-                                {% if form3.tname.errors %}
-                                    {% for error in form3.tname.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
+                        <div class="row form-group col-lg-1 col-md-1 col-sm-12 col-xs-12" style="text-align:center;">
+                            <strong>or</strong>
+                        </div>
 
-                                <div class="form-group">
-                                {{ form3.tname(class="form-control", placeholder="Name of new tag")}}
-                                </div>
+                        <div class="row form-group col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                            {{ form3.newLocation.label }}
+                            {% if form3.newLocation.errors %}
+                                {% for error in form3.newLocation.errors %}
+                                <p class="error-message">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            <div class="form-group">
+                            {{ form3.newLocation(class="form-control", placeholder="Name of New Storeroom")}}
                             </div>
-
-
-
-                            <div class="row form-group">
-                                {{ form3.remarks.label }}
-
-                                <div class="form-group">
-                                {{ form3.remarks(class="form-control", placeholder="Remarks (optional)")}}
-                                </div>
-                            </div>
-
-                            {{ form3.submitThree(class="width-35 pull-right btn btn-sm btn-primary") }}
-
-                        </form>
-
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Delete Tag Form -->
-            <div class="panel panel-default">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-delTag" aria-expanded="true" aria-controls="collapse-delTag">
-                    <div class="panel-heading text-center" role="tab" id="heading-delTag" style="background-color:#f5f5f5;">
-                        <h4 class="panel-title">
-                            Delete A Tag
-                        </h4>
-                    </div>
-                </a>
-                <div id="collapse-delTag" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-delTag">
-                    <div class="panel-body">
-                        <form method="POST" id="delItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ removeTagForm.hidden_tag() }}<input type="hidden"  name="name-form" value='removeTagForm' >
-                            <div class="row form-group">
-                                {{ removeTagForm.tid.label }}
-                                {% if removeTagForm.tid.errors %}
-                                    {% for error in removeTagForm.tid.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-                                <div class="form-group">
-                                {{ removeTagForm.tid(class="form-control") }}
-                                </div>
-                            </div>
+                    <div class="row form-group">
+                        {{ form3.tname.label }}
+                        {% if form3.tname.errors %}
+                            {% for error in form3.tname.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
 
-                            {{ removeTagForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
-                        </form>
+                        <div class="form-group">
+                        {{ form3.tname(class="form-control", placeholder="Name of new tag")}}
+                        </div>
                     </div>
-                </div>
+
+
+
+                    <div class="row form-group">
+                        {{ form3.remarks.label }}
+
+                        <div class="form-group">
+                        {{ form3.remarks(class="form-control", placeholder="Remarks (optional)")}}
+                        </div>
+                    </div>
+
+                    {{ form3.submitThree(class="width-35 pull-right btn btn-sm btn-primary") }}
+
+                </form>
             </div>
         </div>
 
+        <div class="row">
+            <a href="#delTag" data-toggle="collapse"><h3>Delete a Tag</h3></a>
+            <div id="delTag" class="collapse">
+                <form method="POST" id="delItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ removeTagForm.hidden_tag() }}<input type="hidden"  name="name-form" value='removeTagForm' >
+                    <div class="row form-group">
+                        {{ removeTagForm.tid.label }}
+                        {% if removeTagForm.tid.errors %}
+                            {% for error in removeTagForm.tid.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-group">
+                        {{ removeTagForm.tid(class="form-control") }}
+                        </div>
+                    </div>
+
+                    {{ removeTagForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
+                </form>
+            </div>
+        </div>
         
     </div>
 

@@ -193,9 +193,3 @@ span.cart-group img {
 .tab-content .panel-group .panel {
   margin-bottom: 1em;
 }
-
-.tab-content .panel-group .panel .panel-collapse.collapse,
-.tab-content .panel-group .panel .panel-collapse.collapsing,
-.tab-content .panel-group .panel .panel-collapse.collapse.in {
-  padding: 0 2em;
-}
