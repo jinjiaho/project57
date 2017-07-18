@@ -74,6 +74,7 @@ class InsufficientQtyError(Exception):
 class ContainsItemsError(Exception):
     pass
 
+
 ###########################
 ##        METHODS        ##
 ###########################
@@ -1192,7 +1193,7 @@ def dashboard():
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
-
+    
     i = getInventoryLow()
     l = getDailyLogs()
     print(l)
