@@ -76,121 +76,103 @@
 <div class="tab-content">
 
 <!-- ******************* USERS TAB *****************************-->
+         
     <div role="tabpanel" id="users" class="container-fluid tab-pane fade in active">
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-            <div class="panel panel-default">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-currentUsers" aria-expanded="true" aria-controls="collapse-currentUsers">
-                    <div class="panel-heading text-center" role="tab" id="heading-currentUsers" style="background-color:#f5f5f5;">
-                        <h4 class="panel-title">
-                            Current Users
-                        </h4>
-                    </div>
-                </a>
-                <div id="collapse-currentUsers" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-currentUsers">
-                    <div class="panel-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
+        <div class="row">
+            <a href="#currentUsers" data-toggle="collapse"><h3>Current Users</h3></a>
+            <div id="currentUsers" class="collapse">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
 
-                                    <th>{{_('Username')}}</th>
-                                    <th>{{_('Name')}}</th>
-                                    <th>{{_('Role')}}</th>
-                                    <th>{{_('Edit')}}</th>
-                                    <th>{{_('Delete User')}}</th>
-                                </thead>
+                            <th>{{_('Username')}}</th>
+                            <th>{{_('Name')}}</th>
+                            <th>{{_('Role')}}</th>
+                            <th>{{_('Edit')}}</th>
+                            <th>{{_('Delete User')}}</th>
+                        </thead>
 
-                                <tbody>
-                                {% for user in users %}
-                                <tr>
-                                    <td>{{ user.name }}</td>
-                                    <td>{{ user.username }}</td>
-                                    <td>{{ user.role }}</td>
-                                    <td><button class="btn btn-default" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{ user.username }}" id="#modify">{{_('Edit')}}</button></td>
-                                    <td><button class="btn btn-danger" onclick="deleteUser('{{user.username}}')">&times;</button></td>
-                                </tr>
-                                {% endfor %}
-                                </tbody>
+                        <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.role }}</td>
+                            <td><button class="btn btn-default" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{ user.username }}" id="#modify">{{_('Edit')}}</button></td>
+                            <td><button class="btn btn-danger" onclick="deleteUser('{{user.username}}')">&times;</button></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
 
-                            </table>
-                        </div>
-                    </div>
+                    </table>
                 </div>
             </div>
         </div>
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-            <div class="panel panel-default">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-newUser" aria-expanded="true" aria-controls="collapse-newUser">
-                    <div class="panel-heading text-center" role="tab" id="heading-newUser" style="background-color:#f5f5f5;">
-                        <h4 class="panel-title">
-                            Add a New User
-                        </h4>
+        
+        <div class="row">
+            <a href="#newUser" data-toggle="collapse"><h3>Add a New User</h3></a>
+            <div id="newUser" class="collapse">
+                <form method="POST" action="/{{g.current_lang}}/admin" >
+                    {{ form.hidden_tag() }}
+                    <input type="hidden" name="name-form" value='form')>
+
+
+                    <div class="row form-group">
+                        {{ form.name.label }}
+                        {% if form.name.errors %}
+                            {% for error in form.name.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="form-group">
+                        {{ form.name(class="form-control", placeholder="Name of User")}}
+                        </div>
                     </div>
-                </a>
-                <div id="collapse-newUser" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-newUser">
-                    <div class="panel-body">
-                        <form method="POST" action="/{{g.current_lang}}/admin" >
-                            {{ form.hidden_tag() }}
-                            <input type="hidden" name="name-form" value='form')>
 
+                    <div class="row form-group">
+                        {{ form.username.label }}
+                        {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
 
-                            <div class="row form-group">
-                                {{ form.name.label }}
-                                {% if form.name.errors %}
-                                    {% for error in form.name.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="form-group">
-                                {{ form.name(class="form-control", placeholder="Name of User")}}
-                                </div>
-                            </div>
-
-                            <div class="row form-group">
-                                {{ form.username.label }}
-                                {% if form.username.errors %}
-                                    {% for error in form.username.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="form-group">
-                                {{ form.username(class="form-control", placeholder="Username") }}
-                                </div>
-                            </div>
-
-
-                            <div class="row form-group">
-                                {{ form.password.label }}
-                                {% if form.password.errors %}
-                                    {% for error in form.password.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="form-group">
-                                {{ form.password(class="form-control", placeholder="Password") }}
-                                </div>
-                            </div>
-
-
-                            <div class="row form-group">
-                                {{ form.role.label }} <br>
-                                {% for subfield in form.role %}
-                                    <tr>
-                                        <td>{{ subfield }}</td>
-                                        <td>{{ subfield.label }}</td>
-                                        <br>
-                                    </tr>
-                                {% endfor %}
-                            </div>
-                            <br>
-
-                            {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
-
-                        </form>
+                        <div class="form-group">
+                        {{ form.username(class="form-control", placeholder="Username") }}
+                        </div>
                     </div>
-                </div>
+
+
+                    <div class="row form-group">
+                        {{ form.password.label }}
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="form-group">
+                        {{ form.password(class="form-control", placeholder="Password") }}
+                        </div>
+                    </div>
+
+
+                    <div class="row form-group">
+                        {{ form.role.label }} <br>
+                        {% for subfield in form.role %}
+                            <tr>
+                                <td>{{ subfield }}</td>
+                                <td>{{ subfield.label }}</td>
+                                <br>
+                            </tr>
+                        {% endfor %}
+                    </div>
+                    <br>
+
+                    {{ form.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
+
+                </form>
             </div>
         </div>
 
@@ -201,6 +183,159 @@
 <!--#........................ ITEMS TAB .............................  -->
 
     <div role="tabpanel" id="item" class="container-fluid tab-pane fade">
+        <div class="row">
+            <a href="#newItem" data-toggle="collapse"><h3>Add a New Item</h3></a>
+            <div id="newItem" class="collapse">
+                
+            </div>
+        </div>
+
+
+        <div class="row">
+            <a href="#newItem" data-toggle="collapse"><h3>Add a New Item</h3></a>
+            <div id="newItem" class="collapse">
+                <form method="POST" id="newItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ form2.hidden_tag() }}<input type="hidden"  name="name-form" value='form2' >
+
+                    <div class="row form-group">
+                        {{ form2.itemname.label }}
+                        {% if form2.itemname.errors %}
+                            {% for error in form2.itemname.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div id="add-item-name" class="form-group">
+                        {{ form2.itemname(class="form-control", placeholder="Name of Item")}}
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        {{ form2.category.label }}
+                        {% if form2.category.errors %}
+                            {% for error in form2.category.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="form-group">
+                        {{ form2.category(class="form-control")}}
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <strong>Upload a Photo</strong>
+                        <div class="input-group" style="margin-bottom: 20px;">
+                            <label class="input-group-btn">
+                                <span class="btn btn-default">
+                                    Upload photo&hellip;<input type="file" accept="image/*" name="photo" style="display: none;">
+                                </span>
+                            </label>
+                            <input type="text" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        {{ form2.reorderpt.label }}
+                        {% if form2.reorderpt.errors %}
+                            {% for error in form2.reorderpt.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="form-group">
+                        {{ form2.reorderpt(class="form-control", placeholder="Input Min. Stock") }}
+                        </div>
+                    </div>
+
+
+                    <div class="row form-group">
+                        {{ form2.price.label }}
+                        {% if form2.price.errors %}
+                            {% for error in form2.price.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="form-group">
+                        {{ form2.price(class="form-control", placeholder="Unit Price") }}
+                        </div>
+                    </div>
+
+
+                    <div class="row form-group">
+                        {{ form2.count_unit.label }}
+                        {% if form2.count_unit.errors %}
+                            {% for error in form2.count_unit.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div id="add-item-name" class="form-group">
+                        {{ form2.count_unit(class="form-control", placeholder="eg. carton, pc, kg")}}
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        {{ form2.order_unit.label }}
+                        {% if form2.order_unit.errors %}
+                            {% for error in form2.order_unit.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div id="add-item-name" class="form-group">
+                        {{ form2.order_unit(class="form-control", placeholder="eg. carton, pc, kg")}}
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        {{ form2.order_multiplier.label }}
+                        {% if form2.order_multiplier.errors %}
+                            {% for error in form2.order_multiplier.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="form-group">
+                        {{ form2.order_multiplier(class="form-control", placeholder="Items in each order") }}
+                        </div>
+                    </div>
+
+                    {{ form2.submitTwo(class="width-35 pull-right btn btn-sm btn-primary") }}
+
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <a href="#delItem" data-toggle="collapse"><h3>Add a New Item</h3></a>
+            <div id="delItem" class="collapse">
+                <form method="POST" id="delItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ removeItemForm.hidden_tag() }}<input type="hidden"  name="name-form" value='removeItemForm' >
+                    <!-- Just placeholders for future delete group input -->
+                    <div class="row form-group">
+                        {{ removeItemForm.iname.label }}
+                        {% if removeItemForm.iname.errors %}
+                            {% for error in removeItemForm.iname.errors %}
+                            <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        <div id="add-item-name" class="form-group">
+                        {{ removeItemForm.iname(class="form-control typeahead", placeholder="Name of Item")}}
+                        </div>
+                    </div>
+
+                    {{ removeItemForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <a href="#newItem" data-toggle="collapse"><h3>Add a New Item</h3></a>
+            <div id="newItem" class="collapse">
+                
+            </div>
+        </div>
+
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <!-- New Item Form -->
             <div class="panel panel-default">
@@ -213,117 +348,7 @@
                 </a>
                 <div id="collapse-newItem" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-newItem">
                     <div class="panel-body">
-                        <form method="POST" id="newItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ form2.hidden_tag() }}<input type="hidden"  name="name-form" value='form2' >
-
-                            <div class="row form-group">
-                                {{ form2.itemname.label }}
-                                {% if form2.itemname.errors %}
-                                    {% for error in form2.itemname.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div id="add-item-name" class="form-group">
-                                {{ form2.itemname(class="form-control", placeholder="Name of Item")}}
-                                </div>
-                            </div>
-
-                            <div class="row form-group">
-                                {{ form2.category.label }}
-                                {% if form2.category.errors %}
-                                    {% for error in form2.category.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="form-group">
-                                {{ form2.category(class="form-control")}}
-                                </div>
-                            </div>
-
-                            <div class="row form-group">
-                                <strong>Upload a Photo</strong>
-                                <div class="input-group" style="margin-bottom: 20px;">
-                                    <label class="input-group-btn">
-                                        <span class="btn btn-default">
-                                            Upload photo&hellip;<input type="file" accept="image/*" name="photo" style="display: none;">
-                                        </span>
-                                    </label>
-                                    <input type="text" class="form-control" readonly>
-                                </div>
-                            </div>
-
-                            <div class="row form-group">
-                                {{ form2.reorderpt.label }}
-                                {% if form2.reorderpt.errors %}
-                                    {% for error in form2.reorderpt.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="form-group">
-                                {{ form2.reorderpt(class="form-control", placeholder="Input Min. Stock") }}
-                                </div>
-                            </div>
-
-
-                            <div class="row form-group">
-                                {{ form2.price.label }}
-                                {% if form2.price.errors %}
-                                    {% for error in form2.price.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="form-group">
-                                {{ form2.price(class="form-control", placeholder="Unit Price") }}
-                                </div>
-                            </div>
-
-
-                            <div class="row form-group">
-                                {{ form2.count_unit.label }}
-                                {% if form2.count_unit.errors %}
-                                    {% for error in form2.count_unit.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div id="add-item-name" class="form-group">
-                                {{ form2.count_unit(class="form-control", placeholder="eg. carton, pc, kg")}}
-                                </div>
-                            </div>
-
-                            <div class="row form-group">
-                                {{ form2.order_unit.label }}
-                                {% if form2.order_unit.errors %}
-                                    {% for error in form2.order_unit.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div id="add-item-name" class="form-group">
-                                {{ form2.order_unit(class="form-control", placeholder="eg. carton, pc, kg")}}
-                                </div>
-                            </div>
-
-                            <div class="row form-group">
-                                {{ form2.order_multiplier.label }}
-                                {% if form2.order_multiplier.errors %}
-                                    {% for error in form2.order_multiplier.errors %}
-                                    <p class="error-message">{{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="form-group">
-                                {{ form2.order_multiplier(class="form-control", placeholder="Items in each order") }}
-                                </div>
-                            </div>
-
-                            {{ form2.submitTwo(class="width-35 pull-right btn btn-sm btn-primary") }}
-
-
-                        </form>
+                        
                     </div>
                 </div>
             </div>
