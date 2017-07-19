@@ -1194,6 +1194,8 @@ def dashboard():
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
+    if session['username'] != "supervisor":
+        return redirect(url_for("scanner", lang_code=get_locale()))
     
     i = getInventoryLow()
     l = getDailyLogs()
@@ -1214,6 +1216,8 @@ def inventory():
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
+    if session['username'] != "supervisor":
+        return redirect(url_for("scanner", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT DISTINCT category FROM Items;")
@@ -1262,6 +1266,8 @@ def item(iid):
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
+    if session['username'] != "supervisor":
+        return redirect(url_for("scanner", lang_code=get_locale()))
 
     if request.method == 'POST':
 
@@ -1345,6 +1351,8 @@ def category(category):
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
+    if session['username'] != "supervisor":
+        return redirect(url_for("scanner", lang_code=get_locale()))
 
     category = category
     itemtype = getAllInventory(category)
@@ -1362,6 +1370,8 @@ def storeroom(storeroom):
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
+    if session['username'] != "supervisor":
+        return redirect(url_for("scanner", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(storeroom))
@@ -1399,6 +1409,8 @@ def logs():
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
+    if session['username'] != "supervisor":
+        return redirect(url_for("scanner", lang_code=get_locale()))
 
     logs=getAllLogs()
     # names=getUniqueNames()
