@@ -1233,29 +1233,23 @@ def inventory():
                 cat[i['category']].append(i)
                 print(i['category'])
 
-    # A list of a dictionary of a list of dictionaries.
-
-    # supplies = getAllInventory('Guest Supplies')
-    # hampers = getAllInventory('Guest Hampers')
-    # kitchenware = getAllInventory('Kitchenware')
 
     # get list of all locations to display
-    location_query = "SELECT DISTINCT storeroom FROM view_item_locations GROUP BY storeroom DESC;"
+    location_query = "SELECT DISTINCT TagInfo.storeroom FROM TagItems INNER JOIN TagInfo ON TagItems.tag = TagInfo.tid;"
     cursor = mysql.connect().cursor()
     cursor.execute(location_query)
-    locations = cursor.fetchall()
-    shelves = []
-    for i in locations:
-        cursor.execute("SELECT storeroom FROM TagInfo WHERE tid={}".format(i[0]))
-        l_name = cursor.fetchall()[0][0]
-        shelves.append(l_name)
+    data = cursor.fetchall()
+    locations = []
+
+    for i in data:
+        locations.append(i[0].encode('ascii'))
 
     return render_template('inventory.html',
         user = session['username'],
         role = session['role'],
         categories = itemsByCat,
         num_cat = len(itemsByCat),
-        shelves = shelves)
+        locations = locations)
 
 @application.route('/<lang_code>/inventory/<int:iid>', methods=['GET', 'POST'])
 def item(iid):
@@ -1384,9 +1378,6 @@ def storeroom(storeroom):
                     'qty_left':d[4]
                 }
 
-    print(type(items))
-    print(type(items[16]))
-    print(items)
     return render_template('storeroom.html',
         storename = storeroom,
         items = items,
