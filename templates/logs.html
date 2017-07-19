@@ -83,13 +83,13 @@ $(document).ready(function() {
 <table id="logs" class="tablesorter">
     <thead>
         <th>{{_('Timestamp')}}</th>
-        <th class="filter-select filter-onlyAvail" data-placeholder="All">{{_('Username')}}</th>
-        <th class="filter-select filter-onlyAvail" data-placeholder="All">{{_('Item')}}</th>
-        <th class="filter-select filter-onlyAvail" data-placeholder="All">{{_('Category')}}</th>
-        <th class="filter-select" data-placeholder="All">{{_('In/Out')}}</th>
+        <th class="filter-select filter-onlyAvail" data-placeholder="All" data-sorter="false">{{_('Username')}}</th>
+        <th class="filter-select filter-onlyAvail" data-placeholder="All" data-sorter="false">{{_('Item')}}</th>
+        <th class="filter-select filter-onlyAvail" data-placeholder="All" data-sorter="false">{{_('Category')}}</th>
+        <th class="filter-select" data-placeholder="All" data-sorter="false">{{_('In/Out')}}</th>
         <th data-filter="false">{{_('Quantity change')}}</th>
-        <th data-filter="false">{{_('Quantity remaining')}}</th>
-        <th data-filter="false">{{_('Location')}}</th>
+        <th data-filter="false" data-sorter="false">{{_('Quantity remaining')}}</th>
+        <th data-filter="false" data-sorter="false">{{_('Location')}}</th>
     </thead>
     <tbody>
         {% for log in logs %}
