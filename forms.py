@@ -5,10 +5,10 @@ from wtforms.validators import DataRequired, Email, Length
 from flaskext.mysql import MySQL
 
 class AddUserForm(FlaskForm):
-	name = StringField('Name of User:', validators=[DataRequired("Please enter the name of the newcomer.")])
-	username= StringField('New Username:', validators=[DataRequired("Please enter a username.")])
-	role = RadioField('Role of User:')
-	password = PasswordField('New Password:', validators=[DataRequired("Please enter a password."), Length(min=6, message="Passwords must be 6 characters or more.")])
+	name = StringField('Full Name', validators=[DataRequired("Please enter the name of the newcomer.")])
+	username= StringField('Username', validators=[DataRequired("Please enter a username.")])
+	role = RadioField('Role of User')
+	password = PasswordField('Password', validators=[DataRequired("Please enter a password."), Length(min=6, message="Passwords must be 6 characters or more.")])
 	submit = SubmitField('Add User')
 
 class CreateNewItem(FlaskForm):
@@ -52,7 +52,7 @@ class AddNewLocation(FlaskForm):
 	tname = StringField('Name of New Tag', validators=[DataRequired("Please enter the name of the tag without spaces.")])
 	location = SelectField('Select Storeroom', validators = [DataRequired()])
 	newLocation = StringField('Add a New Storeroom')
-	remarks = StringField('Remarks')
+	remarks = StringField('Remarks (optional)')
 	submitThree = SubmitField("Enter")
 
 
