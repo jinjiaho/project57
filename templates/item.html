@@ -197,7 +197,7 @@
         {% endif %}
 
         <!-- Unit price -->
-        <h4 style="line-height:1.5; margin-bottom: 20px;">{{_('Unit price')}}:<b style="font-size: 26px"> $ {{item[0].price}}</b></h4>
+        <h4 style="line-height:1.5; margin-bottom: 20px;">{{_('Unit Price')}}:<b style="font-size: 26px"> $ {{item[0].price}}</b></h4>
 
     </div>
     <!-- END INFO SIDEBAR -->
@@ -257,14 +257,14 @@
         <div class="modal-body">
             <form id="reorder-form-2">
                 <div class="form-group">
-                    <label>Choose minimum stock level for {{item[0].name}}</label>
+                    <label>{{_("Choose minimum stock level for")}} {{item[0].name}}</label>
                     <input type="number" class="form-control" name="reorder" id="reorder-field" placeholder="Reorder point" value="{{item[0].reorder}}" min="0">
                 </div>
             </form>
         </div>
         <div class="modal-footer">
-            <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
-            <button type="button" class="btn btn-default" id="submit-reorder" style="background-color: #e6e6e6;">Apply changes</button>
+            <button type="button" data-dismiss="modal" class="btn btn-default">{{_("Cancel")}}</button>
+            <button type="button" class="btn btn-default" id="submit-reorder" style="background-color: #e6e6e6;">{{_("Apply changes")}}</button>
         </div>
     </div></div></div>
     <!-- END Reorder point modal display -->
@@ -275,18 +275,18 @@
             <div class="modal-content">
                 <form id="reorder-form">
                     <div class="modal-body">
-                        <p>Discontinuing this item will apply the following changes:</p>
+                        <p>{{_("Discontinuing this item will apply the following changes")}}:</p>
                         <ul>
-                            <li>Historical data of item's transactions <b>will</b> remain in the system</li>
-                            <li>Item page <b>will</b> remain, retrievable via the Inventory tab</li>
-                            <li>Minimum stock forecasting <b>will not</b> be applied on this item</li>
-                            <li>Item <b>will not</b> show up in Overview tab when quantity is low</li>
+                            <li>{{_("Historical data of item's transactions will remain in the system")}}</li>
+                            <li>{{_("Item page will remain, retrievable via the Inventory tab")}}</li>
+                            <li>{{_("Minimum stock forecasting will not be applied on this item")}}</li>
+                            <li>{{_("Item will not show up in Overview tab when quantity is low")}}</li>
                         </ul>
-                        <p>Are you sure you want to discontinue <b>{{item[0].name}}</b>?<br><span class="text-info">This action can be reversed at any time</span></p>
+                        <p>{{_("Are you sure you want to discontinue")}} <b>{{item[0].name}}</b>?<br><span class="text-info">{{_("This action can be reversed at any time")}}</span></p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-default">Don't discontinue</button>
-                        <button type="submit" class="btn btn-warning" id="discontinue-button">Discontinue</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-default">{{_("Don't discontinue")}}</button>
+                        <button type="submit" class="btn btn-warning" id="discontinue-button">{{_("Discontinue")}}</button>
                     </div>
                 </form>
             </div>
@@ -301,17 +301,17 @@
             <div class="modal-content">
                 <form id="reorder-form">
                     <div class="modal-body">
-                        <p>Reinstating this item will apply the following changes:</p>
+                        <p>{{_("Reinstating this item will apply the following changes")}}:</p>
                         <ul>
-                            <li>Historical data of item's transactions <b>will</b> remain in the system</li>
-                            <li>Minimum stock forecasting <b>will</b> be applied on this item once again</li>
-                            <li>Item <b>will</b> show up in Overview tab when quantity is low once again</li>
+                            <li>{{_("Historical data of item's transactions will remain in the system")}}</li>
+                            <li>{{_("Minimum stock forecasting will be applied on this item once again")}}</li>
+                            <li>{{_("Item will show up in Overview tab when quantity is low once again")}}</li>
                         </ul>
-                        <p>Are you sure you want to reinstate <b>{{item[0].name}}</b>?<br><span class="text-info">This action can be reversed at any time</span></p>
+                        <p>{{_("Are you sure you want to reinstate")}} <b>{{item[0].name}}</b>?<br><span class="text-info">{{_("This action can be reversed at any time")}}</span></p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-default" value="yes">Don't reinstate</button>
-                        <button type="submit" class="btn btn-default" id="reinstate-button" style="background-color: #e6e6e6;">Reinstate</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-default" value="yes">{{_("Don't reinstate")}}</button>
+                        <button type="submit" class="btn btn-default" id="reinstate-button" style="background-color: #e6e6e6;">{{_("Reinstate")}}</button>
                     </div>
                 </form>
             </div>
@@ -325,17 +325,17 @@
             <div class="modal-content">
                 <form id="reorder-form">
                     <div class="modal-body">
-                        <p>Removing this item will apply the following changes <span class="text-danger">PERMANENTLY</span>:</p>
+                        <p>{{_("Removing this item will apply the following changes PERMANENTLY")}}:</p>
                         <ul>
-                            <li>Historical data of item's transactions <b>will</b> remain in the system via the Logs tab</li>
-                            <li>Item page <b>will not</b> remain in the system at all</li>
-                            <li>Item <b>will not</b> show up in Overview tab when quantity is low</li>
+                            <li>{{_("Historical data of item's transactions will remain in the system via the Logs tab")}}</li>
+                            <li>{{_("Item page will not remain in the system at all")}}</li>
+                            <li>{{_("Item will not show up in Overview tab when quantity is low")}}</li>
                         </ul>
-                        <p>Are you sure you want to remove <b>{{item[0].name}}</b>?<br><span class="text-danger">This action cannot be reversed</span></p>
+                        <p>{{_("Are you sure you want to remove")}} <b>{{item[0].name}}</b>?<br><span class="text-danger">{{_("This action cannot be undone")}}</span></p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-default">Don't remove</button>
-                        <button type="submit" class="btn btn-danger" value="no" id="remove-button">Remove</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-default">{{_("Don't remove")}}</button>
+                        <button type="submit" class="btn btn-danger" value="no" id="remove-button">{{_("Remove")}}</button>
                     </div>
                 </form>
             </div>
@@ -395,7 +395,7 @@
                 <form id="pricechange-form">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Price settings</h4>
+                        <h4 class="modal-title">Update unit price</h4>
                     </div>
                     <div class="modal-body">
                         <p>{% if pricechanges[0].new_price != 0 %}
@@ -408,17 +408,15 @@
                         {% endif %}
                         </p>
 
-                    <p><b>Change current price</b>&nbsp;&nbsp;&nbsp;<label class="radio-inline" id="turn-on-par">
-
                         <div id="price">
-                            <div>                    
-                            <label> New price($):  
-                            <input class="form-control" type="text" id="new-price" placeholder="New Price">
+                            <div class="form-group">                    
+                            <label>{{_("New unit price (in dollars)")}}
+                            <input class="form-control" type="text" id="new-price" placeholder="{{_('New price')}}">
                             </label>
                             </div>
 
-                            <div>
-                            <label> With effect from: 
+                            <div class="form-group">
+                            <label>{{_("With effect from")}}
                             <input class="form-control" type="date" id="date" placeholder="dd/mm/yyyy">
                             </label>
                             </div>
@@ -426,7 +424,8 @@
                     </div>
                
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-default" value="Apply changes" id="submit-price">Apply changes</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{_('Cancel')}}</button>
+                        <button type="submit" class="btn btn-default" value="Apply changes" id="submit-price">{{_('Apply changes')}}</button>
                     </div>
                 </form>
             </div>

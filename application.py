@@ -1204,7 +1204,7 @@ def dashboard():
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
-    if session['username'] != "supervisor":
+    if session['role'] != "supervisor":
         return redirect(url_for("scanner", lang_code=get_locale()))
     
     i = getInventoryLow()
@@ -1226,7 +1226,7 @@ def inventory():
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
-    if session['username'] != "supervisor":
+    if session['role'] != "supervisor":
         return redirect(url_for("scanner", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
@@ -1270,7 +1270,7 @@ def item(iid):
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
-    if session['username'] != "supervisor":
+    if session['role'] != "supervisor":
         return redirect(url_for("scanner", lang_code=get_locale()))
 
     if request.method == 'POST':
@@ -1355,7 +1355,7 @@ def category(category):
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
-    if session['username'] != "supervisor":
+    if session['role'] != "supervisor":
         return redirect(url_for("scanner", lang_code=get_locale()))
 
 
@@ -1375,7 +1375,7 @@ def storeroom(storeroom):
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
-    if session['username'] != "supervisor":
+    if session['role'] != "supervisor":
         return redirect(url_for("scanner", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
@@ -1411,7 +1411,7 @@ def logs():
     if not auth():
         session['next'] = request.url
         return redirect(url_for("login", lang_code=get_locale()))
-    if session['username'] != "supervisor":
+    if session['role'] != "supervisor":
         return redirect(url_for("scanner", lang_code=get_locale()))
 
     logs=getAllLogs()
