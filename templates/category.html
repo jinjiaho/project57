@@ -23,20 +23,22 @@
   {% if itemtype %}
   <table id="review" class="table table-hover">
     <thead>
-      <th data-placeholder="Search">{{_('Name')}}</th>
-      <th data-filter="false">{{_('Unit')}}</th>
+      <th data-placeholder="Search" data-sorter="false" >{{_('Name')}}</th>
+      <th data-filter="false" data-sorter="false">{{_('Picture')}}</th>
+      <th data-filter="false" data-sorter="false">{{_('Unit')}}</th>
       <th data-filter="false">{{_('Unit Price')}}</th>
-      <th data-filter="false">{{_('Opening Stock')}}</th>
-      <th data-filter="false">{{_('Received In')}}</th>
-      <th data-filter="false">{{_('Value (In)')}}</th>
+      <th data-filter="false" data-sorter="false">{{_('Opening Stock')}}</th>
+      <th data-filter="false" data-sorter="false">{{_('Received In')}}</th>
+      <th data-filter="false" data-sorter="false">{{_('Value (In)')}}</th>
       <th data-filter="false">{{_('Delivered Out')}}</th>
-      <th data-filter="false">{{_('Value (Out)')}}</th>
+      <th data-filter="false" data-sorter="false">{{_('Value (Out)')}}</th>
       <th data-filter="false">{{_('Closing Stock')}}</th>
     </thead>
     <tbody>
       {% for item in itemtype %}
       <tr class="clickable-row" data-href="/{{g.current_lang}}/inventory/{{item.iid}}">
       <td>{{item.name}}</td>
+      <td><img src="/static/img/items/{{item.picture}}" alt="" height=75 width=75 ></img></td>
       <td>{{item.unit}}</td>
       <td>${{item.price}}</td>
       <td>{{item.starting}}</td>

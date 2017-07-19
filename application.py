@@ -224,7 +224,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
             qty_diff = inputQty * (-1)     # make qty_input negative to reflect taking qty OUT of store.
 
             if qty_left < 0:
-                flash('Not enough in store!', 'warning')
+                raise InsufficientQtyError("Not enough in store!")
 
         elif action == 'in':
             qty_left = old_qty + inputQty
@@ -254,11 +254,13 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
         cursor.execute(update_logs_query)
         conn.commit()
 
-        return True
+        return ['Success!', "success"]
+
+    except InsufficientQtyError as e:
+        return [e.args[0], "danger"]
 
     except Exception as e:
-        print("STOCK UPDATE ERROR: %s" % e)
-        return False
+        return ["STOCK UPDATE ERROR: %s" % e, "danger"]
 
 
 # Returns all the items based on location. KIV for possible supervisor view filtering.
@@ -1235,29 +1237,23 @@ def inventory():
                 cat[i['category']].append(i)
                 print(i['category'])
 
-    # A list of a dictionary of a list of dictionaries.
-
-    # supplies = getAllInventory('Guest Supplies')
-    # hampers = getAllInventory('Guest Hampers')
-    # kitchenware = getAllInventory('Kitchenware')
 
     # get list of all locations to display
-    location_query = "SELECT DISTINCT tag FROM view_item_locations GROUP BY tag DESC;"
+    location_query = "SELECT DISTINCT TagInfo.storeroom FROM TagItems INNER JOIN TagInfo ON TagItems.tag = TagInfo.tid;"
     cursor = mysql.connect().cursor()
     cursor.execute(location_query)
-    locations = cursor.fetchall()
-    shelves = []
-    for i in locations:
-        cursor.execute("SELECT storeroom FROM TagInfo WHERE tid={}".format(i[0]))
-        l_name = cursor.fetchall()[0][0]
-        shelves.append(l_name)
+    data = cursor.fetchall()
+    locations = []
+
+    for i in data:
+        locations.append(i[0].encode('ascii'))
 
     return render_template('inventory.html',
         user = session['username'],
         role = session['role'],
         categories = itemsByCat,
         num_cat = len(itemsByCat),
-        shelves = shelves)
+        locations = locations)
 
 @application.route('/<lang_code>/inventory/<int:iid>', methods=['GET', 'POST'])
 def item(iid):
@@ -1283,12 +1279,12 @@ def item(iid):
         print("STOCK UPDATE: Form received - (iid: %s ,tid: %s, qty: %s , action: %s, user: %s)" %
             (iid, tid, qty, action, user))
 
-        # process changes
-        updateSuccess = stockUpdate(iid, tid, qty, user, action, now)
-        if updateSuccess:
-            flash('Stock updated!', 'success')
+        try:
+            # process changes
+            updateSuccess = stockUpdate(iid, tid, qty, user, action, now)
+            flash(updateSuccess[0], updateSuccess[1])
             return redirect(url_for("item", lang_code=get_locale(), iid=iid))
-        else:
+        except:
             flash('Oops! Something went wrong :(', 'danger')
             return redirect(url_for("item", lang_code=get_locale(), iid=iid))
 
@@ -1354,6 +1350,7 @@ def category(category):
     if session['username'] != "supervisor":
         return redirect(url_for("scanner", lang_code=get_locale()))
 
+
     category = category
     itemtype = getAllInventory(category)
     return render_template('category.html',
@@ -1393,9 +1390,6 @@ def storeroom(storeroom):
                     'qty_left':d[4]
                 }
 
-    print(type(items))
-    print(type(items[16]))
-    print(items)
     return render_template('storeroom.html',
         storename = storeroom,
         items = items,
@@ -1453,7 +1447,6 @@ def shelf(tag_id):
         try:
             conn = mysql.connect()
             cursor = conn.cursor()
-            updateSuccess = False
             for item, info in form_data.iterlists():
                 iid = item
                 inputQty = int(info[0])
@@ -1461,7 +1454,7 @@ def shelf(tag_id):
 
                 updateSuccess = stockUpdate(iid, tag_id, inputQty, user, action, now)
 
-            flash('Success!', 'success')
+            flash(updateSucces[0], updateSucces[1])
         except:
             flash('Oops! Something went wrong :(', 'danger')
 
@@ -1480,7 +1473,11 @@ def logout():
 
 @application.errorhandler(404)
 def page_not_found(e):
-    return render_template('error/404.html'), 404
+    return render_template('error/404.html', error=e), 404
+
+@application.errorhandler(500)
+def page_not_found(e):
+    return render_template('error/500.html', error=e), 500
 
 ## testing
 if __name__ == '__main__':
