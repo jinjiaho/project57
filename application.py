@@ -182,7 +182,7 @@ def inventoryQuick(location):
     conn = mysql.connect()
     cursor = conn.cursor()
     if location == None:
-        cursor.execute("""SELECT iid, name, category, picture, SUM(qty_left), reorder_pt FROM view_item_locations
+        cursor.execute("""SELECT iid, name, category, picture, SUM(qty_left), reorder_pt, out_by FROM view_item_locations
         				GROUP BY iid;""")
         data = cursor.fetchall()
         for d in data:
@@ -192,7 +192,8 @@ def inventoryQuick(location):
                 "category": d[2].encode('ascii'),
                 "picture": d[3].encode('ascii'),
                 "remaining": d[4],
-                "reorder": d[5]
+                "reorder": d[5],
+                "unit": d[6].encode('ascii')
                 })
     else:
         cursor.execute("""SELECT iid, name, category, picture FROM view_item_locations
@@ -204,7 +205,8 @@ def inventoryQuick(location):
                 {"iid":d[0],
                 "name": d[1].encode('ascii'),
                 "category": d[2].encode('ascii'),
-                "picture":d[3].encode('ascii')
+                "picture":d[3].encode('ascii'),
+                "unit":d[4].encode('ascii')
                 })
     return items
 
@@ -318,7 +320,7 @@ def getInventoryLow():
 
     THRESHOLD = 1.2
     cursor = mysql.connect().cursor()
-    cursor.execute("""SELECT iid, name, qty_left, reorder_pt, picture, category FROM Ascott_InvMgmt.view_item_locations
+    cursor.execute("""SELECT iid, name, qty_left, reorder_pt, picture, category, out_by FROM Ascott_InvMgmt.view_item_locations
         WHERE qty_left <= '"""+str(THRESHOLD)+"""'*reorder_pt AND
         qty_left > 0
         ORDER BY name ASC;""")
@@ -331,7 +333,8 @@ def getInventoryLow():
             "qty_left": i[2],
             "reorder_pt": i[3],
             "picture": i[4].encode('ascii'),
-            "category": i[5].encode('ascii')})
+            "category": i[5].encode('ascii'),
+            "unit":i[6].encode('ascii')})
 
     return r
 
@@ -1239,7 +1242,6 @@ def inventory():
     data = inventoryQuick(None)
 
     for i in data:
-        print(type(i))
         for cat in itemsByCat:
             if cat.keys()[0] == i['category']:
                 cat[i['category']].append(i)
@@ -1385,7 +1387,7 @@ def storeroom(storeroom):
     items = {}
 
     for t in tags:
-        cursor.execute("SELECT iid, name, picture, reorder_pt, qty_left FROM view_item_locations WHERE tag={}".format(t))
+        cursor.execute("SELECT iid, name, picture, reorder_pt, qty_left, out_by FROM view_item_locations WHERE tag={}".format(t))
         data = cursor.fetchall()
         for d in data:
             if d[0] in items.keys():
@@ -1395,7 +1397,8 @@ def storeroom(storeroom):
                     'name':d[1].encode('ascii'),
                     'picture':d[2].encode('ascii'),
                     'reorder_pt':d[3],
-                    'qty_left':d[4]
+                    'qty_left':d[4],
+                    'unit':d[5].encode('ascii')
                 }
 
     return render_template('storeroom.html',
