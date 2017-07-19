@@ -65,13 +65,13 @@
 <!-- DELETE MODAL -->
 <div id="deleteModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
-        <form>
+        <form method="POST" id="deleteForm">
             <div class="modal-content">
-                <div class="modal-header">Delete <span></span></div>
-                <div class="modal-body">Are you sure you want to delete <span></span>?</div>
+                <div class="modal-header"><h2>Delete </h2><span></span></div>
+                <div class="modal-body">Are you sure you want to delete? This action cannot be reversed.</div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Yes, delete it</button>
-                    <button type="button" class="close btn btn-default">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Yes</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-default">No</button>
                 </div>
             </div>
         </form>
@@ -719,30 +719,34 @@ $('#modify-modal').on('show.bs.modal', function (event) {
 })
 
 function deleteUser(username) {
-    var form = document.createElement('form');
+    var form = document.getElementById("deleteForm");
     var input = document.createElement('input');
     var formName = document.createElement('input');
+    console.log(username);
 
     formName.value = 'deleteUser';
     formName.name = 'name-form';
+    formName.type= "hidden";
     form.appendChild(formName);
 
     input.value = username;
     input.name = "username";
+    input.type = "hidden";
     form.appendChild(input);
 
-    form.method = "POST";
+    // $("#deleteModal h2").innerHTML += 'User';
+    // $("#deleteModal #toDelete").innerHTML += user;
+    $("#deleteModal").modal();
 
-    document.body.appendChild(form);
-    form.submit();
-}
+};
 
 function removeFromTag(item, tag) {
     console.log(item, tag);
-    var form = document.createElement('form');
+    var form = document.getElementById("deleteForm");
     var input1 = document.createElement('input');
     var input2 = document.createElement('input');
     var formName = document.createElement('input');
+    var query = item + " from " + tag;
 
     formName.value = 'removeFromTag';
     formName.name = 'name-form';
@@ -759,10 +763,8 @@ function removeFromTag(item, tag) {
     input2.type = "hidden";
     form.appendChild(input2);
 
-    form.method = "POST";
+    $("#deleteModal").modal();
 
-    document.body.appendChild(form);
-    form.submit();
 }
 
 </script>

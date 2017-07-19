@@ -27,7 +27,7 @@ class ExistingItemsLocation(FlaskForm):
 	itemname = StringField('Item Name', validators=[DataRequired("Please insert the name of the item")])
 	tid = SelectField('Tag', coerce=int) # Value is tid
 	qty = IntegerField('Available Amount', validators = [DataRequired()])
-	submitFour = SubmitField('Add Location')
+	submitFour = SubmitField('Assign To Tag')
 
 class TransferItem(FlaskForm):
 	iname = StringField('Item Name')
@@ -64,7 +64,7 @@ class TrackingForm(FlaskForm):
 
 class RemoveItem(FlaskForm):
 	iname = StringField('Item Name')
-	submit = SubmitField()
+	submit = SubmitField("Delete Item")
 
 class RemoveTag(FlaskForm):
 	tid = SelectField('Tag', coerce=int)
