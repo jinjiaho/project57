@@ -215,7 +215,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT qty_left FROM view_item_locations WHERE iid='{}' AND tag='{}';".format(iid, tagId))
+        cursor.execute("SELECT qty_left, in_out_ratio FROM view_item_locations WHERE iid='{}' AND tag='{}';".format(iid, tagId))
         data = cursor.fetchall()
         old_qty = data[0][0]
 
@@ -227,7 +227,9 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
                 raise InsufficientQtyError("Not enough in store!")
 
         elif action == 'in':
-            qty_left = old_qty + inputQty
+            print inputQty
+            print(inputQty*data[0][1])
+            qty_left = old_qty + inputQty*data[0][1]
             qty_diff = qty_left - old_qty
         else:
             qty_left = inputQty
@@ -552,10 +554,16 @@ def before():
 def get_locale():
     return g.get('current_lang', 'en')
 
+@application.after_request
+def add_header(response):
+    response.cache_control.max_age=0
+    return response
 
 ##########################
 ##        ROUTES        ##
 ##########################
+
+
 
 
 @application.route('/')
