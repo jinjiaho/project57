@@ -35,7 +35,7 @@ function exportReview(category, tableid, filename) {
     var header1 = ["Monthly Review of "+category,"","","","Month: "+month,"Year:"+year]
     var header2 = ["Property: Ascott Raffles Place Singapore"]//Property is hard coded for now
     var header3 = ["","","","","",""];
-    var header4 = ["Name","Unit","Unit Price","Initial quantity","In","Value(In)","Out","Value(Out)","Remaining quantity"];    csv.push(header1.join(","));
+    var header4 = ["Name","","Unit","Unit Price","Initial quantity","In","Value(In)","Out","Value(Out)","Remaining quantity"];    csv.push(header1.join(","));
     csv.push(header2);
     csv.push(header3.join(","));
     csv.push(header4.join(","));
