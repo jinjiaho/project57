@@ -1,0 +1,10 @@
+diff a/application.py b/application.py	(rejected hunks)
+@@ -1240,7 +1240,7 @@
+     # kitchenware = getAllInventory('Kitchenware')
+ 
+     # get list of all locations to display
+-    location_query = "SELECT DISTINCT tag FROM view_item_locations GROUP BY tag DESC;"
++    location_query = "SELECT DISTINCT storeroom FROM view_item_locations GROUP BY storeroom DESC;"
+     cursor = mysql.connect().cursor()
+     cursor.execute(location_query)
+     locations = cursor.fetchall()
