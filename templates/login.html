@@ -24,7 +24,7 @@
             <form role="form" method="POST" id="login-form">{{form.hidden_tag()}}
             	<!-- username input -->
                 <div class="form-group">
-                	{{ form.username(class="form-control", placeholder=_("Username")) }}
+                	{{ form.username(class="form-control", placeholder=_("Username"), autocomplete="off") }}
                 </div>
                 <!-- password input -->
                 <div class="form-group">
@@ -46,6 +46,7 @@
         	<p class="text-muted">&copy; The Ascott Limited &bull; SUTD</p>
 	    </div>
 	    <!-- END Form -->
+
 
 </div> <!-- /.col-sm-6 -->
 </div> <!-- /.container-fluid -->
