@@ -120,7 +120,7 @@ def getAllInventory(category):
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT iid, name, qty_left, reorder_pt, out_by, picture, category, price FROM Ascott_InvMgmt.view_item_locations WHERE category = '{}';".format(category))
+        "SELECT iid, name, qty_left, reorder_pt, out_by, picture, category, ROUND(price,2) FROM Ascott_InvMgmt.view_item_locations WHERE category = '{}';".format(category))
     data = cursor.fetchall()
     print(data)
 
