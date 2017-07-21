@@ -1118,7 +1118,7 @@ def admin():
             print('form received')
             item = request.form["iid"]
             tag = request.form["tid"]
-
+            
             try:
                 conn = mysql.connect()
                 cursor = conn.cursor()

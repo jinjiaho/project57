@@ -92,7 +92,11 @@
     <div class="modal-dialog">
         <form method="POST" id="deleteForm">
             <div class="modal-content">
-                <div class="modal-body">{{_('Are you sure you want to remove ')}}<b><input type="text" disabled></b><br>
+                <div class="modal-header">
+                    <span class="close pull-right" data-dismiss="modal">&times;</span>
+                    <h2>Delete</h2>
+                </div>
+                <div class="modal-body">{{_('Are you sure you want to remove ')}}<b><span id="delName"></span></b>?<br>
                     <span class="text-danger">{{_('This action cannot be undone')}}</span>
                 </div>
                 <div class="modal-footer">
@@ -141,7 +145,7 @@
                             <td>{{ user.username }}</td>
                             <td>{{ user.role }}</td>
                             <td><button class="btn btn-default btn-sm" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{user.name}}" data-role="{{user.role}}" data-username="{{ user.username }}" id="#modify">{{_('Edit')}}</button></td>
-                            <td><button class="btn btn-danger btn-xs" onclick="deleteUser('{{user.username}}')">&times;</button></td>
+                            <td><button id="delUserBtn" class="btn btn-danger btn-xs" data-username='{{user.username}}' onclick="deleteUser('{{user.username}}')">&times;</button></td>
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -492,12 +496,12 @@
                 <ul class="list-group">
 
                     {% for i in values %}
-                        <li class="list-group-item" style="overflow-y: auto;">
+                        <li class="list-group-item" style="overflow-y: auto;" data-tag="{{key[1]}}" data-name="{{ i[0].encode('ascii') }}" data-tagid="{{key[0]}}" data-iid="{{i[1]}}">
                             <a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }}, {{i[2]}} </a>
-                            <span style="cursor:pointer;color: red;"  data-toggle="modal" data-target="#deleteModal" data-name="{{ i[0].encode('ascii') }}" onclick="removeFromTag({{i[1]}}, {{key[0]}})" class="pull-right hidden-xs">
+                            <span style="cursor:pointer;" class="pull-right hidden-xs tagItemDel warning-text">
                                 {{_("Remove from tag")}}
                             </span>
-                            <span class="pull-right visible-xs" style="color: red;cursor:pointer;" onclick="removeFromTag({{i[1]}}, {{key[0]}})">&times;</span>
+                            <span class="pull-right visible-xs tagItemDel warning-text" style="cursor:pointer;" >&times;</span>
                         </li>
 
                     {% endfor %}
@@ -797,7 +801,8 @@ $('#deleteModal').on('show.bs.modal', function (event) {
   modal.find('.modal-body input').val(admin);
 })
 
-function deleteUser(username) {
+function deleteUser() {
+    var username = $("#delUserBtn").data('username');
     var form = document.getElementById("deleteForm");
     var input = document.createElement('input');
     var formName = document.createElement('input');
@@ -813,19 +818,25 @@ function deleteUser(username) {
     input.type = "hidden";
     form.appendChild(input);
 
+    $('#deleteForm #delName').html(username);
+
     // $("#deleteModal h2").innerHTML += 'User';
-    // $("#deleteModal #toDelete").innerHTML += user;
-    // $("#deleteModal").modal();
+    $("#deleteModal").modal();
 
-};
+}
 
-function removeFromTag(item, tag) {
-    console.log(item, tag);
+$(document).on("click", ".tagItemDel", function(e) {
+    var row = $(this).parent();
+    var item = row.data('iid');
+    var itemName = row.data('name');
+    var tag = row.data('tagid');
+    console.log(tag)
+    var tagName = row.data('tag');
     var form = document.getElementById("deleteForm");
     var input1 = document.createElement('input');
     var input2 = document.createElement('input');
     var formName = document.createElement('input');
-    var query = item + " from " + tag;
+    var query = itemName + " from " + tagName;
 
     formName.value = 'removeFromTag';
     formName.name = 'name-form';
@@ -842,9 +853,11 @@ function removeFromTag(item, tag) {
     input2.type = "hidden";
     form.appendChild(input2);
 
-    // $("#deleteModal").modal();
+    $('#deleteForm #delName').html(query);
 
-}
+    $("#deleteModal").modal();
+
+});
 
 
 
