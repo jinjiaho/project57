@@ -17,8 +17,8 @@ class CreateNewItem(FlaskForm):
 	category = SelectField('Category of Item', validators = [DataRequired()])
 	price = DecimalField('Unit Price', places=4, rounding=None, validators = [DataRequired()])
 	reorderpt = IntegerField('Reorder Point', validators = [DataRequired()])
-	count_unit = SelectField('Unit for Counting', validators = [DataRequired()], choices=[("carton", "carton"), ("pc", "pc"), ("kg", "kg"), ("tin", "tin"), ("box", "box"), ("unit", "unit")])
-	order_unit = SelectField('Unit for Ordering', validators = [DataRequired()], choices=[("carton", "carton"), ("pc", "pc"), ("kg", "kg"), ("tin", "tin"), ("box", "box"), ("unit", "unit")])
+	count_unit = SelectField('Unit for Withdrawal', validators = [DataRequired()], choices=[("carton", "carton"), ("pc", "pc"), ("kg", "kg"), ("tin", "tin"), ("box", "box"), ("unit", "unit")])
+	order_unit = SelectField('Unit for Purchasing', validators = [DataRequired()], choices=[("carton", "carton"), ("pc", "pc"), ("kg", "kg"), ("tin", "tin"), ("box", "box"), ("unit", "unit")])
 	order_multiplier = DecimalField('Item Qty per Unit Ordered', places=4, rounding=None, validators = [DataRequired()])
 	submitTwo = SubmitField('Add New Item')
 
