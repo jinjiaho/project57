@@ -42,7 +42,7 @@
 
                         </select>
                       </div>
-                        <p>{{_("Are you sure you want to modify the role for ")}}<b><input type="text" readonly></b>
+                        <p>{{_("Are you sure you want to modify the role for ")}}<b><input type="text" disabled></b>
                         <br><span class="text-info">{{_("This action can be reversed at any time")}}</span></p>
                     </div>
                 </div>
@@ -63,7 +63,7 @@
     <div class="modal-dialog">
         <form method="POST" id="deleteForm">
             <div class="modal-content">
-                <div class="modal-body"><b>{{_('Are you sure you want to remove the user?')}}</b><br>
+                <div class="modal-body">{{_('Are you sure you want to remove ')}}<b><input type="text" disabled></b><br>
                     <span class="text-danger">{{_('This action cannot be undone')}}</span>
                 </div>
                 <div class="modal-footer">
@@ -90,7 +90,7 @@
 <div class="tab-content">
 
 <!-- ******************* USERS TAB *****************************-->
-         
+
     <div role="tabpanel" id="users" class="container-fluid tab-pane fade in active">
         <div class="row">
             <a href="#currentUsers" data-toggle="collapse"><h3>{{_('Current Users')}}</h3></a>
@@ -99,8 +99,8 @@
                     <table class="table">
                         <thead>
 
-                            <th>{{_('Username')}}</th>
                             <th>{{_('Name')}}</th>
+                            <th>{{_('Username')}}</th>
                             <th>{{_('Role')}}</th>
                             <th>{{_('Permissions')}}</th>
                             <th>{{_('Remove User')}}</th>
@@ -112,8 +112,8 @@
                             <td>{{ user.name }}</td>
                             <td>{{ user.username }}</td>
                             <td>{{ user.role }}</td>
-                            <td><button class="btn btn-default btn-sm" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{ user.username }}" id="#modify">{{_('Edit')}}</button></td>
-                            <td><button class="btn btn-danger btn-xs" onclick="deleteUser('{{user.username}}')">&times;</button></td>
+                            <td><button class="btn btn-default btn-sm" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{ user.name }}" id="#modify">{{_('Edit')}}</button></td>
+                            <td><button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#deleteModal" data-name="{{ user.name }}" onclick="deleteUser('{{user.name}}')">&times;</button></td>
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -122,7 +122,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="row">
             <a href="#newUser" data-toggle="collapse"><h3>{{_('Add a New User')}}</h3></a>
             <div id="newUser" class="collapse">
@@ -465,7 +465,7 @@
                     {% for i in values %}
                         <li class="list-group-item" style="overflow-y: auto;">
                             <a href="/{{g.current_lang}}/inventory/{{i[1]}}"> {{ i[0].encode('ascii') }}, {{i[2]}} </a>
-                            <span style="cursor:pointer;color: red;" onclick="removeFromTag({{i[1]}}, {{key[0]}})" class="pull-right hidden-xs">
+                            <span style="cursor:pointer;color: red;"  data-toggle="modal" data-target="#deleteModal" data-name="{{ i[0].encode('ascii') }}" onclick="removeFromTag({{i[1]}}, {{key[0]}})" class="pull-right hidden-xs">
                                 {{_("Remove from tag")}}
                             </span>
                             <span class="pull-right visible-xs" style="color: red;">&times;</span>
@@ -574,7 +574,7 @@
                 </form>
             </div>
         </div>
-        
+
     </div>
 
 </div>
@@ -715,6 +715,15 @@ $('#modify-modal').on('show.bs.modal', function (event) {
   modal.find('.modal-body input').val(admin);
 })
 
+$('#deleteModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget); // Button that triggered the modal
+  var admin = button.data('name'); // Extract info from data-* attributes
+  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+  var modal = $(this);
+  modal.find('.modal-body input').val(admin);
+})
+
 function deleteUser(username) {
     var form = document.getElementById("deleteForm");
     var input = document.createElement('input');
@@ -733,7 +742,7 @@ function deleteUser(username) {
 
     // $("#deleteModal h2").innerHTML += 'User';
     // $("#deleteModal #toDelete").innerHTML += user;
-    $("#deleteModal").modal();
+    // $("#deleteModal").modal();
 
 };
 
@@ -760,7 +769,7 @@ function removeFromTag(item, tag) {
     input2.type = "hidden";
     form.appendChild(input2);
 
-    $("#deleteModal").modal();
+    // $("#deleteModal").modal();
 
 }
 
