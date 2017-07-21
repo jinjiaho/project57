@@ -12,7 +12,12 @@
 
     defaults = {
         exclude: ".noExl",
-                name: "Table2Excel"
+        name: "Table2Excel",
+        filename: "table2excel",
+        fileext: ".xls",
+        exclude_img: true,
+        exclude_links: true,
+        exclude_inputs: true
     };
 
     // The actual plugin constructor
@@ -33,8 +38,9 @@
         init: function () {
             var e = this;
 
+            var utf8Heading = "<meta http-equiv=\"content-type\" content=\"application/vnd.ms-excel; charset=UTF-8\">";
             e.template = {
-                head: "<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\" xmlns=\"http://www.w3.org/TR/REC-html40\"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>",
+                head: "<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\" xmlns=\"http://www.w3.org/TR/REC-html40\">" + utf8Heading + "<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>",
                 sheet: {
                     head: "<x:ExcelWorksheet><x:Name>",
                     tail: "</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>"
@@ -53,8 +59,9 @@
             $(e.element).each( function(i,o) {
                 var tempRows = "";
                 $(o).find("tr").not(e.settings.exclude).each(function (i,p) {
+                    
                     tempRows += "<tr>";
-                $(p).find("td,th").not(e.settings.exclude).each(function (i,q) { // p did not exist, I corrected
+                    $(p).find("td,th").not(e.settings.exclude).each(function (i,q) { // p did not exist, I corrected
                         
                         var rc = {
                             rows: $(this).attr("rowspan"),
@@ -79,36 +86,54 @@
                             }
                         }
                     });
+
+                    tempRows += "</tr>";
+                    console.log(tempRows);
+                    
                 });
+                // exclude img tags
+                if(e.settings.exclude_img) {
+                    tempRows = exclude_img(tempRows);
+                }
+
+                // exclude link tags
+                if(e.settings.exclude_links) {
+                    tempRows = exclude_links(tempRows);
+                }
+
+                // exclude input tags
+                if(e.settings.exclude_inputs) {
+                    tempRows = exclude_inputs(tempRows);
+                }
                 e.tableRows.push(tempRows);
             });
 
-            e.tableToExcel(e.tableRows, e.settings.name);
+            e.tableToExcel(e.tableRows, e.settings.name, e.settings.sheetName);
         },
 
-        tableToExcel: function (table, name) {
+        tableToExcel: function (table, name, sheetName) {
             var e = this, fullTemplate="", i, link, a;
 
-            e.uri = "data:application/vnd.ms-excel;base64,";
-            e.base64 = function (s) {
-                return window.btoa(unescape(encodeURIComponent(s)));
-            };
             e.format = function (s, c) {
                 return s.replace(/{(\w+)}/g, function (m, p) {
                     return c[p];
                 });
             };
+
+            sheetName = typeof sheetName === "undefined" ? "Sheet" : sheetName;
+
             e.ctx = {
                 worksheet: name || "Worksheet",
-                table: table
+                table: table,
+                sheetName: sheetName
             };
 
             fullTemplate= e.template.head;
 
             if ( $.isArray(table) ) {
                 for (i in table) {
-                    //fullTemplate += e.template.sheet.head + "{worksheet" + i + "}" + e.template.sheet.tail;
-                    fullTemplate += e.template.sheet.head + "Table" + i + "" + e.template.sheet.tail;
+                      //fullTemplate += e.template.sheet.head + "{worksheet" + i + "}" + e.template.sheet.tail;
+                      fullTemplate += e.template.sheet.head + sheetName + i + e.template.sheet.tail;
                 }
             }
 
@@ -127,10 +152,12 @@
             }
             delete e.ctx.table;
 
-            if (typeof msie !== "undefined" && msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
-            {
+            var isIE = /*@cc_on!@*/false || !!document.documentMode; // this works with IE10 and IE11 both :)            
+            //if (typeof msie !== "undefined" && msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // this works ONLY with IE 11!!!
+            if (isIE) {
                 if (typeof Blob !== "undefined") {
                     //use blobs if we can
+                    fullTemplate = e.format(fullTemplate, e.ctx); // with this, works with IE
                     fullTemplate = [fullTemplate];
                     //convert to array
                     var blob1 = new Blob(fullTemplate, { type: "text/html" });
@@ -139,14 +166,16 @@
                     //otherwise use the iframe and save
                     //requires a blank iframe on page called txtArea1
                     txtArea1.document.open("text/html", "replace");
-                    txtArea1.document.write(fullTemplate);
+                    txtArea1.document.write(e.format(fullTemplate, e.ctx));
                     txtArea1.document.close();
                     txtArea1.focus();
                     sa = txtArea1.document.execCommand("SaveAs", true, getFileName(e.settings) );
                 }
 
             } else {
-                link = e.uri + e.base64(e.format(fullTemplate, e.ctx));
+                var blob = new Blob([e.format(fullTemplate, e.ctx)], {type: "application/vnd.ms-excel"});
+                window.URL = window.URL || window.webkitURL;
+                link = window.URL.createObjectURL(blob);
                 a = document.createElement("a");
                 a.download = getFileName(e.settings);
                 a.href = link;
@@ -163,7 +192,38 @@
     };
 
     function getFileName(settings) {
-        return ( settings.filename ? settings.filename : "table2excel") + ".xlsx";
+        return ( settings.filename ? settings.filename : "table2excel" );
+    }
+
+    // Removes all img tags
+    function exclude_img(string) {
+        var _patt = /(\s+alt\s*=\s*"([^"]*)"|\s+alt\s*=\s*'([^']*)')/i;
+        return string.replace(/<img[^>]*>/gi, function myFunction(x){
+            var res = _patt.exec(x);
+            if (res !== null && res.length >=2) {
+                return res[2];
+            } else {
+                return "";
+            }
+        });
+    }
+
+    // Removes all link tags
+    function exclude_links(string) {
+        return string.replace(/<a[^>]*>|<\/a>/gi, "");
+    }
+
+    // Removes input params
+    function exclude_inputs(string) {
+        var _patt = /(\s+value\s*=\s*"([^"]*)"|\s+value\s*=\s*'([^']*)')/i;
+        return string.replace(/<input[^>]*>|<\/input>/gi, function myFunction(x){
+            var res = _patt.exec(x);
+            if (res !== null && res.length >=2) {
+                return res[2];
+            } else {
+                return "";
+            }
+        });
     }
 
     $.fn[ pluginName ] = function ( options ) {
