@@ -20,6 +20,10 @@
     color: red;
 }
 
+.row.form-group {
+    margin-left: 0px;
+    margin-right: 0px;
+}
 </style>
 
 
@@ -30,19 +34,44 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="modify-form" name="editUser" method="POST">
+                <div class="modal-header">
+                    <span class="close pull-right" data-dismiss="modal">&times;</span>
+                    <h2>Edit User: </h2>
+                </div>
                 <input type="hidden" name="name-form" value="editUser"/>
 
                 <div class="modal-body">
+                    <input type="hidden" name="username" />
                     <div class="container-fluid">
                       <div class="form-group">
+                          <h4>Change Username</h4>
+                          <label for="username">{{_("Username")}}</label>
+                          <input type="text" id="usernameIn" name="usernameNew" />
+                      </div>
+                      <div class="form-group">
+                          <h4>Change Name</h4>
+                          <label for="name">{{_("Name")}}</label>
+                          <input type="text" id="nameIn" name="name" />
+                      </div>
+                      <div class="form-group">
+                        <h4>Change Role</h4>
                         <label for="sel1">{{_("Role")}}</label>
                         <select class="form-control" id="sel1" name="role">
-                          <option value="supervisor">supervisor</option>
-                          <option value="runner">runner</option>
-
+                          <option value="supervisor">{{_("supervisor")}}</option>
+                          <option value="runner">{{_("runner")}}</option>
+                          <option value="attendant">{{_("attendant")}}</option>
                         </select>
                       </div>
-                        <p>{{_("Are you sure you want to modify the role for ")}}<b><input type="text" readonly></b>
+                      <div class="form-group">
+                          <h4>Reset Password</h4>
+                          <!-- <label for="aPasswordIn">{{_("Supervisor Password")}}</label>
+                          <span style="color: red;" id="suppasserror"></span>
+                          <input type="password" id="aPasswordIn" name="adminPass" />
+                          <br/> -->
+                          <label for="passwordIn">{{_("New Password")}}</label>
+                          <input type="password" id="passwordIn" name="newPass" />
+                      </div>
+                        <p>{{_("Are you sure you want to edit")}}?
                         <br><span class="text-info">{{_("This action can be reversed at any time")}}</span></p>
                     </div>
                 </div>
@@ -96,13 +125,12 @@
             <a href="#currentUsers" data-toggle="collapse"><h3>{{_('Current Users')}}</h3></a>
             <div id="currentUsers" class="collapse">
                 <div class="table-responsive">
-                    <table class="table">
+                    <table class="table" id="usersTable">
                         <thead>
-
-                            <th>{{_('Username')}}</th>
                             <th>{{_('Name')}}</th>
+                            <th>{{_('Username')}}</th>
                             <th>{{_('Role')}}</th>
-                            <th>{{_('Permissions')}}</th>
+                            <th>{{_('Edit')}}</th>
                             <th>{{_('Remove User')}}</th>
                         </thead>
 
@@ -112,7 +140,7 @@
                             <td>{{ user.name }}</td>
                             <td>{{ user.username }}</td>
                             <td>{{ user.role }}</td>
-                            <td><button class="btn btn-default btn-sm" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{ user.username }}" id="#modify">{{_('Edit')}}</button></td>
+                            <td><button class="btn btn-default btn-sm" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{user.name}}" data-role="{{user.role}}" data-username="{{ user.username }}" id="#modify">{{_('Edit')}}</button></td>
                             <td><button class="btn btn-danger btn-xs" onclick="deleteUser('{{user.username}}')">&times;</button></td>
                         </tr>
                         {% endfor %}
@@ -199,7 +227,7 @@
     <div role="tabpanel" id="item" class="container-fluid tab-pane fade">
 
         <div class="row">
-            <a href="#newItem" data-toggle="collapse"><h3>Add a New Item</h3></a>
+            <a href="#newItem" data-toggle="collapse"><h3>{{_("Add a New Item")}}</h3></a>
             <div id="newItem" class="collapse">
                 <form method="POST" id="newItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ form2.hidden_tag() }}<input type="hidden"  name="name-form" value='form2' >
 
@@ -234,10 +262,11 @@
                         <div class="input-group" style="margin-bottom: 20px;">
                             <label class="input-group-btn">
                                 <span class="btn btn-default">
-                                    {{_("Upload photo")}}&hellip;<input type="file" accept="image/*" name="photo" style="display: none;">
+                                    {{_("Upload photo")}}&hellip;<input type="file" accept="image/*" name="photo" style="display: none;" id="imageUpload">
                                 </span>
                             </label>
                             <input type="text" class="form-control" readonly>
+                            <div id="imagePreview"></div>
                         </div>
                     </div>
 
@@ -468,7 +497,7 @@
                             <span style="cursor:pointer;color: red;" onclick="removeFromTag({{i[1]}}, {{key[0]}})" class="pull-right hidden-xs">
                                 {{_("Remove from tag")}}
                             </span>
-                            <span class="pull-right visible-xs" style="color: red;">&times;</span>
+                            <span class="pull-right visible-xs" style="color: red;cursor:pointer;" onclick="removeFromTag({{i[1]}}, {{key[0]}})">&times;</span>
                         </li>
 
                     {% endfor %}
@@ -585,28 +614,85 @@
 $(function() {
 
   // Attach the `fileselect` event to all file inputs on the page
-  $(document).on('change', ':file', function() {
-    var input = $(this),
-        numFiles = input.get(0).files ? input.get(0).files.length : 1,
-        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-    input.trigger('fileselect', [numFiles, label]);
-  });
+    $(document).on('change', ':file', function() {
+        console.log("image uploaded");
+        var input = $(this),
+            numFiles = input.get(0).files ? input.get(0).files.length : 1,
+            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+
+        input.trigger('fileselect', [numFiles, label]);
+    });
 
   // Watch for our custom `fileselect` event
-  $(document).ready( function() {
-      $(':file').on('fileselect', function(event, numFiles, label) {
+    $(':file').on('fileselect', function(event, numFiles, label) {
 
-          var input = $(this).parents('.input-group').find(':text'),
-              log = numFiles > 1 ? numFiles + ' files selected' : label;
+        var input = $(this).parents('.input-group').find(':text'),
+          log = numFiles > 1 ? numFiles + ' files selected' : label;
 
-          if( input.length ) {
-              input.val(log);
-          } else {
-              if( log ) alert(log);
-          }
+        if( input.length ) {
+          input.val(log);
+        } else {
+          if( log ) alert(log);
+        }
 
-      });
-  });
+    });
+
+    $("#usersTable").tablesorter({
+        sortList: [[0,0], [1,0], [2,1]],
+        // theme:'blue',
+        showProcessing: true,
+        widgets: ["filter","uitheme"],
+        widgetOptions : {
+
+          // extra css class applied to the table row containing the filters & the inputs within that row
+          filter_cssFilter   : '',
+
+          // If there are child rows in the table (rows with class name from "cssChildRow" option)
+          // and this option is true and a match is found anywhere in the child row, then it will make that row
+          // visible; default is false
+          filter_childRows   : false,
+
+          // if true, filters are collapsed initially, but can be revealed by hovering over the grey bar immediately
+          // below the header row. Additionally, tabbing through the document will open the filter row when an input gets focus
+          filter_hideFilters : false,
+
+          // Set this option to false to make the searches case sensitive
+          filter_ignoreCase  : true,
+
+          // jQuery selector string of an element used to reset the filters
+          filter_reset : '.reset',
+
+          // Use the $.tablesorter.storage utility to save the most recent filters
+          filter_saveFilters : true,
+
+          // Delay in milliseconds before the filter widget starts searching; This option prevents searching for
+          // every character while typing and should make searching large tables faster.
+          filter_searchDelay : 300,
+
+          // Set this option to true to use the filter to find text from the start of the column
+          // So typing in "a" will find "albert" but not "frank", both have a's; default is false
+          filter_startsWith  : false,
+
+        }
+    });
+
+    // $("#modify-form").on("submit", function(e){
+    //     e.preventDefault();
+    //     var form = $("#modify-form");
+    //     $.ajax({
+    //         type: form.attr('method'),
+    //         url: "/api/editUser",
+    //         data: form.serialize(),
+    //         success: function (data) {
+    //             alert("success!");
+    //             location.reload();
+    //         },
+    //         error: function(data) {
+    //             err = JSON.parse(data);
+    //             $("#suppasserror").append(err);
+    //         }
+    //     });
+    // });
 
 });
 
@@ -641,16 +727,6 @@ $("#itemSelect").change(function(){
             }
         }
     })
-    // Creates a new option in tagOld for each tag that the item is associated with.
-    // $("#tagOldDiv select").html('');
-    // for (var i in tagList) {
-    //     var newOption = document.createElement("option");
-    //     newOption.value = tagList[i];
-    //     newOption.innerHTML = dict[tagList[i]];
-    //     console.log(newOption)
-    //     $("#tagOldDiv select").append(newOption);
-    //     console.log(dict[tagList[i]]);
-    // }
 
 });
 
@@ -661,13 +737,6 @@ function fixEncoding(str) {
         return String.fromCharCode(number);
     });
     return s;
-}
-
-function storeChangeListener(storeroom) {
-     $("#"+storeroom).change(function() {
-        filterTags(storeroom);
-    });
-
 }
 
 
@@ -696,23 +765,27 @@ var substringMatcher = function(strs) {
 var all_items = {{ item_list|safe }};
 
 $('#add-item-name .typeahead').typeahead({
-  hint: true,
-  highlight: true,
-  minLength: 1
-},
-{
-  name: 'all_items',
-  source: substringMatcher(all_items)
+        hint: true,
+        highlight: true,
+        minLength: 1
+    },
+    {
+        name: 'all_items',
+        source: substringMatcher(all_items)
 });
 
 // <!-- Modal changes---->
 $('#modify-modal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget); // Button that triggered the modal
-  var admin = button.data('name'); // Extract info from data-* attributes
+  var username = button.data('username'); // Extract info from data-* attributes
+  var name = button.data('name');
+  var role = button.data('role');
   // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
   // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
   var modal = $(this);
-  modal.find('.modal-body input').val(admin);
+  modal.find('.modal-header h2').append(name);
+  modal.find('.modal-body input[name="username"]').val(username);
+  modal.find('.modal-body select option[value="'+role+'"]').attr('selected', 'selected');
 })
 
 function deleteUser(username) {
@@ -763,6 +836,8 @@ function removeFromTag(item, tag) {
     $("#deleteModal").modal();
 
 }
+
+
 
 </script>
 
