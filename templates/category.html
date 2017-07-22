@@ -11,7 +11,7 @@
 </div>
 <div class="col-xs-5">
     <div class="pull-right" style="margin-top:25px;">
-      <button onclick="exportReview('{{category}}','#review', 'table.csv')" class="btn btn-default btn-block" style="margin-top:-7px; background-color: #e6e6e6;">{{_('Export')}}</button>
+      <button id="button" class="btn btn-default btn-block" style="margin-top:-7px; background-color: #e6e6e6;">{{_('Export')}}</button>
     </div><!-- /input-group -->
 </div>
 </div><hr>
@@ -23,22 +23,23 @@
   {% if itemtype %}
   <table id="review" class="table table-hover">
     <thead>
-      <th data-placeholder="Search" data-sorter="false" >{{_('Item')}}</th>
-      <th data-filter="false" data-sorter="false">{{_('Picture')}}</th>
-      <th data-filter="false" data-sorter="false">{{_('Unit')}}</th>
-      <th data-filter="false">{{_('Unit Price')}}</th>
-      <th data-filter="false" data-sorter="false">{{_('Opening Stock')}}</th>
-      <th data-filter="false" data-sorter="false">{{_('Received In')}}</th>
-      <th data-filter="false" data-sorter="false">{{_('Value (In)')}}</th>
-      <th data-filter="false">{{_('Delivered Out')}}</th>
-      <th data-filter="false" data-sorter="false">{{_('Value (Out)')}}</th>
-      <th data-filter="false">{{_('Closing Stock')}}</th>
+      <th data-placeholder="Search" data-sorter="false" style="font-weight: bold" >{{_('Item')}}</th>
+      <th data-filter="false" data-sorter="false" class="noExl" style="font-weight: bold">{{_('Picture')}}</th>
+      <th data-filter="false" data-sorter="false" style="font-weight: bold">{{_('Unit')}}</th>
+      <th data-filter="false" style="font-weight: bold">{{_('Unit Price')}}</th>
+      <th data-filter="false" data-sorter="false" style="font-weight: bold">{{_('Opening Stock')}}</th>
+      <th data-filter="false" data-sorter="false" style="font-weight: bold">{{_('Received In')}}</th>
+      <th data-filter="false" data-sorter="false" style="font-weight: bold">{{_('Value (In)')}}</th>
+      <th data-filter="false" style="font-weight: bold">{{_('Delivered Out')}}</th>
+      <th data-filter="false" data-sorter="false" style="font-weight: bold">{{_('Value (Out)')}}</th>
+      <th data-filter="false" style="font-weight: bold">{{_('Closing Stock')}}</th>
     </thead>
     <tbody>
       {% for item in itemtype %}
+
       <tr>
         <td><button type="button" class="btn btn-link clickable-row" data-href="/{{g.current_lang}}/inventory/{{item.iid}}">{{item.name}}</td>
-        <td><img src="/static/img/items/{{item.picture}}" alt="Picture" height="50"></img></td>
+        <td class="noExl"><img src="/static/img/items/{{item.picture}}" alt="Picture" height="50"></img></td>
         <td>{{item.unit}}</td>
         <td>${{item.price}}</td>
         <td>{{item.starting}}</td>
@@ -47,6 +48,7 @@
         <td>{{item.demand}}</td>
         <td>${{item.value_out}}</td>
         <td>{{item.remaining}}</td>
+
       </tr>
       {% endfor %}
     </tbody>
@@ -67,6 +69,23 @@ $(document).ready(function($) {
         window.location = $(this).data("href");
     });
 });
+
+
+$("#button").click(function(){
+
+    $("#review").table2excel({
+
+      // exclude CSS class
+
+      exclude: ".noExl",
+
+      name: "{{_(category)}}",
+
+      filename: "{{_(category)}}" //do not include extension
+
+    });
+
+  });
 
 $(document).ready(function() {
 
