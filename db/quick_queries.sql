@@ -21,4 +21,6 @@ CREATE TABLE PriceChange (
     PRIMARY KEY (item, date_effective)
 );
 
-DELETE FROM User WHERE username='user 2';
+INSERT INTO Ascott_InvMgmt.TagItems VALUES (20, 11, 20);
+UPDATE TagItems SET qty_left = 2 WHERE iid=20;
+COMMIT;

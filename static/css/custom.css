@@ -193,3 +193,12 @@ span.cart-group img {
 .tab-content .panel-group .panel {
   margin-bottom: 1em;
 }
+
+
+.navbar-default .navbar-toggle {
+  border:none;
+}
+
+.warning-text {
+  color: #d9534f;
+}

@@ -70,3 +70,4 @@ class RemoveTag(FlaskForm):
 	tid = SelectField('Tag', coerce=int)
 	submit = SubmitField()
 
+

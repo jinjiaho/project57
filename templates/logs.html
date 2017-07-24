@@ -60,6 +60,22 @@ $(document).ready(function() {
     }); 
 });
 
+  $("#button").click(function(){
+
+    $("#logs").table2excel({
+
+      // exclude CSS class
+
+      exclude: ".noExl",
+
+      name: "Logs",
+
+      filename: "Logs" //do not include extension
+
+    });
+
+  });
+
 </script>
 
 <div class="container">
@@ -72,7 +88,7 @@ $(document).ready(function() {
 </div>
 <div class="col-xs-5">
     <div class="pull-right" style="margin-top:25px;">
-      <button onclick="exportLogs('#logs', 'table.csv')" class="btn btn-default btn-block" style="margin-top:-7px; background-color: #e6e6e6;">{{_('Export')}}</button>
+      <button id="button" class="btn btn-default btn-block" style="margin-top:-7px; background-color: #e6e6e6;">{{_('Export')}}</button>
     </div><!-- /input-group -->
 </div>
 </div><hr>
@@ -111,5 +127,4 @@ $(document).ready(function() {
 
 </div>
 
-<script src="/static/js/export.js"></script>
 {% endblock %}

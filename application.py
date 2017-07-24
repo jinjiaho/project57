@@ -73,7 +73,8 @@ class InsufficientQtyError(Exception):
 
 class ContainsItemsError(Exception):
     pass
-
+class InvalidPasswordError(Exception):
+    pass
 
 ###########################
 ##        METHODS        ##
@@ -183,7 +184,7 @@ def inventoryQuick(location):
     cursor = conn.cursor()
     if location == None:
         cursor.execute("""SELECT iid, name, category, picture, SUM(qty_left), reorder_pt, out_by FROM view_item_locations
-        				GROUP BY iid;""")
+                        GROUP BY iid;""")
         data = cursor.fetchall()
         for d in data:
             items.append(
@@ -197,9 +198,9 @@ def inventoryQuick(location):
                 })
     else:
         cursor.execute("""SELECT iid, name, category, picture FROM view_item_locations
-        				WHERE tag='{}' AND reorder_pt >= 0;""".format(location))
+                        WHERE tag='{}' AND reorder_pt >= 0;""".format(location))
         data = cursor.fetchall()
-    	conn.commit()
+        conn.commit()
         for d in data:
             items.append(
                 {"iid":d[0],
@@ -364,6 +365,7 @@ def getDailyLogs():
             "location":row[6].encode('ascii')})
     return things
 
+
 # POST for getting chart data
 @application.route('/api/getChartData', methods=["POST"])
 def getChartData():
@@ -429,37 +431,37 @@ def editPrice():
         page_not_found(400)
 
     else:
-    	data = request.get_json()
-    	iid = data["iid"].encode('ascii')
-    	newprice = data["newprice"].encode('ascii')
-    	effectdate = data["effectdate"].encode('ascii')
-    	effectdate1 = datetime.strptime(effectdate , '%Y-%m-%d')
-    	# print(type(effectdate1))
+        data = request.get_json()
+        iid = data["iid"].encode('ascii')
+        newprice = data["newprice"].encode('ascii')
+        effectdate = data["effectdate"].encode('ascii')
+        effectdate1 = datetime.strptime(effectdate , '%Y-%m-%d')
+        # print(type(effectdate1))
 
         # conn = mysql.connect()
         # cursor = conn.cursor()
         # cursor.execute(
-        # 	"SELECT COUNT(*) FROM Ascott_InvMgmt.PriceChange WHERE item = '{}'".format(iid))
+        #   "SELECT COUNT(*) FROM Ascott_InvMgmt.PriceChange WHERE item = '{}'".format(iid))
         # price_changed=cursor.fetchall()
 
         # conn = mysql.connect()
         # cursor = conn.cursor()
         # if price_changed[0][0] == 1:
 
-        # 	cursor.execute(
-        #     	"UPDATE Ascott_InvMgmt.PriceChange SET new_price= '{}' , date_effective= STR_TO_DATE( '{} 00:00:00', '%Y-%m-%d %H:%i:%s') WHERE (item = '{}');".format(newprice, effectdate, iid))
-        # 	conn.commit()
+        #   cursor.execute(
+        #       "UPDATE Ascott_InvMgmt.PriceChange SET new_price= '{}' , date_effective= STR_TO_DATE( '{} 00:00:00', '%Y-%m-%d %H:%i:%s') WHERE (item = '{}');".format(newprice, effectdate, iid))
+        #   conn.commit()
 
         # elif price_changed[0][0] == 0:
 
-        # 	cursor.execute(
-        #     	"INSERT INTO Ascott_InvMgmt.PriceChange (item, new_price, date_effective) VALUES ('{}' ,'{}' ,'{}');".format(iid, newprice, effectdate))
-        # 	conn.commit()
+        #   cursor.execute(
+        #       "INSERT INTO Ascott_InvMgmt.PriceChange (item, new_price, date_effective) VALUES ('{}' ,'{}' ,'{}');".format(iid, newprice, effectdate))
+        #   conn.commit()
 
         try:
-        	sched.remove_job(iid, jobstore=None)
+            sched.remove_job(iid, jobstore=None)
         except:
-        	pass
+            pass
         # The job will be executed on effectdate
         sched.add_job(priceChangenow, 'date', run_date=effectdate1, args=[iid,newprice], id=iid)
         sched.print_jobs(jobstore=None)
@@ -791,22 +793,37 @@ def admin():
 
 # ------------------Edit User Form ----------------------
         elif request.form['name-form'] =='editUser':
-            print('form received')
             username = request.form["username"]
-            print(username)
             role = request.form["role"]
-            print(role)
+            name = request.form["name"]
+            usernameNew = request.form["usernameNew"]
+            password = request.form["newPass"]
+            query = ""
+            messages = []
 
             try:
+                if role:
+                    query += "UPDATE User SET role='{}' WHERE username='{}';".format(role, username)
+                    messages.append(["User role updated!", "success"])
+                if name:
+                    query += "UPDATE User SET name='{}' WHERE username='{}';".format(name, username)
+                    messages.append(["Name updated!", "success"])
+                if usernameNew:
+                    query += "UPDATE User SET username='{}' WHERE username='{}';".format(usernameNew, username)
+                    messages.append(["Username updated!", "success"])
+                if password:
+                    if auth():
+                        query += "UPDATE User SET password='{}' WHERE username='{}';".format(generate_password_hash(password), username)
+                    else:
+                        raise Exception("User authentication failed, please login again.")
                 conn = mysql.connect()
                 cursor = conn.cursor()
-                query = "UPDATE User SET role='{}' WHERE username='{}';".format(role, username)
-                print(query)
                 cursor.execute(query)
                 conn.commit()
-                flash("User role updated!", "success")
+                for i in messages:
+                    flash(i[0], i[1])
             except:
-                flash("Oops! Something went wrong :(", "danger")
+                flash(e.args[0], "danger")
 
             return redirect(url_for('admin', lang_code=get_locale()))
 
@@ -876,7 +893,7 @@ def admin():
                     cursor.execute(query)
                     conn.commit()
 
-                    flash("Item has been added! Next. please assign a tag.", "success")
+                    flash("Item has been added! Next, please assign a tag.", "success")
 
                 except Exception as e:
                     print(e)
@@ -1101,7 +1118,7 @@ def admin():
             print('form received')
             item = request.form["iid"]
             tag = request.form["tid"]
-
+            
             try:
                 conn = mysql.connect()
                 cursor = conn.cursor()
@@ -1330,14 +1347,14 @@ def item(iid):
     pricechanges = []
     if price == ():
         pricechanges.append({
-        	"iid":iid,
+            "iid":iid,
             "new_price": 0,
             "date_effective": 0})
     else:
 
         for item in price:
             pricechanges.append({
-            	"iid":iid,
+                "iid":iid,
                 "new_price": item[0],
                 "date_effective": item[1]})
 
