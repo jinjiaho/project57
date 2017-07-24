@@ -1299,7 +1299,7 @@ def item(iid):
             return redirect(url_for("item", lang_code=get_locale(), iid=iid))
 
     cursor = mysql.connect().cursor()
-    query = "SELECT name, category, picture, tag, qty_left, reorder_pt, in_out_ratio, out_by, price FROM Ascott_InvMgmt.view_item_locations WHERE iid = {};".format(iid)
+    query = "SELECT name, category, picture, tag, qty_left, reorder_pt, in_out_ratio, out_by, ROUND(price,2) FROM Ascott_InvMgmt.view_item_locations WHERE iid = {};".format(iid)
     cursor.execute(query)
     data = cursor.fetchall()
     # d = [[s.encode('ascii') for s in list] for list in data]
