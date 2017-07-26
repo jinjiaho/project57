@@ -197,7 +197,7 @@ def inventoryQuick(location):
                 "unit": d[6].encode('ascii')
                 })
     else:
-        cursor.execute("""SELECT iid, name, category, picture FROM view_item_locations
+        cursor.execute("""SELECT iid, name, category, picture, out_by FROM view_item_locations
                         WHERE tag='{}' AND reorder_pt >= 0;""".format(location))
         data = cursor.fetchall()
         conn.commit()
