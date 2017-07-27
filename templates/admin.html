@@ -33,50 +33,53 @@
 <div id="modify-modal" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="modify-form" name="editUser" method="POST">
+            <form id="modify-form" method="POST" action="/{{g.current_lang}}/admin" >
+                <input type="hidden" name="name-form" value="editUserForm">
                 <div class="modal-header">
                     <span class="close pull-right" data-dismiss="modal">&times;</span>
                     <h2>Edit User: </h2>
                 </div>
-                <input type="hidden" name="name-form" value="editUser"/>
+                <div class="modal-body" style="padding: 2em 3em 1em;">
 
-                <div class="modal-body">
-                    <input type="hidden" name="username" />
-                    <div class="container-fluid">
-                      <div class="form-group">
-                          <h4>Change Username</h4>
-                          <label for="username">{{_("Username")}}</label>
-                          <input type="text" id="usernameIn" name="usernameNew" />
-                      </div>
-                      <div class="form-group">
-                          <h4>Change Name</h4>
-                          <label for="name">{{_("Name")}}</label>
-                          <input type="text" id="nameIn" name="name" />
-                      </div>
-                      <div class="form-group">
-                        <h4>Change Role</h4>
-                        <label for="sel1">{{_("Role")}}</label>
-                        <select class="form-control" id="sel1" name="role">
-                          <option value="supervisor">{{_("supervisor")}}</option>
-                          <option value="runner">{{_("runner")}}</option>
-                          <option value="attendant">{{_("attendant")}}</option>
-                        </select>
-                      </div>
-                      <div class="form-group">
-                          <h4>Reset Password</h4>
-                          <!-- <label for="aPasswordIn">{{_("Supervisor Password")}}</label>
-                          <span style="color: red;" id="suppasserror"></span>
-                          <input type="password" id="aPasswordIn" name="adminPass" />
-                          <br/> -->
-                          <label for="passwordIn">{{_("New Password")}}</label>
-                          <input type="password" id="passwordIn" name="newPass" />
-                      </div>
-                        <p>{{_("Are you sure you want to edit")}}?
-                        <br><span class="text-info">{{_("This action can be reversed at any time")}}</span></p>
-                    </div>
+                        <!-- <input type="text" id="editUsername" name="username"/> -->
+
+                        <div class="row form-group">
+                            <label for="name">Name</label>
+
+                            <div class="form-group">
+                            <input class="form-control" id="name" name="name" placeholder="Change Name" type="text" value="">
+                            
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label for="password">Password</label>
+
+                            <div class="form-group">
+                            <input class="form-control" id="password" name="password" placeholder="Change Password" type="password" value="" />
+                            </div>
+                        </div>
+
+
+                        <div class="row form-group">
+                            <label for="role">Role</label>
+                            
+                            <div class="form-group">
+                                <select class="form-control" id="role" name="role">
+                                    <option value="attendant" selected="selected">attendant</option>
+                                    <option value="runner">runner</option>
+                                    <option value="supervisor">supervisor</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    <p>{{_("Are you sure you want to edit")}}?
+                    <br><span class="text-info">{{_("This action can be reversed at any time")}}</span></p>
+
                 </div>
 
                 <div class="modal-footer">
+                    
                     <button type="button" data-dismiss="modal" class="btn btn-default">{{_('Cancel')}}</button>
                     <button type="submit" class="btn btn-success" id="modify-button">{{_('Apply changes')}}</button>
 
@@ -144,8 +147,8 @@
                             <td>{{ user.name }}</td>
                             <td>{{ user.username }}</td>
                             <td>{{ user.role }}</td>
-                            <td {% if user.username == "supervisor" or user.username == "ra" or user.username == session["username"] %}style="height: 52px;"{% else %}><button class="btn btn-default btn-sm" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{user.name}}" data-role="{{user.role}}" data-username="{{ user.username }}" id="#modify">{{_('Edit')}}</button>{% endif %}</td>
-                            <td>{% if user.username == "supervisor" or user.username == "ra" or user.username == session["username"] %}{% else %}<button id="delUserBtn" class="btn btn-danger btn-xs" data-username='{{user.username}}' onclick="deleteUser('{{user.username}}')">&times;</button>{% endif %}</td>
+                            <td {% if user.username == "supervisor" %}style="height: 52px;"{% else %}><button class="btn btn-default btn-sm" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{user.name}}" data-role="{{user.role}}" data-username="{{ user.username }}" id="#modify">{{_('Edit')}}</button>{% endif %}</td>
+                            <td>{% if user.username == "supervisor" %}{% else %}<button id="delUserBtn" class="btn btn-danger btn-xs" data-username='{{user.username}}' onclick="deleteUser('{{user.username}}')">&times;</button>{% endif %}</td>
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -743,13 +746,15 @@ $('#add-item-name .typeahead').typeahead({
 $('#modify-modal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget); // Button that triggered the modal
   var username = button.data('username'); // Extract info from data-* attributes
+  console.log(username)
   var name = button.data('name');
   var role = button.data('role');
   // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
   // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
   var modal = $(this);
+  modal.find('.modal-header h2').html();
   modal.find('.modal-header h2').append(name);
-  modal.find('.modal-body input[name="username"]').val(username);
+  modal.find('.modal-body #editUsername').val(username);
   modal.find('.modal-body select option[value="'+role+'"]').attr('selected', 'selected');
 })
 

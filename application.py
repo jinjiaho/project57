@@ -197,7 +197,7 @@ def inventoryQuick(location):
                 "unit": d[6].encode('ascii')
                 })
     else:
-        cursor.execute("""SELECT iid, name, category, picture, out_by FROM view_item_locations
+        cursor.execute("""SELECT iid, name, category, picture FROM view_item_locations
                         WHERE tag='{}' AND reorder_pt >= 0;""".format(location))
         data = cursor.fetchall()
         conn.commit()
@@ -553,6 +553,13 @@ def before():
     if u'logged_in' not in session:
         session["logged_in"] = False
 
+@application.after_request
+def add_header(r):
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    r.headers['Pragma'] = 'no-cache'
+    r.headers['Expires'] = '0'
+    return r
+
 # used in setting locale for each route
 # used in ALL ROUTES
 @babel.localeselector
@@ -667,13 +674,14 @@ def admin():
 
 
     storeTagChoices = storeTags()
+    roles = choices('Permissions', 'role')
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT name, tag FROM view_item_locations;")
     itemTags = cursor.fetchall()
 
     # Initialize options for all select fields
-    form.role.choices = choices('Permissions', 'role')
+    form.role.choices = roles
     form2.category.choices = choices('Items', 'category')
     form3.location.choices = choices('TagInfo', 'storeroom')
     form4.tid.choices = storeTagChoices
@@ -792,32 +800,31 @@ def admin():
                 return redirect(url_for('admin', lang_code=get_locale()))
 
 # ------------------Edit User Form ----------------------
-        elif request.form['name-form'] =='editUser':
-            username = request.form["username"]
-            role = request.form["role"]
-            name = request.form["name"]
-            usernameNew = request.form["usernameNew"]
-            password = request.form["newPass"]
-            query = ""
-            messages = []
+        elif request.form['name-form'] =='editUserForm':
 
             try:
+                username = request.form["username"]
+                role = request.form["role"]
+                name = request.form["name"]
+                password = request.form["password"]
+                query = ""
+                messages = []
+
                 if role:
                     query += "UPDATE User SET role='{}' WHERE username='{}';".format(role, username)
-                    messages.append(["User role updated!", "success"])
+                    messages.append(["User role updated to "+role, "success"])
                 if name:
                     query += "UPDATE User SET name='{}' WHERE username='{}';".format(name, username)
-                    messages.append(["Name updated!", "success"])
-                if usernameNew:
-                    query += "UPDATE User SET username='{}' WHERE username='{}';".format(usernameNew, username)
-                    messages.append(["Username updated!", "success"])
+                    messages.append(["Name updated to "+name, "success"])
                 if password:
                     if auth():
                         query += "UPDATE User SET password='{}' WHERE username='{}';".format(generate_password_hash(password), username)
+                        messages.append(["Password updated!", "success"])
                     else:
                         raise Exception("User authentication failed, please login again.")
                 conn = mysql.connect()
                 cursor = conn.cursor()
+                print query
                 cursor.execute(query)
                 conn.commit()
                 for i in messages:
@@ -1316,7 +1323,7 @@ def item(iid):
             return redirect(url_for("item", lang_code=get_locale(), iid=iid))
 
     cursor = mysql.connect().cursor()
-    query = "SELECT name, category, picture, tag, qty_left, reorder_pt, in_out_ratio, out_by, ROUND(price,2) FROM Ascott_InvMgmt.view_item_locations WHERE iid = {};".format(iid)
+    query = "SELECT name, category, picture, tag, qty_left, reorder_pt, in_out_ratio, out_by, price FROM Ascott_InvMgmt.view_item_locations WHERE iid = {};".format(iid)
     cursor.execute(query)
     data = cursor.fetchall()
     # d = [[s.encode('ascii') for s in list] for list in data]
