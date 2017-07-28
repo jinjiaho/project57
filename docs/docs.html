@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<!--
+
+Document Structure:
+
+0.  Definitions
+1.  Application Overview
+  1.1  General Case
+  1.2  Specific Case
+2.  Application Architecture
+  2.1  Architecture Overview
+  2.2  Package Overview
+  2.3  Points of Entry
+3.  Detailed Specifications
+  3.1  Configuration
+    3.1.1  General Case
+    3.1.2  Specific Case
+    3.1.3  Sample Configuration File
+  3.2  Back-end
+  	3.2.1  Entities
+  	3.2.2  Flow Of Data
+  	3.2.3  Policies
+  3.3  Front-end
+4.  Handling A New Log Category
+  4.1  Back-end
+    4.1.1  Database
+    4.1.2  Configuration
+    4.1.3  DAO Object
+    4.1.4  Parser
+    4.1.5  Registering the Parser
+    4.1.6  Main Parser Module
+    4.1.7  HTML Parser
+  4.2  Front-end
+ 
+ -->
+<html>
+<head>
+
+	<!-- Metadata -->
+	<title>Documentation - JCMS Monitoring Dashboard</title>
+	<meta charset="utf-8">
+	<meta content="IE=edge" http-equiv="X-UA-Compatible">
+	
+	<!-- Stylesheets -->
+	<link rel="stylesheet" href="assets/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/docs.min.css">
+
+	<!-- JS files are located at end of document body -->
+
+</head>
+<body>
+
+
+<!-- Header -->
+<div class="jumbotron" id="top">
+  <div class="container">
+	  <h1>Documentation</h1>
+	  <p>A complete reference and configuration guide to JCMS Monitoring Dashboard and its functions.</p>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="container bs-docs-container"><div class="row">
+
+	<!-- Docs content -->
+	<div class="col-md-9" role="main">
+
+		<!-- Link to definitions -->
+		<div class="bs-callout bs-callout-info">
+		    <p>Throughout this documentation, you may encounter unfamiliar terms. To dispel any confusion, a
+				near-exhaustive list of terms and their definitions have been provided <a href="#appendix-definitions">in the appendix</a>.</p>
+		</div>
+
+		<!-- Getting started -->
+		<div class="bs-docs-section">
+			<h1 id="started" class="page-header">Getting started</h1>
+			<p class="lead">JCMS Monitoring Dashboard (currently v1.1.0) provides an easy setup for developers and service managers alike.
+				Read through to see what suits your particular needs.</p>
+			<p>The production repository is located at <code>/carm/proj/HG/tools/cpd_intern_prod</code> on <code>sinsv-12</code>.
+				Once cloned, navigate to the project root directory and enter:</p>
+			<div class="highlight">
+				<pre>$ ./activator</pre>
+			</div>
+			<h2 id="started-dev">Run in development mode</h2>
+			<p>You can enable hot-compiling by running in development mode with the following (demo config):</p>
+			<div class="highlight">
+				<pre>[<span style="color:#22AABA;">JCMS Monitoring Dashboard</span>] $ run -Dconf.resource=demo.conf -Dhttp.port=9000</pre>
+			</div>
+			<h2 id="started-prod">Run in production mode</h2>
+			<p>You can run in production mode with the following (demo config):</p>
+			<div class="highlight">
+				<pre>[<span style="color:#22AABA;">JCMS Monitoring Dashboard</span>] $ start -Dconf.resource=demo.conf -Dhttp.port=9000</pre>
+			</div>
+			<p><code>-Dconf.resource=[CONF_NAME].conf</code> loads all setup options in <code>/conf/[CONF_NAME].conf</code> and uses them to determine deployment settings. You can also define your own configuration file and load them; however, the configuration options cannot be changed during runtume. For more details, see <a href="#started-conf">Configuration</a>.</p>  
+			<p><code>-Dttp.port</code> sets the port used by the application. The default is <code>9000</code>.
+			<div class="bs-callout bs-callout-info">
+				<h4>More commands and options</h4>
+			    <p>The application's console uses the <em>Play!</em> console syntax. See the official documentation
+			    <a href="https://www.playframework.com/documentation/2.3.x/PlayConsole"> here</a> for more information.</p>
+			</div>
+			<h2 id="started-dir">Directory structure</h2>
+			<p>All sources are contained in <code>/app</code>, organised into packages. Accordingly, the directory naming of <code>/app</code> subfolders is synonymous with the naming of packages. Configuration options are found in <code>/conf</code>. A list of important directories of the project is as follows:</p>
+			<div class="highlight"><pre><code>/
+├── app/
+|   ├── actors/        # Akka actors used in monitoring file states
+|   ├── assets/        # JS/LESS files that are compiled and symlinked in /public by the application
+|   ├── charts/        # Handles chart logic and data
+|   ├── controllers/   # Handles HTTP requests incoming from routes; see /conf/routes
+|   ├── cookies/       # Source files that handles and builds cookies
+|   ├── database/      # Source files that handle database access and retrieval operations
+|   ├── global/        # Contains values required throughout the application
+|   ├── logboxes/      # Handles log viewing logic and data
+|   ├── parsers/       # Contains all log parsers and their helper entities. 
+|   ├── tools/         # Miscellaneous tools and sources
+|   ├── views/         # Templates used by the application to generate HTML pages
+|   └── Global.scala   # Contains application startup procedure and operations
+├── conf
+|   ├── database/
+|   |   └── database.conf   # Contains database setup options used during application startup
+|   ├── demo.conf           # Configuration file used for demonstration purposes
+|   └── routes              # Routes that map HTTP requests with controllers; see /app/controllers/
+├── databases/              # DB files containing parsed log data
+├── demo/                   # Sample logs for use in demo mode
+├── public/                 # Public static assets that are used by the application (favicons, images, etc.)
+├── target/                 # Contains managed dependencies (JS, Scala, Play)
+└── test/                   # Contains test sources</code></pre></div>
+			<h2 id="started-conf">Configuration</h2>
+			<p>The configuration files located in <code>/conf</code> contain a few options necessary for the application to know the location
+			of and structure of logs, such that data contained within them can be parsed and stored in the configured databases.</p>
+			<h3 id="started-conf-required">Required options</h3>
+			<table class="table">
+				<thead><tr><th>Option</th><th>Description</th></tr></thead>
+				<tbody>
+					<tr>
+						<td><code>log.root.directory</code></td>
+						<td>Top-level directory acting as a pointer to which relative paths in
+						<code>important.files</code> are linked</td>
+					</tr>
+					<tr>
+						<td><code>important.files</code></td>
+						<td>A list of folders in <code>log.root.directory</code> from which the application should crawl for logs</td>
+					</tr>
+					<tr>
+						<td><code>ignore</code></td>
+						<td>List of regexes specifying files to ignore</td>
+					</tr>
+					<tr>
+						<td><code>username.regex</code></td>
+						<td>A matching regex that specifies the owner of the log. The actual nature of this regex can vary depending on how the log parsers are implemented, since only those parsers will use this parameter.</td>
+					</tr>
+				</tbody>
+			</table>
+			<h3 id="started-conf-deploy-specific">Deployment-specific options</h3>
+			<p>For the application to categorise logs, each log semantic's file naming syntax and logging structure must be defined in
+				the configuration file as follows:</p>
+			<table class="table">
+				<thead><tr><th>Option</th><th>Description</th></tr></thead>
+				<tbody>
+					<tr>
+						<td><code>[NEW_LOG].logs.filename</code></td>
+						<td>A list of regexes specifiying file naming syntax for <code>[NEW_LOG]</code>.</td>
+					</tr>
+					<tr>
+						<td><code>[NEW_LOG].logs.firstline</code></td>
+						<td>A list of regexes specifiying the syntax of the first few lines of <code>[NEW_LOG]</code>.</td>
+					</tr>
+				</tbody>
+			</table>
+			<p>Each log <strong>MUST NOT</strong> fall under multiple categories; see <a href="">policy #1</a>. Logs that do not fall in any of the above categories/semantics, that are not ignored, will be automatically categorized as "unclassified".</p>
+			<p>The following optional parameters may be useful in optimising the performance of the application:</p>
+			<table class="table">
+				<thead><tr><th>Option</th><th>Description</th><th>Default</th></tr></thead>
+				<tbody>
+					<tr>
+						<td><code>spacesaving</code></td>
+						<td>Boolean value. If <code>true</code>, logs more than seven days old are not parsed.</td>
+						<td><code>true</code>
+					</tr>
+					<tr>
+						<td><code>days.to.parse</code></td>
+						<td>Integer value. Modifies the period in <code>spacesaving</code> for an old log to be skipped while parsing.</td>
+						<td><code>7</code>
+					</tr>
+				</tbody>
+			</table>
+			<h3 id="started-conf-databases">Database options</h3>
+			<p>Data parsed from each log type/semantic should occupy only one database file; see <a href="">policy #2</a>. To define a database for a log semantic, the following lines should be appended to <code>/conf/database/database.conf</code> :</p>
+			<div class="highlight"><pre><code>db.[NEW_LOG] {
+	driver=org.sqlite.JDBC
+	url="jdbc:sqlite:"${?PWD}"/databases/[NEW_LOG].db"
+}</code></pre></div>
+			<div class="bs-callout bs-callout-info">
+				<h4>Parsing new semantics</h4>
+			    <p>A new parser <strong>will be required</strong> to process data from logs with the new semantic, using new log definitions provided in the configuration file. Refer to <a href="">this</a> for a full-stack, step-by-step guide on processing log data from new semantics and displaying them on the browser.</p>
+			</div>
+		</div>
+
+		<!-- Features -->
+		<div class="bs-docs-section">
+			<h1 id="features" class="page-header">Features</h1>
+			<p>JCMS Monitoring Dashboard is an extensible diagnostics platform designed to collect, parse and transform logs into structured data for easy querying and indexing. It serves a website allowing users to efficiently view content from the selected
+			logs generated intuitively and visually.</p>
+			<p>The tasks performed by the application during runtime can be summarized as such:</p>
+			<ol>
+				<li>Crawl a set of predetermined directories and retrieve all logs in those directories and their
+					descendant directories.</li>
+				<li>Select relevant logs based on predetermined criteria, and classify them according into predetermined categories
+					based on their file name and syntactical structure.</li>
+				<li>Parse each relevant log to extract useful content and store the information in a database,
+					allowing for different algorithms to be used for different log files.</li>
+				<li>Serve a website where users can select the content they wish to see.</li>
+				<li>Deliver content from logs to the user through the website quickly, with minimal latency between the
+					user request and the successful delivery of the content (on the order of seconds, and not minutes or hours).</li>
+			</ol>
+			<p>In the event of a new log semantic or content, the application can be easily extended in a highly organised fashion. It achieves
+				this by adopting a highly object-oriented approach, such that implementing new functionality can be as simple as writing
+				new modules for new entities and adding those entities into the system.</p>
+			<p>The application comes equipped with components enabling it to handle -  without crashing - large volumes of logs and background
+				log I/O as would be the case in a production environment:</p>
+			<ul>
+				<li>Logs with arbitrarily many lines, even on the order of tens of millions.</li>
+				<li>Logs with lines that are arbitrarily long, even on the order of hundreds of thousands.</li>
+				<li>Logs being created, deleted, or renamed during runtime.</li>
+				<li>Logs being modified or appended to during runtime.</li>
+				<li>Two logs in different directories having the same file name.</li>
+			</ul>
+			<p>Developers working on extending the application should ensure that all the above cases are catered for
+				when implementing new components.</p>
+
+			<div class="bs-callout bs-callout-info">
+				<h4>Supported logs</h4>
+				<p>As of v1.1.0, the application recognises only <em>Alert</em>, <em>DaveModelCheck</em>, <em>Interface</em>, <em>Studio</em>, <em>ReportWorker</em>, <em>Portal</em> log semantics as follows:</p>
+				<table class="table">
+					<thead>
+						<tr><th>Log semantic</th><th>File naming syntax</th><th>First line syntax</th></tr>
+					</thead>
+					<tbody>					
+						<tr>
+							<td>Alert</td>
+							<td><code>"alertgenerator\.\w+\.\S+"<br>"alertrpcserver\.\w+\.\S+"</code></td>
+							<td><code>".+"</code></td>
+						</tr>
+						<tr>
+							<td>DaveModelCheck</td>
+							<td><code>"oracle_database_dangling_reference.log"</code></td>
+							<td><code>"Oracle Database Dangling Reference Check on \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"</code></td>
+						</tr>
+						<tr>
+							<td>Interface</td>
+							<td><code>".+"</code></td>
+							<td><code>"&lt;\d\d&gt;\d \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z \S+ \S+: .+"</code></td>
+						</tr>
+						<tr>
+							<td>Studio</td>
+							<td><code>"studio\.Tracking\.\S+"<br>"studio\.AlertMonitor\.\S+"</code></td>
+							<td><code>"Studio Log: started on .+"</code></td>
+						</tr>
+						<tr>
+							<td>ReportWorker / Portal</td>
+							<td><code>"reportworker\.\S+"<br>"portal\.\S+"</code></td>
+							<td><code>".+"</code></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- Architecture -->
+		<div class="bs-docs-section">
+			<h1 id="architecture" class="page-header">Architecture</h1>
+			<p class="lead">JCMS Monitoring Dashboard is built on <em><a href="https://www.playframework.com/">Play!</a></em>, which provides MVC functionality for hassle-free extensibility.</p>
+			<h2 id="architecture-overview">Overview</h2>
+			<a href="assets/SystemArchitectureDiagram.png" target=_blank>
+				<img src="assets/SystemArchitectureDiagram.png" alt="Click for full size" class="img-responsive img-rounded">
+			</a><br>
+			<p>The application can be said to comprise four discrete parts:</p>
+			<ul>
+				<li><a href="https://www.playframework.com/"><em>Play!</em> Framework</a></li>
+				<li>Unix file system</li>
+				<li>SQLite databases</li>
+				<li>Client browser</li>
+			</ul>
+			<p>Seen in the diagram above, data always flows from the file system to the client, with some
+				being stored in the database. The application therefore serves to retrieve, extract, and deliver that
+				data from the file system to the client.</p>
+			<p>The Application itself can be segregated into "back-end" and "front-end". A general rule by which this
+				classification is made is that components that put data into the database are considered "back-end",
+				while components that retrieve data from the database are considered "front-end".</p>
+			<p>The back-end's main responsibility is to extract and store as much data from the log files as reasonably possible 
+				before the user requests to retrieve them, so that the data can be delivered to the user as quickly as possible
+				upon request. For this reason, the back-end is active all the time, periodically performing time-intensive data
+				retrieval and processing operations, and storing the data in the database for quick on-demand retrieval
+				by the front-end.</p>
+			<p>However, some time-intensive operations are also space-intensive. If the data from such
+				operations were stored in the database, this would create unnecessary disk space overheads. As such, operations
+				that are both time-intensive and space-intensive have to be done by the front-end, where the data generated
+				can be immediately delivered to the client and then discarded. This design decision threatens to compromise the ideal of
+				quick delivery of data, so to mitigate this, the back-end also collects information from the log files that can expedite
+				these operations. This design decision has proven to be highly effective - in one case, processing time was cut from
+				30 seconds to just 3 seconds.
+			<p>The front-end's main responsibility is to handle HTTP requests, and deliver content from the log file to the user
+				in the form of HTML or JSON, which can be served to the user's web browser via HTTP. It is only responsible for handling
+				user requests, so it is only active when a user request is submitted. Most of the data that is served by the
+				front-end can be simply retrieved from the database, but, as mentioned above, some have to be retrieved directly
+				from the file system due to the voluminous nature of the data. The front-end also retrieves information
+				directly from the file system if the nature of the information is not predetermined.</p>
+			<p>Once it possesses the information that was requested by the user, it puts this information into a dynamic
+				HTML template, and serves it to the Client. The front-end also deals in JSON, which is used to dynamically populate a
+				HTML page that has already been delivered.</p>
+			<p>The above framework implementation and infrastructure is also known as a MVC (model-view-controller) architecture.</p>
+			<h2 id="architecture-packages">Packages</h2>
+			<p>All sources are contained in <code>/app</code>, organised into packages and objects.</p>
+			<p>From the <a href="#architecture-overview">architectural overview</a>, it is clear that there are four important types of
+				entities in the application (which correspond to the four most prominent packages):</p>
+			<ul>
+				<li>Parsers (package <code>parsers</code>)</li>
+				<li>DAO Objects (package <code>database</code>)</li>
+				<li>Controllers (package <code>controllers</code>)</li>
+				<li>Views (package <code>views</code>)</li>
+			</ul>
+			<p><b>Parsers</b> are objects that extract data from log files, by reading them line-by-line and performing
+				certain processing operations on each line of text.</p>
+			<p><b>DAO Objects</b> are objects that act as the interface between the Scala program and the database files.
+				Instead of allowing all parts of the program to make direct connections to the databases, all methods
+				that involve some sort of interaction with the database are encapsulated in the DAO Objects. This
+				design decision was made to ensure thread safety, among other things.</p>
+			<p><b>Controllers</b> are objects that handle HTTP requests, and pull together the necessary resources
+				to serve the correct content back to the requester.</p>
+			<p><b>Views</b> are objects that contain HTML intertwined with Scala code providing dynamic content. HTML pages are
+				delivered by these objects when they are called in controller methods.</p>
+			<p>Other packages, such as <code>charts</code>, <code>logboxes</code> are less important, but they are critical in
+				displaying and visualising parsed data. These packages form the "front-end" of the application.</p>
+			<h2 id="architecture-poe">Points of entry</h2>
+			<p>There are three possible situations where the system is actively performing tasks:</p>
+			<ul>
+				<li>When the Application is started up</li>
+				<li>When a periodic check is triggered</li>
+				<li>When an HTTP request is received</li>
+			</ul>
+			<p>The detailed sequence of events for each of the above situations will not be included in this document,
+				due to the sheer complexity of it. A better way of attaining an understanding of the sequence of events
+				will be to trace the method calls using an IDE that allows for <code>Ctrl-click</code> code navigation,
+				such as Eclipse or IntelliJ Idea.</p>
+			<p>Instead, the points of entry (i.e., the first method to be called) will be listed below:</p>
+			<p><b>When the Application is started up:</b></p>
+			<p><code>app.Global.onStart()</code></p>
+			<p><b>When a periodic check is triggered:</b></p>
+			<p><code>app.actors.FileSystemObserverActor.receive</code></p>
+			<p><b>When a HTTP request is received:</b></p>
+			<p>Look for the controller method that maps to the URL requested in <code>conf.routes</code>.</p>
+		</div>
+
+
+		<!-- Init components -->
+		<div class="bs-docs-section">
+			<h1 id="components" class="page-header">Init components</h1>
+			<p>These are the entities that collectively form the skeleton of the application:</p>
+			<table class="table">
+				<thead><th></th><th>Entity name and description</th></thead>
+				<tbody>
+					<tr>
+						<td><img src="assets/object.png" alt="Object"></td>
+						<td>
+							<code><b>Global</b></code><br>
+							A packageless object that the <i>Play! Framework</i> looks at first when the Application is started.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/object.png"></td>
+						<td>
+							<code><b>global.GlobalConstants</b></code><br>
+							A container for objects that need to be referenced from more than one package.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/class.png"></td>
+						<td>
+							<code><b>actors.FileSystemObserverActor</b></code><br>
+							The actor that ensures that the database is up to date with the file system.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/class.png"></td>
+						<td>
+							<code><b>actors.ParserActor</b></code><br>
+							The actor that performs parsing operations in parallel.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/trait.png"></td>
+						<td>
+							<code><b>parsers.ParserLikeWithChecker</b></code><br>
+							The trait for all parsers. For each category of log files that the Application must handle, there should
+							be one child of this trait.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/object.png"></td>
+						<td>
+							<code><b>parsers.ParserLikeWithChecker</b></code><br>
+							The master of all parsers. This object is the only object in the entire Application
+							that maintains a list of all parsers that exist in the system, and performs the assignment of
+							log files to parsers.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/trait.png"></td>
+						<td>
+							<code><b>parsers.parsermodules.ParserModule</b></code><br>
+							The trait for all parser modules.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/class.png"></td>
+						<td>
+							<code><b>parsers.tools.BoundedBufferedReader</b></code><br>
+							A wrapper for the <code>BufferedReader</code> class, which allows for a character limit to be set
+							for the <code>readLine()</code> method.
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+			
+
+		<!-- Databases -->
+		<div class="bs-docs-section">
+			<h1 id="databases">Databases</h1>
+			<p>DAO Objects perform read/write operations on database tables and data stored in them. They perform as object-relational
+				mappers, i.e. insertion and extraction of data is done with object/class methods. Rudimentary SQL query methods are contained
+				within the <code>LogDAO</code> trait. This trait is made available for other DAO Objects related to a specific log semantic to inherit:</p>
+			<table class="table">
+				<thead><th></th><th></th></thead>
+				<tbody>
+					<tr>
+						<td><img src="assets/trait.png"></td>
+						<td>
+							<code><b>database.LogDAO</b></code><br>
+							The trait for all DAO Objects. For each log semantic that the application must handle, there should
+							be one child of this trait.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/object.png"></td>
+						<td>
+							<code><b>database.LogDAO</b></code><br>
+							The master of all DAO Objects. This object is the only object in the entire Application that maintains
+							a list of the DAO Objects that exist in the system, and contains methods that perform operations across
+							all database files. Also contains low-level API methods that make direct connections to the databases.
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<p>Every database must maintain a list of log metadata of the semantic/log type that it handles,
+				in the form of a <code>masterlist</code> table. Metadata from each log of that semantic should be recorded and stored in only
+				<strong>ONE</strong> <code>masterlist</code> table , e.g. Studio log metadata is recorded in <code>masterlist</code>
+				in <code>logs-studio.db</code>. However, each log will have varied syntaxes, structures and data to parse and parsers
+				may extract more than one type of data from each log, e.g. performance metrics, error tracking, etc. To handle this, each
+				data type extracted from each log will be stored in a separate table using a <code>tabletrait</code> trait that handles
+				highly specialised database operations on a specific data type; see Policy #5.</p>
+			<table class="table">
+				<thead><th></th><th></th></thead>
+				<tbody>
+					<tr>
+						<td><img src="assets/object.png"></td>
+						<td>
+							<code><b>database.[NAME]LogsDAO</b></code><br>
+							The DAO Object for performing insertion and extraction of data related to logs with [NAME] semantic.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/trait.png"></td>
+						<td>
+							<code><b>database.tabletraits.Masterlist</b></code><br>
+							The tabletrait for the "<code>masterlist</code>" static table. This tabletrait contains methods performing read/write operations related to a log's metadata.
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<p>The <code>masterlist</code> table can contain as much information as required,
+				and contain as many columns as required, but it must at least contain the following columns:</p>
+			<ol>
+				<li><code>filename VARCHAR(64)</code> - The file name of the log.</li>
+				<li><code>user VARCHAR(16)</code> - The username of the account from which the log originated.</li>
+				<li><code>lastmodified VARCHAR(16)</code> - The date last modified of the file,
+					formatted as a string using the convention "yyyy-MM-dd HH:mm:ss".</li>
+				<li><code>nooflines INT</code> - The number of lines in the log (as per the most recent parse).</li>
+				<li><code>size INT</code> - The size of the log in bytes (as per the most recent parse).</li>
+				<li><code>absolutepath VARCHAR(128) PRIMARY KEY UNIQUE NOT NULL</code> - The absolute, canonical path
+					of the log.</li>
+			</ol>
+			<p>The <code>masterlist</code> table is an example of a <strong>static</strong> table,
+				meaning that it exists independently of how many logs are registered in the database.
+				This is fine because the nature of the data that it stores will only require one row for each log.</p>
+			<p>However, if there is a data set that will require more than one row for each log,
+				a dynamic table scheme should be employed. This means that instead of storing all data from
+				all logs in one huge table, there should exist many tables with the same structure
+				(i.e., column names and types), with each table only containing information about one log.
+				In such a case, the table's name will be used to both identify the table as belonging to a certain class of tables,
+				and also to indicate which log it corresponds to.
+				We shall call this type of table scheme a <strong>dynamic</strong> table.</p>
+			<p>The table name for dynamic tables should be a concatenation of a predetermined prefix and the
+				absolute path of the log, with all non-alphanumeric characters removed.
+				For example, a table that lists the function calls (with the prefix "functioncalls"),
+				containing information from the log file with absolute path
+				"/users/jonfoo/logfiles/studio.Tracking.jonfoo.sinsv-11_2" would be called:<br>
+				<code>"functioncallsusersjonfoologfilesstudioTrackingjonfoosinsv11_2"</code>.</p>
+			<p>To make this structure and convention easier to maintain, methods pertaining to dynamic tables should
+				have as many parameters as possible hard-coded, to prevent errors arising from having to pass in table
+				names from the outside. This means that the methods should be as specific and as specialised as possible.</p>
+			<p>To make maintaining this structure even more convenient, developers can use the idea of "tabletraits".
+				These traits are all children of <code>LogDAO</code>,
+				and are designed to be extended by the DAO Objects that require a certain table type to be implemented.
+				They implement highly specialised creation, deletion, insertion and selection methods for a class of tables,
+				and abstract away the table name by only taking in the raw absolute path as a parameter for identifying
+				the table. Using the idea of tabletraits, multiple DAO Objects that are required to implement the same
+				table scheme do not need to each implement the methods for
+				handling that type of table, but can instead simply all extend the same tabletrait.</p>
+			<div class="bs-callout bs-callout-info">
+				<h4>Supported logs</h4>
+				<p>As of v1.1.0, Studio, Alert, Interface, ReportWorker/Portal, DaveModelCheck log semantics are supported with the
+					following DAO Objects and tabletraits:</p>
+				<table class="table">
+					<thead><th></th><th></th></thead>
+					<tbody>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>database.AlertLogsDAO</b></code><br>
+								The DAO Object for Alert log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>database.DRefLogsDAO</b></code><br>
+								The DAO Object for Dangling Reference log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>database.GenericLogsDAO</b></code><br>
+								The DAO Object for unclassified log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>database.InterfaceLogsDAO</b></code><br>
+								The DAO Object for Interface log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>database.RWPortalLogsDAO</b></code><br>
+								The DAO Object for Report Worker / Portal log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>database.StudioLogsDAO</b></code><br>
+								The DAO Object for Studio log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/trait.png"></td>
+							<td>
+								<code><b>database.tabletraits.Danglingref</b></code><br>
+								The tabletrait for the "<code>danglingref</code>" dynamic table scheme.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/trait.png"></td>
+							<td>
+								<code><b>database.tabletraits.Dateline</b></code><br>
+								The tabletrait for the "<code>dateline</code>" dynamic table scheme.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/trait.png"></td>
+							<td>
+								<code><b>database.tabletraits.Functioncalls</b></code><br>
+								The tabletrait for the "<code>functioncalls</code>" dynamic table scheme.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/trait.png"></td>
+							<td>
+								<code><b>database.tabletraits.Masterlist</b></code><br>
+								The tabletrait for the "<code>masterlist</code>" static table.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/trait.png"></td>
+							<td>
+								<code><b>database.tabletraits.Tracebacks</b></code><br>
+								The tabletrait for the "<code>tracebacks</code>" dynamic table scheme.
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<h2 id="databases-create">Creating a new DAO Object</h2>
+			<p>Given a new log semantic to process, a DAO Object must be created to guard the new database file
+				that must also be created to store the requisite data. This object must extend the
+				<code>LogDAO</code> trait, as well as the <code>Masterlist</code> tabletrait.
+				The naming convention for DAO Objects is <code>[NAME]LogsDAO</code>.
+				This DAO Object will also need to extend the tabletraits that it needs,
+				depending on what kind of tables are needed. If none of the tabletraits meet your needs,
+				you can create a new one. After this, you will need to override and implement the
+				following valUES and methods:</p>
+			<ol>
+				<li><code>val LOCK: ReentrantLock</code> - The mutex for this
+					DAO Object.</li>
+				<li><code>val dbName: String</code> - The name of the
+					database that this DAO Object guards. The name must correspond
+					with the one in conf/databases/database.conf. In our case, the
+					dbName would be <code>logs-[name].db</code>.</li>
+				<li><code>val defaultParser: ParserLikeWithChecker</code> -
+					The parser object that handles this category of log files. We
+					will talk about the parser later, but for now you can just know
+					that it will be called <code>[NAME]LogParser</code>.</li>
+				<li><code>val masterlist_columns: Array[(String, String)]</code> - Define
+					the column names and types for the <code>masterlist</code>
+					table. This was left unimplemented because the requirements might
+					be different for different categories of log files. Remember to
+					include the 6 mandatory columns listed above; see <a href="#DetailedSpecs-Backend-Policies-5">Policy #5</a>.</li>
+				<li><code>def createAllTables</code> - The method that will
+					create all the necessary tables in the database. Within this
+					method, you will need to call all the creation methods for all
+					the static tables that the DAO Object implements. For example,
+					since every database must have a <code>masterlist</code> table,
+					the method <code>createTable_masterlist</code> will definitely
+					appear here. If you add more tabletraits for static tables in
+					future, remember to add their creation methods here. It is
+					senseless to call the creation methods for dynamic tables here,
+					because the nature of the dynamic tables to create will not be
+					known until runtime.</li>
+				<li><code>def dropAllTables</code> - The method that will
+					drop all tables from this database. Within this method, you will
+					need to call all the deletion methods for <em>all</em> tables,
+					including dynamic tables. You will definitely need to include <code>dropTable_masterlist</code>,
+					but this method must be last, because the deletion methods of
+					most dynamic tables require information from <code>masterlist</code>,
+					so <code>masterlist</code> must be dropped last.</li>
+				<li><code>def deleteAllWithAbsolutePath(absolutepath: String)</code> - The method
+					that will delete all entries from all
+					tables in the database that pertain to a particular log file, as
+					identified by its absolute (canonical) path. Within this method,
+					you will need to call the method in every tabletrait to delete
+					entries pertaining to a specified absolute path.</li>
+				<li><code>def cleanup</code> - The method that will clean up old and irrelevant data
+					so as to free up space on the disk. It is very possible that this method
+					is empty, since not all databases need to be cleaned up.</li>
+				<li><code>def getAllList_masterlist(): Array&#91;List&#91;Any&#93;&#93;</code> - The
+					method that returns the
+					content of the entire <code>masterlist</code> table in Scala
+					form. This method was left unimplemented because the columns in
+					the table will vary between log file categories.</li>
+				<li>Any other unimplemented methods or vals from other
+					tabletraits.</li>
+			</ol>
+			<p>In the constructor of the DAO Object, you will need to register
+				the object with <code>LogDAO</code> by calling <code>LogDAO.register(this)</code>, and also call
+				<code>createAllTables</code> to create all the necessary static tables.</p>
+		</div>
+
+
+		<!-- Parsers -->
+		<div class="bs-docs-section">
+			<h1 id="parsers">Parsers</h1>
+			<a href="assets/ParserDiagram.png">
+				<img src="assets/ParserDiagram.png" class="img-responsive img-rounded" alt="Click for full size">
+			</a><br>
+			<p>The figure above illustrates the mechanism by which the application extracts data from logs and
+				puts it in the database.</p>
+			<p>When a log is passed to the parser, the parser reads the file line by line. Each line is passed
+				to each of the parser modules that are installed in the parser. The parser modules perform the processing
+				on the line of text, then write the extracted data into the database via the associated DAO Object.</p>
+			<p>No processing is done in the parser itself. All processing logic is encapsulated in the <code>parser.parsermodules</code>
+				package, i.e. the parser is the skeleton holding the parsing logic, while <code>parsermodules</code> parse data of a specific type.
+				This is to maintain modularity and extensibility. Some of these parser modules may also be used universally
+				with other parsers for different categories of logs.</p>
+			<p>Given how <code>parsermodules</code> are specific with the data they parse, and how each <code>tabletrait</code> contains the
+				read/write methods for <strong>one</strong> specific static or dynamic table, <code>parsermodules</code> should be written
+				such that inherit only one <code>tabletrait</code> and write into one table in a database.
+				It should be apparent, then, that <code>parsermodules</code> and <code>tabletraits</code> function together.</p>
+			<table class="table">
+				<thead><th></th><th></th></thead>
+				<tbody>
+					<tr>
+						<td><img src="assets/object.png"></td>
+						<td>
+							<code><b>parsers.[NAME]LogParser</b></code><br>
+							The parser for [NAME] log files.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/class.png"></td>
+						<td>
+							<code><b>parsers.parsermodules.[NAME]LogMainModule</b></code><br>
+							The main parser module for [NAME] log files.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/class.png"></td>
+						<td>
+							<code><b>parsers.parsermodules.FunctionCallParserModule</b></code><br>
+							The main parser module that populates the <code>functioncalls</code> dynamic table scheme.
+						</td>
+					</tr>
+					<tr>
+						<td><img src="assets/class.png"></td>
+						<td>
+							<code><b>parsers.containers.[NAME]LogView</b></code><br>
+							A container for parameters that tell <code>[NAME]LogHTMLParser</code> how to deliver its content as HTML.
+						</td>
+					</tr>
+
+				</tbody>
+			</table>
+			<div class="bs-callout bs-callout-info">
+				<h4>Supported logs</h4>
+				<p>As of v1.1.0, Studio, Interface, Alert, ReportWorker, Portal, DaveModelCheck log semantics are supported with the following <code>parsers</code>, <code>parsermodules</code> and <code>containers</code>:</p>
+				<table class="table">
+					<thead><th></th><th>Entity</th></thead>
+					<tbody>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.AlertLogParser</b></code><br>
+								The parser for Alert log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.DRefLogParser</b></code><br>
+								The parser for Dangling Reference log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.GenericLogParser</b></code><br>
+								The parser for unclassified log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.InterfaceLogParser</b></code><br>
+								The parser for Interface log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.RWPortalLogParser</b></code><br>
+								The parser for Report Worker / Portal log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.StudioLogParser</b></code><br>
+								The parser for Studio log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.AlertLogHTMLParser</b></code><br>
+								The HTML parser for Alert log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.DRefLogHTMLParser</b></code><br>
+								The HTML parser for Dangling Reference log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.GenericLogHTMLParser</b></code><br>
+								The HTML parser for unclassified log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.InterfaceLogHTMLParser</b></code><br>
+								The HTML parser for Interface log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.RWPortalLogHTMLParser</b></code><br>
+								The HTML parser for Report Worker / Portal log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.StudioLogHTMLParser</b></code><br>
+								The HTML parser for Studio log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.containers.AlertLogView</b></code><br>
+								A container for parameters that tell the <code>AlertLogHTMLParser</code> how to deliver its content.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.containers.DRefLogView</b></code><br>
+								A container for parameters that tell the <code>DRefLogHTMLParser</code> how to deliver its content.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.containers.GenericLogView</b></code><br>
+								A container for parameters that tell the <code>GenericLogHTMLParser</code> how to deliver its content.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.containers.InterfaceLogView</b></code><br>
+								A container for parameters that tell the <code>InterfaceLogHTMLParser</code> how to deliver its content.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/trait.png"></td>
+							<td>
+								<code><b>parsers.containers.LogView</b></code><br>
+								A trait for all LogView classes.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.containers.RWPortalLogView</b></code><br>
+								A container for parameters that tell the <code>RWPortalLogHTMLParser</code> how to deliver its content.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.containers.StudioLogView</b></code><br>
+								A container for parameters that tell the <code>StudioLogHTMLParser</code> how to deliver its content.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.containers.Table</b></code><br>
+								A container for values that behaves like a table.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.containers.TokenBox</b></code><br>
+								A container for <code>Token</code> objects.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.containers.Token</b></code><br>
+								A class that is used with HTML parsers, to instruct them on how to format lines of text
+								that contain a certain regex.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/object.png"></td>
+							<td>
+								<code><b>parsers.containers.Scope</b></code><br>
+								A container for constant integer values that instruct HTML parsers how to format lines of text.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.containers.Format</b></code><br>
+								A container for parameters that represent a text formatting setting.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.parsermodules.AlertLogMainModule</b></code><br>
+								The main parser module for Alert log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.parsermodules.DanglingRefParserModule</b></code><br>
+								The main parser module that populates the <code>danglingref</code> dynamic table scheme.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.parsermodules.DateLineParserModule</b></code><br>
+								The main parser module that populates the <code>dateline</code> dynamic table scheme.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.parsermodules.DRefLogMainModule</b></code><br>
+								The main parser module for Dangling Reference log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.parsermodules.FunctionCallParserModule</b></code><br>
+								The main parser module that populates the <code>functioncalls</code> dynamic table scheme.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.parsermodules.GenericLogMainModule</b></code><br>
+								The main parser module for unclassified log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.parsermodules.InterfaceLogMainModule</b></code><br>
+								The main parser module for Interface log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.parsermodules.RWPortalLogMainModule</b></code><br>
+								The main parser module for Report Worker / Portal log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.parsermodules.StudioLogMainModule</b></code><br>
+								The main parser module for Studio log files.
+							</td>
+						</tr>
+						<tr>
+							<td><img src="assets/class.png"></td>
+							<td>
+								<code><b>parsers.parsermodules.TracebackParserModule</b></code><br>
+								The main parser module that populates the <code>tracebacks</code> dynamic table scheme.
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<h2 id="parsers-create">Creating a new parser</h2>
+			<p>First, create a new parser object under the package <code>parsers</code>. For consistency, this object should also be
+				located in the folder <code>/app/parsers</code> and follow the <code>[NAME]LogParser</code> naming convention.
+				You will need to extend the <code>ParserLikeWithChecker</code> object, override and implement the following values and
+				methods:</p>
+			<ol>
+				<li><code>val defaultDAO: LogDAO</code> - The DAO Object that
+					handles information about this category of logs. In our case, it
+					would be <code>FaafLogsDAO</code>.</li>
+				<li><code>val logtype: String</code> - The name of the log as
+					found in the configuration file. Used by the <code>checkType()</code>
+					method to select the correct regular expression to use from the
+					configuration file. For Faaf logs, this would be <code>"faaf"</code>.</li>
+				<li><code>def parse(file: File, firstparse: Boolean): Unit</code> - The
+					method that performs the actual parsing of the file. Remember to observe
+					<a href="#DetailedSpecs-Backend-Policies-8">Policy #8</a>
+					when implementing this method. You will be required to create a <code>[NAME]LogMainModule</code> parser module
+					that extracts log metadata and registers it in the <code>masterlist</code>
+					table. You can also instantiate any other parser modules you want,
+					either from the existing collection or one created by you.</li>
+			</ol>
+			<p>Secondly, simply add the newly created parser object into <code>parserlist</code> in the
+				<code>ParserLikeWithChecker</code> object, so that <code>ParserLikeWithChecker</code>
+				will include this new parser when assigning parsers to logs.</p>
+			<p>Then, create a new parser module that gathers the necessary data to register the log file in <code>masterlist</code>. For consistency, this object should also be located in the folder
+				<code>/app/parsers/parsermodules</code> and follow the <code>[NAME]LogMainModule</code> naming convention.
+				You will need to extend the <code>ParserModule</code> object, override and implement the following methods:</p>
+			<ol>
+				<li><code>def feedLine(line: String, lineno: Int)</code> -
+					The method for feeding a line of text from the log file into the
+					parser module.</li>
+				<li><code>def closeAndReset</code> - The method that performs
+					all the final operations on the data collected, and resets the
+					parser module.</li>
+			</ol>
+			<p>Lastly, if you wish to display raw log entries in the web application, a separate HTML parser that converts log entries into HTML is
+			required. An <code>HTMLParser</code> trait containing many useful methods is provided should one decide to implement an object that
+			displays log entries as HTML. There are no guidelines for implementation, since it is not accountable to any parent class. The naming
+			convention follows <code>[NAME]LogHTMLParser</code>.</p>
+		</div>
+
+
+		<!-- Controllers -->
+		<div class="bs-docs-section">
+			<h1 id="controllers">Controllers</h1>
+			<p>Controllers are objects that handle HTTP requests as defined by routing policies in <code>/conf/routes</code>. Each URI is mapped
+				to a single controller method that is called when the mapped URI is requested. The routing policies that define the mapping is located in <code>/conf/routes</code>.</p>
+			<p>Routing policies follow the <code>[REST API method] [URI] [Controller method]</code> syntax, as demonstrated in the example below:</p>
+			<!-- CODE EXAMPLE -->
+			<div class="highlight"><pre><code><span class="text-muted"><em># Use "#" as comment tags</em></span>
+GET    /studioLogs                controllers.LogViewer.getStudioLogList
+GET    /studioPerf/:path/:func    controllers.Performance.getStudioPerfSingle(<span class="text-danger"><strong><em>path</em></strong></span>, <span class="text-danger"><strong><em>func</em></strong></span>)  <span class="text-muted"><em>
+                                  # Fixed input parameters</em></span>
+POST   /getLogData                controllers.LogViewer.getJSON</code></pre></div>
+			<!-- END CODE EXAMPLE -->
+			<p>Once called, the relevant controller method will process any input parameters, if any, and <strog>MUST</strong> output an HTTP response. To do so, simply use the HTTP response name as shown below:</p>
+			<!-- CODE EXAMPLE -->
+			<div class="highlight"><pre><code><strong>def</strong> getStudioLogList = Action {
+    Ok(views.html.pages.studioLogList)
+    <span class="text-muted"><em># file called is /app/views/studioLogList.scala.html</em></span>
+}</code></pre></div>
+			<!-- END CODE EXAMPLE -->
+			<p>All controllers accept the following common HTTP responses:</p>
+			<ul>
+				<li><code>Ok</code></li>
+				<li><code>Redirect</code></li>
+				<li><code>BadRequest</code></li>
+				<li><code>Forbidden</code></li>
+				<li><code>NotFound</code></li>
+				<li><code>BadRequest</code></li>
+			</ul>
+			<div class="bs-callout bs-callout-info">
+				<h4>HTML pages as objects</h4>
+				<p><em>Play!</em> HTML files (<code>.scala.html</code>) allow interspersed Scala code. This gives the ability to insert dynamic content into pages with loops, conditionals, pattern matching, etc. HTML pages found in <code>/app/views</code> are abstracted by <em>Play!</em> as objects under the <code>views.html.pages</code> package. Sub-folders within <code>/app/views</code> form subpackages of the same name, therefore, <code>/app/views/subfolder1/page1.scala.html</code> will be abstracted as <code>views.htm.pages.subfolder1.page1</code></p>
+			</div>
+		</div>
+
+
+		<!-- Views -->
+		<div class="bs-docs-section">
+			<h1 id="views">Views</h1>
+			<p>HTML files (format <code>.scala.html</code>) in this application are written as Scala-based templates. Each template is in essence an HTML file with Scala code providing dynamic functionality, allowing for each file to be compiled as a standard Scala function. If a <code>views/Application/index.scala.html</code> template is created, a <code>views.html.Application.index</code> class that has an <code>apply()</code> method will be automatically generated.</p>
+			<p>Every HTML page written as a template uses <code>@</code> as a special character denoting the start of a block of Scala code, and for defining any input parameter for the template.</p>
+			<div class="bs-example">
+				<p>A simple demonstration on using this templating system.</p>
+			</div>
+			<!-- CODE EXAMPLE -->
+			<div class="highlight"><pre><code>@(<span class="text-danger"><strong><em>param1</em></strong></span>: Array[String], <span class="text-danger"><strong><em>param2</em></strong></span>: ArbitraryObject)
+
+<span class="text-primary">&lt;/h1></span>Welcome @param2.MethodName<span class="text-primary">&lt;/h1></span>
+  <span class="text-primary">&lt;ul></span>
+      @for(element <- param1) {
+        <span class="text-primary">&lt;li></span>@element<span class="text-primary">&lt;/li></span>
+      }
+  <span class="text-primary">&lt;/ul></code></pre></div>
+			<p>The above example template can be called from any controller by using:</p>
+			<div class="highlight"><pre><code>Ok(views.html.pages.index)</code></pre></div>
+			<!-- END CODE EXAMPLE -->
+			<p>This templating functionality provided by the application allows content to be inserted dynamically into each page depending on the input parameter passed to the HTML template. One can also modularise page components into separate files for reusability or chain multiple Scala codeblocks together for creating complex dynamic functions.</p>
+
+			<div class="bs-example">
+				<p><code>functionCallsFunctionCompleteList.scala.html</code> provides a great illustration on the flexibility of the templating
+				system.</p>
+			</div>
+			<!-- CODE EXAMPLE -->
+			<div class="highlight"><pre><code>@<strong>import</strong> <span class="text-primary">database.StudioLogsDAO</span>
+@<strong>import</strong> <span class="text-primary">parsers.containers.Table</span>
+
+@(<span class="text-danger"><strong><em>path</em></strong></span>: String, <span class="text-danger"><strong><em>table</em></strong></span>: Table, <span class="text-danger"><strong><em>tableSort</em></strong></span>: (<strong><em>Int</em></strong>, <strong><em>Int</em></strong>))
+@fileName = @{StudioLogsDAO.getFileNameByAbsolutepath(absolutepath)}
+
+@main(s<span class="text-danger">"Function Calls :: $fileName"</span>) {
+<span class="text-primary">&lt;script</span> <span class="text-info">src=</span><span class="text-danger">'https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/widgets/widget-grouping.min.js'</span><span class="text-primary">>&lt;/script></span>
+<span class="text-primary">&lt;div</span> <span class="text-info">class=</span><span class="text-danger">"container-fluid"</span><span class="text-primary">></span>
+
+  <span class="text-primary">&lt;ol</span> <span class="text-info">class=</span><span class="text-danger">"breadcrumb"</span><span class="text-primary">></span>
+    <span class="text-primary">&lt;li>&lt;a</span> <span class="text-info">href=</span><span class="text-danger">"/"</span><span class="text-primary">></span>Home<span class="text-primary">&lt;/a>&lt;/li></span>
+    <span class="text-primary">&lt;li>&lt;a</span> <span class="text-info">href=</span><span class="text-danger">"/functionCalls"</span><span class="text-primary">></span>Function Calls<span class="text-primary">&lt;/a>&lt;/li></span>
+    <span class="text-primary">&lt;li</span> <span class="text-info">class=</span><span class="text-danger">"active"</span><span class="text-primary">></span>@fileName<span class="text-primary">&lt;/li></span>
+  <span class="text-primary">&lt;/ol></span>
+
+  <span class="text-muted">...</span>
+
+<span class="text-primary">&lt;div</span> <span class="text-info">class=</span><span class="text-danger">"row"</span><span class="text-primary">>&lt;div</span> <span class="text-info">class=</span><span class="text-danger">"col-lg-12"</span> <span class="text-info">style=</span><span class="text-danger">"display:none;"</span><span class="text-primary">></span>
+
+  <span class="text-muted">...</span>
+
+  <span class="text-primary">&lt;table</span> <span class="text-info">id=</span><span class="text-danger">"funcTable"</span> <span class="text-info">class=</span><span class="text-danger">"table tablesorter"</span> <span class="text-info">style=</span><span class="text-danger">"word-break:break-word"</span><span class="text-primary">></span>
+
+    <span class="text-primary">&lt;thead></span>
+      <span class="text-primary">&lt;tr></span>
+        <span class="text-primary">&lt;th</span> <span class="text-info">class=</span><span class="text-danger">"group-false alter-width"</span><span class="text-primary">></span>@table.getHeader(0)<span class="text-primary">&lt;/th></span>
+        <span class="text-primary">&lt;th</span> <span class="text-info">class=</span><span class="text-danger">"group-false"</span><span class="text-primary">></span>@table.getHeader(1)<span class="text-primary">&lt;/th></span>
+        <span class="text-primary">&lt;th</span> <span class="text-info">class=</span><span class="text-danger">"group-letter-500"</span><span class="text-primary">></span>@table.getHeader(2)<span class="text-primary">&lt;/th></span>
+          @for(n <- 3 to table.noofcols-1) {
+            <span class="text-primary">&lt;th</span> <span class="text-info">class=</span><span class="text-danger">"group-false alter-width"</span><span class="text-primary">></span>@table.getHeader(n)<span class="text-primary">&lt;/th></span>
+          }
+      <span class="text-primary">&lt;/tr></span>
+    <span class="text-primary">&lt;/thead></span>
+
+    <span class="text-primary">&lt;tbody></span>
+      @for(i <- table.getValues) {
+        <span class="text-primary">&lt;tr></span>
+          <span class="text-primary">&lt;td</span> <span class="text-info">class=</span><span class="text-danger">"alter-width"</span><span class="text-primary">></span>@i(0)<span class="text-primary">&lt;/td></span>
+          <span class="text-primary">&lt;td>&lt;a</span> <span class="text-info">href=</span><span class="text-danger">'@routes.LogViewer.getStudioLogSingleView(absolutepath)'</span><span class="text-primary">></span>@i(1)<span class="text-primary">&lt;/a>&lt;/td></span>
+          <span class="text-primary">&lt;td>&lt;a</span> <span class="text-info">href=</span><span class="text-danger">'@routes.Performance.getFunctionSingleView(absolutepath, i(2).toString)'</span><span class="text-primary">></span>@i(2)<span class="text-primary">&lt;/td></span>
+          @for(n <- 3 to table.noofcols-1) {
+            <span class="text-primary">&lt;td</span> <span class="text-info">class=</span><span class="text-danger">"alter-width"</span><span class="text-primary">></span>@i(n)<span class="text-primary">&lt;td></span>
+          }
+        <span class="text-primary">&lt;/tr></span>
+      }
+    <span class="text-primary">&lt;/tbody></span>
+
+  <span class="text-primary">&lt;/table></span>
+
+<span class="text-primary">&lt;/div>&lt;/div></span>
+
+@widgets.scrollToTop(<span class="text-danger">"#funcTable"</span>)
+
+<span class="text-primary">&lt;/div></span>
+
+@help.tableFilters()
+
+<span class="text-primary">&lt;script</span> <span class="text-info">type=</span><span class="text-danger">"text/javascript"</span><span class="text-primary">></span>
+
+  <span class="text-muted">// Initialise variables</span>
+  <strong>var</strong> absolutePath = <span class="text-danger">"@absolutepath"</span>;
+  <strong>var</strong> tableLength = @table.noofcols;
+  <strong>var</strong> tableSort = [[@{tableSort._1},@{tableSort._2}]];
+  <strong>var</strong> tableHeader = <span class="text-danger">"@{table.getHeader.mkString(";")}"</span>.split(<span class="text-danger">";"</span>);
+
+<span class="text-primary">&lt;/script></span>
+<span class="text-primary">&lt;script</span> <span class="text-info">src=</span><span class="text-danger">'@routes.Assets.versioned("javascripts/logboxDefinition/trackFunctions.js")'</span><span class="text-primary">>&lt;/script></span>
+<span class="text-primary">&lt;script</span> <span class="text-info">src=</span><span class="text-danger">'@routes.Assets.versioned("javascripts/logboxCallback.js")'</span><span class="text-primary">>&lt;/script></span></code></pre></div>
+			<!-- END CODE EXAMPLE -->
+			<h2 id="views-modules">Modules</h2>
+			<p>To speed up implementation, the <code>/app/views</code> directory has been sectioned according to each page's function. HTML templates which display raw log entries are located in <code>/app/views/logviewer</code> while templates which display performance metrics are located in <code>/app/views/performance</code>. Form elements have been modularised and located at <code>/app/views/forms</code>. while miscellaneous templates are provided at <code>/app/views/widgets</code> for reusability.</p>
+			<p>The following reusable templates may be of use:</p>
+			<table class="table">
+				<tbody>
+					<tr>
+						<td><code>views.html.pages.logviewer.logCompleteList</code></td>
+						<td>Display a table of logs. The table's name is pattern-matched and created accordingly.</td>
+					</tr>
+					<tr>
+						<td><code>views.html.pages.widgets.studioMenu</code></td>
+						<td>Inserts a fully formatted input form for logs of any semantic. See <em>Studio</em> logs for examples on using this.</td>
+					</tr>
+					<tr>
+						<td><code>views.html.pages.widgets.interfaceMenu</code></td>
+						<td>Inserts a fully formatted input form only for logs with consistent logging structures. See <em>Interface</em> logs for examples on using this.</td>
+					</tr>
+					<tr>
+						<td><code>views.html.pages.widgets.chartAggregation</code></td>
+						<td>Provides aggregation functionality to charts.</td>
+					</tr>
+					<tr>
+						<td><code>views.html.pages.widgets.scrollToTop</code></td>
+						<td>Inserts a "scroll-to-top" button at the bottom of the page for better UX. See source for more details.</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="bs-callout bs-callout-info">
+				<h4>Implementing new pages</h4>
+				<p>Each HTML source has been documented individually. Please look at the sources in <code>/app/views</code> directories for directions on extending the templates or refer to <a href="#new-front">"Handling new data"</a> to an explanation on using these templates.</p>
+			</div>
+		</div>
+
+
+		<!-- Assets -->
+		<div class="bs-docs-section">
+			<h1 id="assets">Assets</h1>
+			<h2 id="assets-managed">Managed assets</h2>
+			<p>The application provides a build tool to manage web assets and libraries. As of 28 August 2015, <a href="http://www.webjars.org/">WebJars</a> hosts the largest selection of web plugins and libraries compatible with the build tool we have. There are many advantages to using a build tool, such as the ability to fingerprint your assets and serve them with aggressive caching instructions to the browser, and the ability to automate resource downloading and updating.</p>
+			<div class="bs-example">
+				<p>To add a web plugin or asset to the application, simply copy the desired plugin's build tool line from WebJars to <code>/build.sbt</code> as shown below.</p>
+			</div>
+			<div class="highlight"><pre><code>libraryDependencies += <span class="text-danger">"org.webjars" % "bootstrap" % "3.3.5"</span></code></pre></div>
+			<div class="bs-example">
+				<p>Comparing fingerprinted assets with non-fingerprinted assets.</p>
+			</div>
+			<div class="highlight"><pre><code><span class="text-muted"><em>&lt;!-- Non-fingerprinted assets --></em></span>
+<span class="text-primary">&lt;script</span> <span class="text-info">src=</span><span class="text-danger">'lib/highcharts/highcharts.js'</span><span class="text-primary">>&lt;/script></span>
+
+<span class="text-muted"><em>&lt;!-- Fingerprinted assets --></em></span>
+<span class="text-primary">&lt;script</span> <span class="text-info">src=</span><span class="text-danger">'@routes.Assets.versioned("lib/highcharts/highcharts.js">'</span><span class="text-primary">>&lt;/script></span></code></pre></div>
+			<div class="bs-callout bs-callout-info">
+				<h4>Location of managed libraries</h4>
+				<p>All managed libraries are downloaded to <code>/target/web/web-modules/main/webjars/lib</code>.</p>
+			</div>
+			<h2 id="assets-unmanaged">Unmanaged assets</h2>
+			<p>There is nothing to add to <code>/build.sbt</code> to use unmanaged assets and libraries. Simply place the asset source in <code>/app/assets/lib</code> and call them normally in the required HTML pages.</p>
+		</div>
+
+
+		<!-- Charts -->
+		<div class="bs-docs-section">
+			<h1 id="charts">Charts</h1>
+			<p>Front-end data visualisation is provided for by Highcharts, a Javascript library providing fully customisable interactive charts, area and stock graphs. However, data series provided to Highcharts need to be obtained through database queries.</p>
+			<div class="bs-callout bs-callout-info">
+				<h4>Supported chart types</h4>
+				<p>As of v1.1.0, line graphs, stacked graphs and area charts are supported. The code handling the packaging of data series according to the chart type selected is located in <code>/app/charts/series</code>.</p>
+			</div>
+			<h2 id="charts-init">Initialisation</h2>
+			<p>To initialise a chart on a page, simply define a JSON detailing the content/type of chart to display, its options and instantiate a <code>Chart()</code> Javascript "class" with the JSON parameter.</p>
+			<div class="bs-example">
+				<p>The following example code is lifted from <code>/app/assets/javascripts/chartDefinition/functionPerformance.js</code>
+				(as of v1.1.0).</p>
+			</div>
+			<div class="highlight"><pre><code>$(document).ready(<span class="text-primary">function</span>() {
+
+  <span class="text-muted"><em>/**
+   * Define chart type and data to extract, as well as relevant config options and metadata
+   */</em></span>
+  <span class="text-primary">var</span> chartOptions = {
+    <span class="text-info">series</span>: [{
+      <span class="text-info">logPath</span>: absolutePath,
+      <span class="text-info">functionPerf</span>: functionName,
+      <span class="text-info">options</span>: {
+        <span class="text-info">key</span>: <span class="text-danger">"nameVerbosity"</span>,
+        <span class="text-info">value</span>: <span class="text-danger">"onlyColumnName"</span>
+      }
+    }],
+    <span class="text-info">metadata</span>: {
+      <span class="text-info">title</span>: <span class="text-danger">"Execution time"</span>,
+      <span class="text-info">description</span>: <span class="text-danger">"Displays the time in milliseconds to execute at every function call. "</span> +
+        <span class="text-danger">"Each node on this chart represents sampled function calls and their aggregated execution time."</span> +
+        <span class="text-danger">"If no sampling type is selected, this chart will perform 1:1 mapping "</span> +
+        <span class="text-danger">"of the execution time of each function call. Resulting chart trends "</span> +
+        <span class="text-danger">"may accordingly be misleading if function call frequencies vary dramatically."</span>
+    },
+    <span class="text-info">options</span>: [{
+      <span class="text-info">key</span>: <span class="text-danger">"aggregationType"</span>,
+      <span class="text-info">value</span>: <span class="text-danger">"average"</span>
+    },{
+     <span class="text-info">key</span>: <span class="text-danger">"splittingMethod"</span>,
+      <span class="text-info">value</span>: <span class="text-danger">"default"</span>
+   }]
+    };
+
+  <span class="text-muted"><em>/**
+   * Initialise chart on page and create nav dropdown for chart
+   */</em></span>
+  window.chartInstances = [<strong>new</strong> Chart(<span class="text-danger">"chart"</span>, chartOptions)];
+  createMenu(window.chartInstances);
+
+});</code></pre></div>
+			<h2 id="charts-build">Building data series</h2>
+			<p>Upon a user request to view a chart, a JSON is sent to a <code>controllers.ChartController.getJSON()</code> method which passes the JSON further on to the <code>Chart.ChartBuilder()</code> helper class. <code>ChartBuilder()</code> will pattern-match the contents of the JSON and pass it further to a relevant subclass of <code>ChartBuilder()</code> for building of the actual data series through database queries.</p>
+			<p>Flow of events: <strong><em>HTTP request</em></strong> >> <strong><em>ChartController.getJSON()</em></strong> >> <strong><em>Chart.ChartBuilder()</em></strong> >> <strong><em>[CHART_NAME]Chart()</em></strong></p>
+			<div class="bs-example">
+				<p>A JSON containing traceback data on PQR logs will be pattern-matched to <code>PQRTracebackChart()</code> for building the required data series while another JSON containing performance data on XYZ logs will be pattern-matched to <code>XYZPerformanceChart()</code> for processing according to that chart data type.</p>
+			</div>
+			<div class="bs-callout bs-callout-info">
+				<h4>For more information</h4>
+				<p>See source at <code>/app/chart/Chart.scala</code> for details on back-end implementation and method parameters and output.</p>
+			</div>
+			<h2 id="charts-display">Display options</h2>
+			<p>You can fully customise the appearance of the chart container by modifying the JSONs found in <code>/app/assets/chartOptions</code>. For deatils on customisation options available, see the Highcharts API documentation
+			<a href="http://api.highcharts.com/highcharts">here</a>.</p>
+		</div>
+
+		<!-- Logboxes -->
+		<div class="bs-docs-section">
+			<h1 id="logboxes">Logboxes</h1>
+			<p>Log entries viewed on a terminal are not syntax highlighted and does not focus the user's attention appropriately. To this end, a custom-built <code>Logbox()</code> Javascript "class" has been built to display log entries with proper syntax highlighting on a browser, automatic creation/modification of HTML containers for holding log entries, support for customised AJAX requests, Javascript form validation and custom callbacks upon successful AJAX responses.</p>
+			<h2 id="logboxes-init">Initialisation</h2>
+			<p>To initialise a new <code>Logbox()</code>, simply call it as shown below with optional parameters.</p>
+			<div class="highlight"><pre><code><strong>new</strong> Logbox({
+  <span class="text-info">options</span>: { 
+    <span class="text-info">display</span>:          // defines if the logbox is anchored to the page with "iframe" or "div"
+    <span class="text-info">validation_form</span>:  // CSS selector of the form to validate; defaults to undefined
+    <span class="text-info">validation_input</span>: // Key/value pair of form inputs and matching regex, 
+                         defaults to undefined
+    <span class="text-info">response</span>:         // Callback function executing upon a successful AJAX response;
+                         defaults to undefined
+  }
+});</code></pre></div>
+			<p>Instantiating a <code>Logbox()</code> class merely calls <code>Logbox.validateOnInput()</code> and anchors the HTML container for displaying log entries to elements with <code>class="logbox-wrapper"</code>. Users are <strong>required</strong> to write their own Javascript to handle form updating, submission, log displaying and any other custom functionality the user wishes to add. Though cumbersome, this modularity is neccessary for the sake of allowing scalable applications that differ wildly from original intents, an example of which can be seen in the HTML source for <em>DaveModelCheck</em> logs.</p>
+			<div class="bs-example">
+				<p>The following Javascript handles form submission and updating for <em>Interface</em> logs, as of v1.1.0.</p>
+			</div>
+			<div class="highlight"><pre><code>$(document).ready(<span class="text-info">function</span>() {
+
+  <span class="text-muted"><em>/**
+   * Define form and declare function that updates it whenever it is called
+   */</em></span>
+  <strong>var</strong> defineForm = <span class="text-info">function</span>() {
+    <strong>return</strong> {
+      <span class="text-info">interfaceLog</span>: {
+        <span class="text-danger">"absolutePath"</span>: absolutePath,
+        <span class="text-danger">"start-date"</span> : $(<span class="text-danger">"input[name='start-date']"</span>).val() + <span class="text-danger">".000"</span>,
+        <span class="text-danger">"end-date"</span>: $(<span class="text-danger">"input[name='end-date'"</span>).val() + <span class="text-danger">".999"</span>,
+        <span class="text-danger">"logLevels"</span>: {
+          <span class="text-danger">"11"</span>: $(<span class="text-danger">"input[name='error']"</span>).is(<span class="text-danger">":checked"</span>),
+          <span class="text-danger">"12"</span>: $(<span class="text-danger">"input[name='warn']"</span>).is(<span class="text-danger">":checked"</span>),
+          <span class="text-danger">"13"</span>: $(<span class="text-danger">"input[name='info']"</span>).is(<span class="text-danger">":checked"</span>),
+          <span class="text-danger">"14"</span>: $(<span class="text-danger">"input[name='debug']"</span>).is(<span class="text-danger">":checked"</span>),
+          <span class="text-danger">"15"</span>: $(<span class="text-danger">"input[name='trace']"</span>).is(<span class="text-danger">":checked"</span>)
+        },
+        <span class="text-danger">"logColumns"</span>: {
+          <span class="text-info">0</span>: $(<span class="text-danger">"input[name='levelColumn']"</span>).is(<span class="text-danger">":checked"</span>),
+          <span class="text-info">1</span>: $(<span class="text-danger">"input[name='dateColumn']"</span>).is(<span class="text-danger">":checked"</span>),
+          <span class="text-info">2</span>: $(<span class="text-danger">"input[name='timeColumn']"</span>).is(<span class="text-danger">":checked"</span>),
+          <span class="text-info">3</span>: $(<span class="text-danger">"input[name='serverColumn']"</span>).is(<span class="text-danger">":checked"</span>),
+          <span class="text-info">4</span>: $(<span class="text-danger">"input[name='labelColumn']"</span>).is(<span class="text-danger">":checked"</span>),
+          <span class="text-info">5</span>: $(<span class="text-danger">"input[name='messageColumn']"</span>).is(<span class="text-danger">":checked"</span>)
+        }
+      },
+      <span class="text-info">options</span>: {
+        <span class="text-info">display</span>: <span class="text-danger">"iframe"</span>,
+        <span class="text-info">validation_form</span>: <span class="text-danger">"#filter-form"</span>,
+        <span class="text-info">validation_input</span>: {
+          <span class="text-danger">"start-date"</span> : /[0-9]{4}-[01]{1}[0-9]{1}-[0-3]{1}[0-9]{1}/,
+          <span class="text-danger">"end-date"</span> : /[0-9]{4}-[01]{1}[0-9]{1}-[0-3]{1}[0-9]{1}/
+        }
+      }
+    };
+  };
+  <strong>var</strong> interfaceLogbox = <strong>new</strong> Logbox(defineForm());
+
+  <span class="text-muted"><em>/**
+   * Process form and output log entries when submission button is clicked
+   */</em></span>
+  $(<span class="text-danger">"form#filter-form button"</span>).click(<span class="text-info">function</span>(event) {
+    event.preventDefault();
+    interfaceLogbox.formData = defineForm();
+    interfaceLogbox.refreshLogbox();
+  });
+
+});</code></pre></div>
+			<div class="bs-callout bs-callout-info">
+				<h4>Attributes and methods</h4>
+				<p>For more information on implementing this Javascript class, see source at <code>/app/assets/logboxConstructor.js</code> for details on attributes and methods.</p>
+			</div>
+			<h2 id="logboxes-build">Building log entries</h2>
+			<p>Upon a user request to view log entries, a JSON is sent to a <code>controllers.LogViewer.geJSON()</code> method which passes the JSON further on to the <code>LogboxBuilder()</code> companion object. <code>LogboxBuilder()</code> will pattern-match the contents of the JSON and pass it further to an object inheriting the <code>Logbox</code> trait for building of the actual data series through database queries.</p>
+			<p>Flow of events: <strong><em>HTTP request</em></strong> >> <strong><em>LogViewer.geJSON()</em></strong> >> <strong><em>LogboxBuilder()</em></strong> >> <strong><em>[LOG_NAME]Log()</em></strong></p>
+			<div class="bs-example">
+				<p>A JSON containing form data containing the section of PQR logs to view, will be pattern-matched to <code>PQRLog()</code> for building the requested log entries based on the form data.</p>
+			</div>
+			<div class="bs-callout bs-callout-info">
+				<h4>Attributres and methods</h4>
+				<p>See source at <code>/app/logboxes/Logbox.scala</code> for details on back-end implementation and method parameters and output.</p>
+			</div>
+		</div>
+
+
+		<!-- Miscellaneous tools -->
+		<div class="bs-docs-section">
+			<h1 id="misc-tools">Miscellaneous tools</h1>
+			<p><code>cookies.CookieBuilder()</code> currently handles cookies on the back-end. Its API is still liable to change and may cease to work in the future.</p>
+		</div>
+
+		<!-- Creating a new stack to handle new semantics -->
+		<div class="bs-docs-section">
+			<h1 id="new">Handling new data</h1>
+			<p>For the purposes of illustration, we shall imagine that we have defined a new log semantic called <em>Faaf</em>. In order for the application to be able to handle <em>Faaf</em> logs, all tasks listed below need to be performed.</p>
+
+			<h2 id="new-back">Back-end</h2>
+			<h3 id="new-back-databases">Configure a database</h3>
+			<p>Define a new database file to store information about <em>Faaf</em> logs in <code>conf/database/database.conf</code>.
+				You will need to add this set of lines:</p>
+			<div class="highlight"><pre><code><span class="text-muted"><em># Database for Faaf Logs information</em></span>
+db.logs-faaf {
+  driver=org.sqlite.JDBC
+  url="jdbc:sqlite:"${?PWD}"databases/logs-faaf.db"
+}</code></pre></div>
+			<p>Database files are named according to <code>logs-[LOG_NAME].db</code>,
+				so <em>Faaf</em> logs will have parsed data stored in <code>/databases/logs-faaf.db</code>.</p>
+			<h3 id="new-back-conf">Configure a log semantic</h3>
+			<p>Define the fields in the main configuration file specifying
+				the regular expressions used to recognise that the a log
+				belongs to this category. You will need to add this set of lines
+				(SomeRegex1, SomeRegex2, SomeOtherRegex are placeholders, and
+				should be replaced with the real regular expressions):</p>
+			<div class="highlight"><pre><code><span class="text-muted"><em># Faaf Log filename convention regexes</em></span>
+faaf.logs.filename=&#91;
+  <span class="text-danger">"SomeRegex1"</span>,
+  <span class="text-danger">"SomeRegex2"</span>
+&#93;
+
+<span class="text-muted"><em># Faaf Log first line regexes</em></span>
+faaf.logs.firstline=&#91;
+  <span class="text-danger">"SomeOtherRegex"</span>
+&#93;</code></pre></div>
+			<p>The naming convention of the two fields are <code>[LOG_NAME].logs.filename</code> and
+				<code>[LOG_NAME].logs.firstline</code>, so for <em>Faaf</em> logs it would be <code>faaf.logs.filename</code>
+				and <code>faaf.logs.firstline</code> respectively.</p>
+			<h3 id="new-back-dao">Create a DAO Object</h3>
+			<p>Create a DAO Object to guard the new database file. This object must extend the
+				<code>LogDAO</code> trait, as well as the <code>Masterlist</code> tabletrait.
+				The naming convention for DAO Objects is <code>[LOG_NAME]LogsDAO</code>,
+				so for <em>Faaf</em> logs the name would be <code>FaafLogsDAO</code>.
+				This DAO Object will also need to extend the tabletraits that it needs,
+				depending on what kind of tables are needed. If none of the tabletraits meet your needs,
+				you can create a new one. After this, you will need to override and implement the
+				following vals and methods:</p>
+			<ol>
+				<li><code>val LOCK: ReentrantLock</code> - The mutex for this
+					DAO Object.</li>
+				<li><code>val dbName: String</code> - The name of the
+					database that this DAO Object guards. The name must correspond
+					with the one in conf/databases/database.conf. In our scenario,
+					<code>val dbName = logs-faaf</code>.</li>
+				<li><code>val defaultParser: ParserLikeWithChecker</code> -
+					The parser object that handles this category of log files. We
+					will talk about the parser later, but for now you can just know
+					that it will be called <code>FaafLogParser</code>.</li>
+				<li><code>val masterlist_columns: Array[(String, String)]</code> - Define
+					the column names and types for the <code>masterlist</code>
+					table. This was left unimplemented because the requirements might
+					be different for different categories of log files. Remember to
+					include the 6 mandatory columns listed above.
+					(see <a href="#guidelines-5">Policy #5</a>)</li>
+				<li><code>def createAllTables</code> - The method that will
+					create all the necessary tables in the database. Within this
+					method, you will need to call all the creation methods for all
+					the static tables that the DAO Object implements. For example,
+					since every database must have a <code>masterlist</code> table,
+					the method <code>createTable_masterlist</code> will definitely
+					appear here. If you add more tabletraits for static tables in
+					future, remember to add their creation methods here. It is
+					senseless to call the creation methods for dynamic tables here,
+					because the nature of the dynamic tables to create will not be
+					known until runtime.</li>
+				<li><code>def dropAllTables</code> - The method that will
+					drop all tables from this database. Within this method, you will
+					need to call all the deletion methods for <strong>all</strong> tables,
+					including dynamic tables. You will definitely need to include <code>dropTable_masterlist</code>,
+					but this method must be last, because the deletion methods of
+					most dynamic tables require information from <code>masterlist</code>,
+					so <code>masterlist</code> must be dropped last.</li>
+				<li><code>def deleteAllWithAbsolutePath(absolutepath: String)</code> - The method
+					that will delete all entries from all
+					tables in the database that pertain to a particular log file, as
+					identified by its absolute (canonical) path. Within this method,
+					you will need to call the method in every tabletrait to delete
+					entries pertaining to a specified absolute path.</li>
+				<li><code>def cleanup</code> - The method that will clean up old and irrelevant data
+					so as to free up space on the disk. It is very possible that this method
+					is empty, since not all databases need to be cleaned up.</li>
+				<li><code>def getAllList_masterlist(): Array[List[Any]]</code> - The
+					method that returns the
+					content of the entire <code>masterlist</code> table in Scala
+					form. This method was left unimplemented because the columns in
+					the table will vary between log file categories.</li>
+				<li>Any other unimplemented methods or vals from other
+					tabletraits.</li>
+			</ol>
+			<p>In the constructor of the DAO Object, you will need to register
+				the object with <code>LogDAO</code> by calling <code>LogDAO.register(this)</code>, and also call
+				<code>createAllTables</code> to create all the necessary static tables.</p>
+
+			<h3 id="new-back-parser">Create a parser</h3>
+			<p>Create the parser object for this category of logs. This object must extend
+				<code>ParserLikeWithChecker</code>. The naming convention is <code>[LOG_NAME]LogParser</code>,
+				so for <em>Faaf</em> logs it would be <code>FaafLogParser</code>.
+				You will need to override and implement the following values and methods:</p>
+			<ol>
+				<li><code>val defaultDAO: LogDAO</code> - The DAO Object that
+					handles information about this category of logs. In our case, it
+					would be <code>FaafLogsDAO</code>.</li>
+				<li><code>val logtype: String</code> - The name of the log as
+					found in the configuration file. Used by the <code>checkType()</code>
+					method to select the correct regular expression to use from the
+					configuration file. For <em>Faaf</em> logs, this would be <code>faaf</code>.</li>
+				<li><code>def parse(file: File, firstparse: Boolean): Unit</code> - The
+					method that performs the actual parsing of the file. Remember to observe
+					<a href="#guidelines-8">Policy #8</a>
+					when implementing this method. You will definitely need to
+					instantiate the main module that registers the log file in the <code>masterlist</code>
+					table. We will talk about that module later, but for now you can
+					just know that it will be called <code>FaafLogMainModule</code>.
+					You can also instantiate any other parser modules you want,
+					either from the existing collection or one created by you.</li>
+			</ol>
+			<p>You will need to add the parser object into <code>parserlist</code> in the
+				<code>ParserLikeWithChecker</code> object, so that <code>ParserLikeWithChecker</code>
+				will include this new parser when assigning parsers to files.</p>
+			<p>Create the parser module that gathers the necessary data to
+				register the log file in <code>masterlist</code>.
+				This class must extend <code>ParserModule</code>. The naming convention is
+				<code>[LOG_NAME]LogMainModule</code>, so for <em>Faaf</em> logs it will be
+				<code>FaafLogMainModule</code>. You will need to override and implement the following methods:</p>
+			<ol>
+				<li><code>def feedLine(line: String, lineno: Int)</code> -
+					The method for feeding a line of text from the log file into the
+					parser module.</li>
+				<li><code>def closeAndReset</code> - The method that performs
+					all the final operations on the data collected, and resets the
+					parser module.</li>
+			</ol>
+
+			<h3 id="new-back-htmlparser">Create an HTML Parser</h3>
+			<p>Create the HTML parser that will format text from the log into HTML strings.
+				The naming convention is <code>[LOG_NAME]LogHTMLParser</code>,
+				so for <em>Faaf</em> logs it would be <code>FaafLogHTMLParser</code>.
+				There are no guidelines for how to implement this, since it is
+				not accountable to any parent class. It would be useful to extend the
+				<code>HTMLParser</code> trait, because the <code>HTMLParser</code>
+				trait contains many useful methods.</p>
+
+			<h2 id="new-front">Front-end</h2>
+			<h3 id="new-front-templates">Create/extend templates</h3>
+			<div class="bs-callout bs-callout-info">
+				<h4>Template engine</h4>
+				<p>For information on how view templates work, see <a href="#views">Views</a>.</p>
+			</div>
+			<p>As of v1.1.0, the source contains HTML templates for displaying tables, forms, log entries (<code>views/pages/logviewer</code>) and charts (<code>views/pages/performance</code>). The following steps show how to re-use these templates for creating <code>logviewer</code> and <code>performance</code> pages for <em>Faaf</em> logs.</p>
+			<h3 id="new-front-templates-table">List logs in a table</h3>
+			<p>The <code>views/pages/logviewer/logViewerCompleteList.scala.html</code> template lists all kinds of logs in an HTML table. This template has been written such that it accepts all log semantics, as long as it receives two parameters; a <code>Table</code> Scala object containing data to be inserted in an HTML table, and a <code>tableSort</code> Tuple2 containing integers that define the sorting order of the HTML table.</p>
+			<p><code>Table</code> instantiation in this particular template is usually done in the controller method (see <a href="#">Create a controller method</a>). It requires three values; <code>name</code>, <code>header</code>, <code>values</code>. <code>name</code> stores the name of the table as <code>String</code>, <code>header</code> stores the names of the table heads as <code>Array[String]</code> and <code>values</code> stores the table data as <code>Array[Array[String]]</code>.</p>
+			<div class="bs-example">
+				<p>If we wish to use <code>logViewerCompleteList.scala.html</code> to list all <em>Faaf</em> logs and have their file names point to a page displaying log entries, we can simply extend it as follows:</p>
+			</div>
+			<div class="highlight"><pre><code><span class="text-muted"><em>...</em></span>
+
+<span class="text-muted"><em>&lt;!-- Filename column (Link to single log view) --></em></span>
+@table.name match {
+
+  case "Interface (DIG)" => {
+    &lt;td>&lt;a href="@routes.LogViewer.getInterfaceLogSingleView(i.last.toString)">@{i(1)}&lt;/a>&lt;/td>
+  }
+
+  <span class="text-muted"><em>...</em></span>
+
+  <span class="text-muted"><em>&lt;!-- Newly inserted case for Faaf logs --></em></span>
+  case "Faaf" => {
+    &lt;td>&lt;a href="@routes.LogViewer.getFaafLogSingleView(i.last.toString)">@{i(1)}&lt;/a>&lt;/td>
+  }
+
+  case _ => {
+    &lt;td>&lt;a href="@routes.LogViewer.getOtherLogSingleView(i.last.toString)">@{i(1)}&lt;/a>&lt;/td>
+  }
+}
+
+<span class="text-muted"><em>...</em></span></code></pre></div>
+			<h3 id="new-front-controllers">Assign routes and create controller methods</h3>
+			<div class="bs-callout bs-callout-info">
+				<h4>Route mapping convention</h4>
+				<p>Route mapping follows the <code>[REST API method] [URI] [Controller method]</code> syntax, with whitespace as delimiters.</p>
+			</div>
+			<p>First, define URI routes in <code>/conf/routes</code> to accomodate new <em>Faaf</em> web pages to be served to the user. Routes may include parameters in their name if the mapped controller method requires input parameters.</p>
+			<p>For the sake of illustration, let us assume <em>Faaf</em> logs contain multi-line traceback logs and performance information. In this illustration, we have chosen to extend existing templates (LogViewer, Performance) to create two types of pages for the <em>Faaf</em> semantic to visualise and explore our data. Our new routes will look similar to this:</p>
+			<!-- CODE EXAMPLE -->
+			<div class="highlight"><pre><code><span class="text-muted"><em># Use "#" as comment tags</em></span>
+GET    /faafLogs                controllers.LogViewer.getFaafLogCompleteList
+GET    /faafLogs/:path          controllers.LogViewer.getFaafLogSingleView(path: String)
+GET    /faafPerf/               controllers.Performance.getFaafPerfAll
+GET    /faafPerf/:path          controllers.Performance.getFaafPerfSingleLog(path: String)
+GET    /faafPerf/:path/:func    controllers.Performance.getFaafPerfSingleFunc(<span class="text-danger"><strong><em>path</em></strong></span>, <span class="text-danger"><strong><em>func</em></strong></span>)
+
+<span class="text-muted"><em># POST data to obtain log entries and perf data</em></span>
+POST   /getLogData              controllers.LogViewer.getJSON
+POST   /getData                 controllers.ChartController.getJSON</code></pre></div>
+			<!-- END CODE EXAMPLE -->
+			<p>All controllers accept the following HTTP responses as outputs:</p>
+			<ul>
+				<li><code>Ok</code></li>
+				<li><code>Redirect</code></li>
+				<li><code>BadRequest</code></li>
+				<li><code>Forbidden</code></li>
+				<li><code>NotFound</code></li>
+			</ul>
+			<p>Any HTTP request for the URI <code>/faafLogs</code>, for example, will call <code>controllers.LogViewer.getFaafLogCompleteList</code>. The controller method can be used to manipulate, modify, insert data just like in any method in other objects. However, the controller method must return an HTTP response. In the example below, we see one way of writing controller methods to return <code>logViewerCompleteList.scala.html</code> using the <code>Table</code> Scala object and <code>tableSort</code> Tuple2.</p>
+			<div class="bs-example">
+				<p>Controller methods returning pages dedicated to displaying <em>Faaf</em> logs:</p>
+			</div>
+			<!-- CODE EXAMPLE -->
+			<div class="highlight"><pre><code><span class="text-muted"><em># Return a page displaying an HTML table of Faaf logs</em></span>
+<strong>def</strong> getAlertLogCompleteList = Action {
+
+  <span class="text-muted">// Set table data and configuration</span>
+  <strong>val</strong> table = <strong>new</strong> Table(<span class="text-danger">"Faaf"</span>, 
+                        Array(<span class="text-danger">"User"</span>, <span class="text-danger">"File"</span>, <span class="text-danger">"Type"</span>, <span class="text-danger">"Lines"</span>, <span class="text-danger">"Last modified"</span>),
+                        FaafLogsDAO.getAllList_masterlist().to[ArrayBuffer])
+  <span class="text-muted">// tableSort = (column_to_sort_by, asc=0/desc=1)</span>
+  <strong>val</strong> tableSort = (table.header.indexOf(<span class="text-danger">"Last modified"</span>), 1)
+
+  Ok(views.html.pages.logviewer.logViewerCompleteList(table, tableSort))
+}
+
+<span class="text-muted"><em># Return a page displaying log entries of a single Faaf log</em></span>
+<strong>def</strong> getFaafLogSingleView(<span class="text-danger"><em><strong>path</strong></em></span>: String) = Action {
+    Ok(views.html.pages.faafLogSingleView(path))
+}</code></pre></div>
+
+
+			<div class="bs-callout bs-callout-info">
+				<h4>Controller naming convention</h4>
+				<p>As a rule of thumb, controller methods should follow the <code>get[LOG_NAME][PURPOSE]</code> naming convention for easy maintainability; controller method for obtaining a page containing the log entries of a single <em>Faaf</em> log should therefore be named <code>getFaafLogSingleView</code>.</p>
+				<p>Feel free to sidestep the controller method naming convention if the situation calls for it. See existing implementation for production examples of utilising controllers in varied ways.</p>
+			</div>
+			<h3 id="new-front-templates-entries">Display log entries with <code>Logbox</code></h3>
+			<p>As of v1.1.0, there are two logging structures currently in use; <code>CARMSYS</code> and <code>Studio</code>. All logs with <code>CARMSYS</code> logging structures have log levels, timestamps, hostname logged in addition to the log message itself. This makes for easy filtering of data. On the contrary, <code>Studio</code> is completely bare and inconsistent in struture.</p>
+			<div class="bs-example">
+				<p>Assuming <em>Faaf</em> logs conform to <code>CARMSYS</code> logging structure, simply copy <code>interfaceLogSingleView.scala.html</code> and adjust the template variables as follows:</p>
+			</div>
+			<div class="highlight"><pre><code>@import database.FaafLogsDAO 
+
+@(absolutepath: String)
+@fileName = @{FaafLogsDAO.getFileNameByAbsolutepath(absolutepath)}
+@lineTotal = @{FaafLogsDAO.getNoOfLines(absolutepath).toInt}
+
+@main("Log Viewer :: Faaf") {
+
+  <span class="text-muted"><em>...</em></span>
+
+   &lt;!-- MANDATORY: Provide an element within which log entries are to be inserted by "Logbox" -->
+   &lt;div class="logbox-wrapper">&lt;/div>
+
+   &lt;!--  Use meaningful form ids and input names! -->
+   &lt;form id="faaf-form">
+     &lt;input name="line-number">&lt;/input>
+     &lt;input name="line-quantity">&lt;/input>
+   &lt;/form>
+   &lt;button>Submit&lt;/button> &lt;!-- Provide a button for use as a event firer for form submission -->
+
+
+  &lt;script type="text/javascript" src='@routes.Assets.versioned("javascripts/logboxDefinition/faafLog.js")'>
+
+}</code></pre></div>
+			<p>The example above shows one implementation of HTML form inputs from scratch. To allow users ease of configuring the number/level of log entries to display and their verbosity, two HTML form modules have been created for insertion in a template for displaying log entries; <code>views/forms/interfaceMenu.scala.html</code> and <code>views/forms/studioMenu.scala.html</code> for <code>CARMSYS</code> and <code>Studio</code> respectively. Both <code>interfaceMenu.scala.html</code> and <code>studioMenu.scala.html</code> can be used as is for new log semantics, however a new <code>Logbox()</code> Javascript "class" needs to be instantiated to handle form inputs and display log entries in a syntax-highlighted HTML element with <code>class="logbox-wrapper"</code>.</p>
+			<div class="bs-example">
+				<p>The following is an arbitrary example of form <code>faafLog.js</code> can take.</p>
+			</div>
+			<div class="highlight"><pre><code><strong>var</strong> defineForm = function() {
+  <strong>return</strong> {
+    <span class="text-info">options</span>: { 
+      <span class="text-info">display</span>: <span class="text-danger">"div"</span>,
+      <span class="text-info">validation_form</span>: <span class="text-danger">"#faaf-form"</span>,
+      <span class="text-info">validation_input</span>: {
+        <span class="text-danger">"line-number"</span>: /[0-9]/,
+        <span class="text-danger">"line-quantity"</span>: /[0-9]/
+      }
+                      
+      <span class="text-info">response</span>: function(ajaxResponse) {
+       alert("Status: " + ajaxResponse.statusCode.toString())
+      }
+    },
+    <span class="text-info">faafLog</span>: {
+      <span class="text-danger">"absolute-path"</span>: path,
+      <span class="text-danger">"line-number"</span>: $(<span class="text-danger">"input[name='line-number'"</span>).val()
+      <span class="text-danger">"line-quantity"</span>: $(<span class="text-danger">"input[name='line-quantity'"</span>).val()
+    }
+  };
+};
+<strong>var</strong> faafLogbox = <strong>new</strong> Logbox(defineForm());
+
+$("form input").on("change focus blur input", function(event) {
+  faafLogbox.formData = defineForm();
+});
+
+$("form button").click(function(event) {
+  event.preventDefault();
+  faafLogbox.refreshLogbox();
+});</code></pre></div>
+			<div class="bs-callout bs-callout-info">
+				<h4>Logbox callbacks</h4>
+				<p>Please see source at <code>/app/assets/logboxCallback.js</code> and existing implementation on using various advanced callback functions, such as dynamically modifying an HTML pager to see previous/next log entries.</p>
+			</div>
+			<p><code>Logbox()</code> will submit all AJAX requests for log entries via POST to the <code>/getLogData</code> URI, which in turn passes the JSON data to <code>LogboxBuilder().buildFromRequest</code> in <code>/app/logboxes/Logbox.scala</code>. This object method will build the required log entries to be sent by JSON depending on the semantic of the JSON sent by the user.</p>
+ 			<div class="bs-example">
+				<p>Given the JSON sent in the previous example, we will need to inherit the <code>Logbox</code> Scala trait. The trait provides common methods used by all objects that build log entries. You may re-use existing <code>Logbox</code> Scala objects or write your own logic to build new HTML-formatted log entries. An example of the how <code>FaafLogbox.scala</code> will look like:</p>
+			</div>
+			<div class="highlight"><pre><code><strong>object</strong> FaafLogbox <strong>extends</strong> <em><span class="text-info">Logbox</span></em> {
+
+  override val logtype = "faafLog"
+
+  <span class="text-muted"><em>/**
+   * Process JsValue form with Faaf logtype and outputs the requested log entries.
+   *
+   * All forms with Faaf logtypes are directed to this method, where the Faaf log parser and
+   * Faaf HTML syntax highlighting will be applied to the logbox on the webpage.
+   * 
+   * @param requestBody JsValue of the form
+   * @return Either an errorneous JsObject containing exception messages or a successful JsObject
+   *         containing the parsed log with Faaf syntax highlighting and HTML styling
+   */</em></span>
+  def buildFaafLog(requestBody: JsValue): Either[Error, Log] = {
+    try {
+      <span class="text-muted"><em>// Build Faaf log file object</em></span>
+      val faafFile = new File((requestBody \ logtype \ "absolute-path").as[String])
+
+      <span class="text-muted"><em>// Initialise logview</em></span>
+      val firstLine = (requestBody \ logtype \ "firstLine").as[String].toInt
+      val lineQuantity = (requestBody \ logtype \ "lineQuantity").as[String].toInt
+      val logview = new FaafLogView(firstLine, lineQuantity)
+
+      <span class="text-muted"><em>// Obtain parser response</em></span>
+      this.createResponse(
+        true, FaafLogHTMLParser.parse(faafFile, logview, FaafLogHTMLParser.faafLogTokenBox))
+
+    } catch {
+      case e: Exception => {Logger.error(e.getStackTrace.mkString("\n"))}
+    }
+  }
+}</code></pre></div>
+			<p>Following on from the example above, a new Javascript file will need to be written for displaying <em>Faaf</em> log entries utilising the <code>Logbox()</code> Javascript "class" as discussed <a href="#logboxes">here</a>. To use it, simply create any HTML element with a class of <code>logbox-wrapper</code> and initialiase <code>Logbox()</code>. <code>Logbox()</code> will populate and modify this element automatically, displaying log entries within it.</p>
+			<div class="bs-example">
+				<p>Assuming <em>Faaf</em> logs conform to <code>CARMSYS</code> logging structure, create <code>faafLogSingleView.scala.html</code> for displaying entries of a single log.</p>
+			</div>
+			
+			<h3 id="new-front-performance">Display graphs with <code>Chart</code></h3>
+			<p>As of v1.1.0, there are three kinds of chart logic the application supports; line charts, area and stacked graphs. Assuming <em>Faaf</em> logs contain performance information, there are two k</p>
+
+
+			<div class="highlight"><pre><code>Ok(views.html.pages.faafLogSingleView(<span class="text-danger"><em><strong>path</em></strong></span>: String))</code></pre></div>
+			<p>Each view is able to take in multiple input parameters to dynamically insert content into the template file before it is formatted as HTML and served to the user. See Views for more information.</p>
+			<p>Due to the MVC nature of the application, adding a page to display a new log semantic will require the following steps:
+			<ol>
+				<li><strong>Create or extend a template</strong> - The creation/extension of templates is necessary to display the page content. See Views for details on using the template system. In addition, you may refer to exisiting implementation and source at <code>/app/views</code> to extend their use cases.</li>
+				<li><strong>Associate to a controller method</strong> - This action is required for the application to serve the page when the requsted URI is entered. See Controllers for more information.</li>
+				<li>Specifing a path for the page This action creates a map between a specific request PATH and the controller method that renders it. It is done in the routes file in the conf folder. It is possible to find extensive documentation here .
+Adding a menu entry for the new page If the new page will be accessed frequently it is reccomended to perform this step. The menu widget is contatined in the app/views/widgets folder (navBarTop.scala.html). The navbar uses bootstrap . To obtain the proper href attribute for the anchor element please refer to the available examples or once again to the routing docs of Play framework
+			<p>Should one require that <em>Faaf</em> logs be listed in a Log Viewer table, <code>/app/views/pages/logviewer/logCompleteList.scala.html</code> will have to be modified to include an additional pattern-match case accomodating <em>Faaf</em> logs, as shown below:</p></li>
+			</ol>
+			<div class="bs-callout bs-callout-info">
+				<h4>Extending existing views</h4>
+				<p>All significant views have been documented. Please refer to exisiting implementation and source at <code>/app/views</code> to extend their use cases.</p>
+			</div>
+		</div>
+		<h3 id="new-front-navbar">Update navbar with new pages</h3>
+		<p>You may add shortcuts or top-level links to most-visited pages.</p>
+
+		<!-- Policies -->
+		<div class="bs-docs-section">
+			<h1 id="guidelines">Guidelines and policies</h1>
+			<div class="bs-callout bs-callout-info">
+				<h4>Policy #2 - Database files</h4>
+				<p>Each log semantic should be accompanied with exactly one database file with parsed data stored in it.
+					That is to say, any given database file should only contain information pertaining to exactly one category of logs.</p>
+				<p>This is done to promote clarity, modularity and encapsulation of information pertaining to each category of logs
+					inside each database. If this is not observed, there is a possibility of log parsers of different semantic implementing tables
+					with the same name and structure.</p>
+			</div>
+			<p>These are the policies governing the way classes and objects are implemented in the application.</p>
+			<h2 id="guidelines-1">Policy #1 - Log file classifications</h2>
+			<p>Each log file should fall under exactly one category and log root directories must contain only text files. Categories should be defined in such a way that this policy is observed.</p>
+			<h2 id="guidelines-2">Policy #2 - Database files and log categories</h2>
+			<p>There should be a one-to-one mapping of database (.db) files and categories of log files.
+				That is to say, information pertaining to any given category of log files
+				should be stored in exactly one database file,
+				and any given database file should only contain information pertaining to exactly one category of log files.</p>
+			<p>The rationale behind this is to encapsulate information pertaining to each category of log files
+				inside a database file and thereby eliminate any confusion,
+				since different databases for different log file categories might implement tables with the
+				same name and structure. This also facilitates modularity and eliminates
+				repeated code as much as possible on the application side.</p>
+			<h2 id="guidelines-3">Policy #3 - Database files and DAO Objects</h2>
+			<p>There should be a one-to-one mapping of DAO Objects and database files.
+				That is to say, each database file should be guarded by exactly one DAO Object,
+				and each DAO Object should be guarding exactly one database file.</p>
+			<p>The rationale behind this is that each DAO Object contains a mutex lock,
+				and every method inside the object is supposed to lock on the mutex when performing the
+				database API calls. The reason for this is that the Application is multi-threaded,
+				and concurrent database operations are sometimes required.
+				The database files themselves contain a mutex lock, and so are thread-safe.
+				However, if the Application encounters a locked database file when attempting to perform
+				a database operation, an exception is thrown.
+				Thus, to eliminate the need for complex exception handling, mutual exclusion is enforced
+				on the application-side, by confining all database-access methods inside the DAO Object,
+				and ensuring that all these methods perform database access operations
+				in a sequential manner. This way, the database file will only be accessed by one
+				thread at any given point in time, and all other threads will wait.</p>
+			<h2 id="guidelines-4">Policy #4 - <code>LogDAO</code> and DAO Objects</h2>
+			<p>The <code>LogDAO</code> object is supposed to maintain a list of DAO Objects that exist in the Application.
+				However, this list is only populated at runtime using the Observer design pattern.
+				Inside the constructor of each DAO Object, the DAO Object must call <code>LogDAO.register(this)</code>,
+				to register itself with <code>LogDAO</code>.</p>
+			<p>The reason <code>LogDAO</code> maintains a list of DAO Objects is that some of its methods are supposed
+				to perform operations across all database files, such as clearing all the databases or vacuuming all the databases.
+				The Observer design pattern was used so as to facilitate extensibility, in the sense that the DAO Objects
+				do not need to be manually added into the list inside <code>LogDAO</code>.</p>
+			<h2 id="guidelines-5">Policy #5 - Table structure and tabletraits</h2>
+			<p>Due to the diverse needs among the log file categories, the database structure of each database can vary widely.
+				However, every database must maintain a master list of log files of the category that it handles,
+				in the form of a <code>masterlist</code> table. Each database must contain exactly <b>one</b>
+				<code>masterlist</code> table.</p>
+			<p>The <code>masterlist</code> table can contain as much information as required,
+				and contain as many columns as required, but it must at least contain the following columns:</p>
+			<ol>
+				<li><code>filename VARCHAR(64)</code> - The file name of the log file.</li>
+				<li><code>user VARCHAR(16)</code> - The username of the account from which the log file originated.</li>
+				<li><code>lastmodified VARCHAR(16)</code> - The date last modified of the file,
+					formatted as a string using the convention "yyyy-MM-dd HH:mm:ss".</li>
+				<li><code>nooflines INT</code> - The number of lines in the log file (as per the most recent parse).</li>
+				<li><code>size INT</code> - The size of the log file in bytes (as per the most recent parse).</li>
+				<li><code>absolutepath VARCHAR(128) PRIMARY KEY UNIQUE NOT NULL</code> - The absolute, canonical path
+					of the log file.</li>
+			</ol>
+			<p>The <code>masterlist</code> table is an example of a <strong>static</strong> table,
+				meaning that it exists independently of how many log files are registered in the database.
+				This is fine because the nature of the data that it stores will only require one row for each log file.
+				However, if there is a data set that will require more than one row for each log file,
+				a dynamic table scheme should be employed. This means that instead of storing all data from
+				all log files in one huge table, there should exist many tables with the same structure
+				(i.e., column names and types), with each table only containing information about one log file.
+				In such a case, the table's name will be used to both identify the table as belonging to a certain class of tables,
+				and also to indicate which log file it corresponds to.
+				We shall call this type of table scheme a <strong>dynamic</strong> table.</p>
+			<p>The table name for dynamic tables should be a concatenation of a predetermined prefix and the
+				absolute path of the log file, with all non-alphanumeric characters removed.
+				For example, a table that lists the function calls (with the prefix "functioncalls"),
+				containing information from the log file with absolute path
+				"/users/jonfoo/logfiles/studio.Tracking.jonfoo.sinsv-11_2" would be called:<br>
+				<code>"functioncallsusersjonfoologfilesstudioTrackingjonfoosinsv11_2"</code>.</p>
+			<p>To make this structure and convention easier to maintain, methods pertaining to dynamic tables should
+				have as many parameters as possible hard-coded, to prevent errors arising from having to pass in table
+				names from the outside. This means that the methods should be as specific and as specialised as possible.</p>
+			<p>To make maintaining this structure even more convenient, developers can use the idea of "tabletraits".
+				These traits are all children of <code>LogDAO</code>,
+				and are designed to be extended by the DAO Objects that require a certain table type to be implemented.
+				They implement highly specialised creation, deletion, insertion and selection methods for a class of tables,
+				and abstract away the table name by only taking in the raw absolute path as a parameter for identifying
+				the table. Using the idea of tabletraits, multiple DAO Objects that are required to implement the same
+				table scheme do not need to each implement the methods for
+				handling that type of table, but can instead simply all extend the same tabletrait.</p>
+			<h2 id="guidelines-6">Policy #6 - Application-database interactions</h2>
+			<p>Data in a database file should always flow to and from the Application through this path:</p>
+			<p>Application &#8644; DAO Object &#8644; LogDAO (Object) &#8644; Database</p>
+			<p>This policy has the following implications:</p>
+			<ul>
+				<li>If any part of the Application is required to perform any sort of database operation (whether reading or writing),
+					it must only do so by calling a method from the relevant DAO Object.
+					At no point in time should any part of the Application make the direct API calls to directly access
+					the database file, or call any of the low-level methods in <code>LogDAO</code>.
+					If there currently exists no method in the DAO Object that can perform the
+					required database operation in a satisfactory manner (in terms of efficiency),
+					the developer can add new methods inside the DAO Object.</li>
+				<li>The methods in the DAO Objects should not make direct API calls to access their database file,
+					but instead, call the highly parameterized low-level methods in <code>LogDAO</code>.
+					This is more for neatness and convenience, as many methods, even across DAO Objects,
+					require the same SQLite queries, but with different parameters,
+					and SQLite API calls can be very messy and verbose. Thus, to eliminate repeated code,
+					and to eliminate the need to type out the verbose API calls,
+					all the API calls are confined into <code>LogDAO</code>. Likewise to the previous point,
+					if there currently exists no method that can perform the required SQLite query,
+					new methods can be added into <code>LogDAO</code> by the developer.</li>
+			</ul>
+			<h2 id="guidelines-7">Policy #7 - File reading operations</h2>
+			<p>Files should never be read completely into memory, because some files can be large enough to cause an
+				<code>OutOfMemoryError</code>, which would crash the entire Application.
+				Instead, files should be streamed into memory line by line. Even then, there have been cases
+				of files that have lines that are hundreds of thousands of characters long, also causing an
+				<code>OutOfMemoryError</code>.</p>
+			<p>For this reason, <code>BoundedBufferedReader</code> was created, to address the inability of the
+				conventional <code>BufferedReader</code> to limit the number of characters read into memory.
+				Thus, all file reading operations should make use of <code>BoundedBufferedReader</code>.</p>
+			<h2 id="guidelines-8">Policy #8 - Parsers and parser modules</h2>
+			<p>A parser should not contain any code that performs processing of the text from a log file.
+				Instead, it should only take in the file, read it line by line,
+				and pass each line to a set of <code>ParserModule</code> objects for processing.
+				All logic for processing the data should be encapsulated inside the <code>ParserModule</code> objects.</p>
+			<p>This design decision was made in order to make it easy to add new functionality to a parser.
+				Instead of having to write new code every time new functionality is required in a parser,
+				a new <code>ParserModule</code> can simply be added into the list of <code>ParserModule</code> objects
+				that are instantiated inside the parser's <code>parse()</code> method.
+				Moreover, some <code>ParserModule</code> classes are generic, and can be used by any parser for any
+				category of log files.</p>
+			<h2 id="guidelines-9">Policy #9 - Handling invalid syntax</h2>
+			<p>All parsers must be prepared to handle a case where invalid syntax is detected in a file.
+				Such a situation might occur if the first line of the file matches the syntax pattern for that
+				category of log files, but one or more lines later on in the file do not conform to that syntax pattern.
+				How the parser deals with such a case is up to the developer to decide,
+				but a simple solution would be to send it to be parsed by <code>GenericLogParser</code>.</p>
+			<h2 id="guidelines-10">Policy #10 - HTML Parsers</h2>
+			<p>Since the HTML Parsers are designed to deliver a long HTML string,
+				they usually contain some sort of buffer for the string. The length of that buffer should not
+				exceed 50 000 000 characters, or else an <code>OutOfMemoryError</code> could occur,
+				crashing the entire Application. Common practice is to simply abort the parsing operation,
+				and inform the user that the segment selected is too long to process.
+				This is reasonable because the user's web browser would also run into
+				problems if the HTML string is too long.</p>
+		</div>
+
+		<!-- Appendix -->
+		<div class="bs-docs-section">
+			<h1 id="appendix" class="page-header">Appendix</h1>
+			<h2 id="appendix-definitions">Definitions</h2>
+			<p>Throughout this documentation, you may encounter unfamiliar terms. To dispel any confusion, a
+				near-exhaustive list of terms and their descriptions have been provided.</p>
+			<ul>
+				<li><code>Application</code> - The program, or JCMS Monitoring Dashboard as a whole. On the lowest-level, it refers to the JVM process that runs
+					on the computer. At the highest-level, collectively refers to all components of the program that begin as
+					Scala, HTML or Javascript sources.</li>
+				<li><code>Log file</code> - A file that contains only textual content that is generated by a software as an intentional
+					by-product, usually used as a record of the operations taking place in the software.</li>
+				<li><code>Semantic</code> - The structure or type of data contained within something.</li>
+				<li><code>Client</code> - Refers to a process that is separate from the Application, that interacts with the Application only
+					via HTTP.</li>
+				<li><code>General case</code> - A context where the Application is viewed as a template or framework.
+					The Application was developed both as program to meet specific requirements, and also as a framework that allows for
+					efficient customization, so "general case" refers to the latter paradigm.</li>
+				<li><code>Specific case</code> - Specific implementation of the Application for Jeppesen Singapore's implementation team.</li>
+				<li><code>DAO Object</code> - Stands for Database Access Operation Object, which is a Scala object that contains methods that
+					perform read or write operations on a database.</li>
+				<li><code>Dynamic table</code> - A table in a database that is strictly and singly associated with one log file,
+					and only exists if that log file is registered in the database.</li>
+				<li><code>Entity</code> - Collectively refers to any Scala class, trait, or object.</li>
+				<li><code>JVM</code> - Acronym for the Java Virtual Machine.</li>
+				<li><code>On-demand</code> - Phrase used to describe operations that are done in response to a user's request.</li>
+				<li><code>Predetermined</code> - Same meaning as "determined before runtime" (i.e, during development or earlier).</li>
+				<li><code>Process</code> - A computer program that is being executed. Usually treated by a computer
+					system as an atomic item, with a unique process identifier (PID).</li>
+				<li><code>Regex</code> or <code>regexes</code> (plural) - Contraction of "regular expression".
+					Refers to both the actual regular expression strings as well as the general technique of using regular expressions.</li>
+				<li><code>Runtime</code> - Period of time starting from the point where the Application is run and ending
+					when the Application is terminated.</li>
+				<li><code>Starting directories</code> - Predetermined directories that the Application will start crawling from.</li>
+				<li><code>Static table</code> - The table in a database that will always exist regardless of the number or nature
+					of log files registered in the database.</li>
+			</ul>
+			<h2 id="appendix-resources">Resources</h2>
+			<p>The following resources, languages and tools are used in this application:</p>
+			<ul>
+				<li><strong>Scala</strong> is a superset of Java providing functional programming and Java bytecode compatibility. See official site <a href="http://www.scala-lang.org/">here</a>.</li>
+				<li><strong><em>Play!</em> Framework</strong> is a highly-scalable MVC web application framework written in Scala. Its official documentation can be found <a href="https://playframework.com/documentation/2.3.x/Home">here</a> while the API reference docs are found <a href="https://playframework.com/documentation/2.3.x/api/scala/index.html#package">here</a>.</li>
+				<li><strong>Scala Build Tool (sbt) / Typesafe Activator</strong>provides launch, compile, update and other console functionalities. Official documentation can be found <a href="http://www.scala-sbt.org/">here</a> and <a href="https://typesafe.com/activator">here</a>.</li>
+				<li><strong>Bootstrap</strong> is an open-source HTML, CSS, JS framework for simplifying the creation and maintainance of responsive websites and web components. Documentation can be found <a href="http://getbootstrap.com/components/">here</a>.</li>
+				<li><strong>HighCharts</strong> an an open-source jQuery library used for displaying customisable and interactive graphs. Official examples are found <a href="https://playframework.com/documentation/2.3.x/Home">here</a> while the API reference docs are found <a href="https://typesafe.com/activator">here</a>.</li>
+				<li><strong>Bootstrap 3 Datetimepicker</strong> is a jQuery providing calendar and time selection tooltips for form inputs.</li>
+				<li><strong>Tablesorter</strong> is a jQuery plugin for turning a standard HTML table with <em>thead</em> and <em>tbody</em> tags into a sortable table without page refreshes and comes with many feature-enhancing widgets such row grouping and filtering. Official site is located <a href="https://mottie.github.io/tablesorter/docs/index.html">here</a>.</li>
+			</ul>
+			<h2 id="appendix-licence">Licence</h2>
+			<ul>
+				<li>JCMS Monitoring Dashboard is built on Jeppesen CPD and remains proprietary</li>
+				<li>Highcharts is licensed as Single Developer, number 100025868001500</li>
+				<li>Play Framework, Bootstrap, Bootstrap Switch, Scala-csv, ScalaTest Plus and SQLite JDBC are licensed under Apache
+					Licence 2.0</li>
+				<li>jQuery, Select2, Tablesorter, Moment.js, Bootstrap 3 Date/Time Picker are licensed under MIT Licence</li>
+				<li>Scala is licensed under BSD 3-Clause Licence</li>
+			</ul>
+		</div>
+
+	</div>
+	<!-- End of docs content -->
+
+	<!-- Sidebar menu -->
+	<div class="col-md-3" role="complementary">
+		<nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm">
+            <ul class="nav bs-docs-sidenav">
+
+                <li>
+				  <a href="#started">Getting started</a>
+				  <ul class="nav">
+				    <li><a href="#started-dev">Run in development mode</a></li>
+				    <li><a href="#started-prod">Run in production mode</a></li>
+				    <li><a href="#started-dir">Directory structure</a></li>
+				    <li><a href="#started-conf">Configuration</a></li>
+				   </ul>
+				</li>
+
+				<li>
+				  <a href="#features">Features</a>
+				</li>
+
+				<li>
+				  <a href="#architecture">Architecture</a>
+				  <ul class="nav">
+				    <li><a href="#architecture-overview">Overview</a></li>
+				    <li><a href="#architecture-poe">Points of entry</a></li>
+				  </ul>
+				</li>
+
+				<li>
+				  <a href="#databases">Databases</a>
+				  <ul class="nav">
+				    <li><a href="#databases-create">Creating a new DAO Object</a></li>
+				  </ul>
+				</li>
+
+				<li>
+				  <a href="#parsers">Parsers</a>
+				  <ul class="nav">
+				    <li><a href="#parsers-create">Creating a new parser</a></li>
+				  </ul>
+				</li>
+
+				<li>
+				  <a href="#controllers">Controllers</a>
+				  <ul class="nav">
+				    <li><a href="#parsers-">Creating a new DAO Object</a></li>
+				  </ul>
+				</li>
+
+				<li>
+				  <a href="#views">Views</a>
+				  <ul class="nav">
+				    <li><a href="#views-modules">Modules</a></li>
+				  </ul>
+				</li>
+
+				<li>
+				  <a href="#assets">Assets</a>
+				  <ul class="nav">
+				    <li><a href="#assets-managed">Managed assets</a></li>
+				    <li><a href="#assets-unmanaged">Unmanaged assets</a></li>
+				  </ul>
+				</li>
+
+				<li>
+				  <a href="#charts">Charts</a>
+				  <ul class="nav">
+				    <li><a href="#charts-init">Initialisation</a></li>
+				    <li><a href="#charts-build">Building data series</a></li>
+				    <li><a href="#charts-display">Display options</a></li>
+				  </ul>
+				</li>
+
+				<li>
+				  <a href="#logboxes">Logboxes</a>
+				  <ul class="nav">
+				    <li><a href="#logboxes-init">Initialisation</a></li>
+				    <li><a href="#logboxes-build">Building log entries</a></li>
+				  </ul>
+				</li>
+
+				<li>
+				  <a href="#misc-tools">Miscellaneous tools</a>
+				  <ul class="nav">
+				    <li><a href="#misc-tools-">1</a></li>
+				  </ul>
+				</li>
+
+                <li>
+				  <a href="#new">Handling new data</a>
+				  <ul class="nav">
+				    <li><a href="#new-back">Back-end</a></li>
+				    <li><a href="#new-front">Front-end</a></li>
+				   </ul>
+				</li>
+
+                <li>
+				  <a href="#guidelines">Guidelines and policies</a>
+				</li>
+
+				 <li>
+				  <a href="#appendix">Appendix</a>
+				  <ul class="nav">
+				    <li><a href="#appendix-definitions">Definitions</a></li>
+				    <li><a href="#appendix-resources">Resources</a></li>
+				    <li><a href="#appendix-licence">Licence</a></li>
+				   </ul>
+				</li>
+
+            </ul>
+            <a class="back-to-top" href="#top">Back to top</a>
+        </nav>
+	</div>
+	<!-- End of sidebar menu -->
+
+</div></div>
+
+<!-- Footer content -->
+<footer class="bs-docs-footer">
+  <div class="container">
+    <p>Special thanks to the creators of CPD!</p>
+    <p>© 2015 Jeppesen Systems. All rights reserved.</p>
+    <ul class="bs-docs-footer-links text-muted">
+      <li>Docs version 2.0</li>
+      <li><strong>·</strong></li>
+      <li>28 August 2015</li>
+  </div>
+</footer>
+
+<!-- Placed at end of document so page loads faster -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/1.2.1/anchor.min.js"></script>
+<script src="assets/bootstrap.min.js"></script>
+<script src="assets/docs2.js"></script>
+
+</body>
+</html>

@@ -37,7 +37,7 @@
                 <input type="hidden" name="name-form" value="editUserForm">
                 <div class="modal-header">
                     <span class="close pull-right" data-dismiss="modal">&times;</span>
-                    <h2>Edit User: </h2>
+                    <h4>Edit User: </h4>
                 </div>
                 <div class="modal-body" style="padding: 2em 3em 1em;">
 
@@ -97,7 +97,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="close pull-right" data-dismiss="modal">&times;</span>
-                    <h2>Delete</h2>
                 </div>
                 <div class="modal-body">{{_('Are you sure you want to remove ')}}<b><span id="delName"></span></b>?<br>
                     <span class="text-danger">{{_('This action cannot be undone')}}</span>
@@ -760,8 +759,8 @@ $('#modify-modal').on('show.bs.modal', function (event) {
   // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
   // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
   var modal = $(this);
-  modal.find('.modal-header h2').html('Edit User: ');
-  modal.find('.modal-header h2').append(name);
+  modal.find('.modal-header h4').html('Edit User: ');
+  modal.find('.modal-header h4').append(name);
   modal.find('.modal-body #editUsername').val(username);
   modal.find('.modal-body select option[value="'+role+'"]').attr('selected', 'selected');
 })
@@ -794,7 +793,7 @@ function deleteUser() {
 
     $('#deleteForm #delName').html(username);
 
-    // $("#deleteModal h2").innerHTML += 'User';
+    // $("#deleteModal h4").innerHTML += 'User';
     $("#deleteModal").modal();
 
 }
