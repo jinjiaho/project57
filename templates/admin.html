@@ -48,7 +48,7 @@
 
                             <div class="form-group">
                             <input class="form-control" id="name" name="name" placeholder="Change Name" type="text" value="">
-                            
+
                             </div>
                         </div>
 
@@ -63,7 +63,7 @@
 
                         <div class="row form-group">
                             <label for="role">Role</label>
-                            
+
                             <div class="form-group">
                                 <select class="form-control" id="role" name="role">
                                     <option value="attendant" selected="selected">attendant</option>
@@ -79,7 +79,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    
+
                     <button type="button" data-dismiss="modal" class="btn btn-default">{{_('Cancel')}}</button>
                     <button type="submit" class="btn btn-success" id="modify-button">{{_('Apply changes')}}</button>
 
@@ -313,7 +313,7 @@
 
 
                     <div class="row form-group">
-                        {{ form2.count_unit.label }}
+                        {{ form2.count_unit.label }} <span class="glyphicon glyphicon-info-sign" data-toggle="popover" data-title="In what unit used to take from Storeroom?" data-content="eg. White Sugar - by packet"></span>
                         {% if form2.count_unit.errors %}
                             {% for error in form2.count_unit.errors %}
                             <p class="error-message">{{ error }}</p>
@@ -833,6 +833,13 @@ $(document).on("click", ".tagItemDel", function(e) {
 });
 
 
+// info popover button
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover({
+        placement : 'right',
+        trigger : 'hover'
+    });
+});
 
 </script>
 
