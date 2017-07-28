@@ -675,6 +675,7 @@ def admin():
 
     storeTagChoices = storeTags()
     roles = choices('Permissions', 'role')
+    categories = ['Guest Hamper', 'Guest Supplies', 'Kitchenware']
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT name, tag FROM view_item_locations;")
@@ -753,6 +754,7 @@ def admin():
             transferItemForm = transferItemForm,
             tagsByStore = json.dumps(storeTagChoices),
             itemTags = json.dumps(itemTags),
+            cat_list = categories,
             users=things,
             group=group,
             item_list=flat_items)
@@ -775,6 +777,7 @@ def admin():
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
+                    cat_list = categories,
                     users=things,
                     group=group)
             else:
@@ -866,6 +869,7 @@ def admin():
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
+                    cat_list = categories,
                     users=things,
                     group=group)
             else:
@@ -922,6 +926,7 @@ def admin():
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
+                    cat_list = categories,
                     users=things,
                     group=group)
 
@@ -978,6 +983,7 @@ def admin():
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
+                    cat_list = categories,
                     users=things,
                     group=group)
             else:
@@ -1030,6 +1036,7 @@ def admin():
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
+                    cat_list = categories,
                     users=things,
                     group=group)
             else:
@@ -1155,6 +1162,7 @@ def admin():
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
+                    cat_list = categories,
                     users=things,
                     group=group)
             else:
@@ -1198,6 +1206,7 @@ def admin():
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
+                    cat_list = categories,
                     users=things,
                     group=group)
             else:

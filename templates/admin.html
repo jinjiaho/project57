@@ -258,7 +258,7 @@
                         </div>
                     </div>
 
-                    <div class="row form-group">
+                    <div class="row form-group" id="enterCategory">
                         {{ form2.category.label }}
                         {% if form2.category.errors %}
                             {% for error in form2.category.errors %}
@@ -267,7 +267,7 @@
                         {% endif %}
 
                         <div class="form-group">
-                        {{ form2.category(class="form-control")}}
+                        {{ form2.category(class="form-control typeahead", placeholder=_("Enter a category"))}}
                         </div>
                     </div>
 
@@ -313,7 +313,7 @@
 
 
                     <div class="row form-group">
-                        {{ form2.count_unit.label }} <span class="glyphicon glyphicon-info-sign" data-toggle="popover" data-title="In what unit used to take from Storeroom?" data-content="eg. White Sugar - by packet"></span>
+                        {{ form2.count_unit.label }} <span class="glyphicon glyphicon-info-sign" data-toggle="popover" data-title="How do you take this item from Storeroom?" data-content="eg. White Sugar - by packet"></span>
                         {% if form2.count_unit.errors %}
                             {% for error in form2.count_unit.errors %}
                             <p class="error-message">{{ error }}</p>
@@ -326,7 +326,7 @@
                     </div>
 
                     <div class="row form-group">
-                        {{ form2.order_unit.label }}
+                        {{ form2.order_unit.label }} <span class="glyphicon glyphicon-info-sign" data-toggle="popover" data-title="How do you receive this item from supplier?" data-content="eg. White Sugar - by carton"></span>
                         {% if form2.order_unit.errors %}
                             {% for error in form2.order_unit.errors %}
                             <p class="error-message">{{ error }}</p>
@@ -339,7 +339,7 @@
                     </div>
 
                     <div class="row form-group">
-                        {{ form2.order_multiplier.label }}
+                        {{ form2.order_multiplier.label }} <span class="glyphicon glyphicon-info-sign" data-toggle="popover" data-title="How many items in each unit received?" data-content="eg. White Sugar - 8 - [8 packets in Carton]"></span>
                         {% if form2.order_multiplier.errors %}
                             {% for error in form2.order_multiplier.errors %}
                             <p class="error-message">{{ error }}</p>
@@ -347,7 +347,7 @@
                         {% endif %}
 
                         <div class="form-group">
-                        {{ form2.order_multiplier(class="form-control", placeholder=_("Quantity in each unit ordered")) }}
+                        {{ form2.order_multiplier(class="form-control", placeholder=_("Quantity in each unit received")) }}
                         </div>
                     </div>
 
@@ -738,6 +738,7 @@ var substringMatcher = function(strs) {
 };
 
 var all_items = {{ item_list|safe }};
+var all_cats = {{ cat_list|safe }}
 
 $('#add-item-name .typeahead').typeahead({
         hint: true,
@@ -747,6 +748,16 @@ $('#add-item-name .typeahead').typeahead({
     {
         name: 'all_items',
         source: substringMatcher(all_items)
+});
+
+$('#enterCategory .typeahead').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+    },
+    {
+        name: 'all_items',
+        source: substringMatcher(all_cats)
 });
 
 // <!-- Modal changes---->
