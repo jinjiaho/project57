@@ -18,8 +18,8 @@ class CreateNewItem(FlaskForm):
 	price = DecimalField('Unit Price', places=4, rounding=None, validators = [DataRequired()])
 	reorderpt = IntegerField('Reorder Point', validators = [DataRequired()])
 	count_unit = SelectField('Unit for Withdrawal', validators = [DataRequired()], choices=[("carton", "carton"), ("pc", "pc"), ("kg", "kg"), ("tin", "tin"), ("box", "box"), ("unit", "unit"), ("packet", "packet")])
-	order_unit = SelectField('Unit for Purchasing', validators = [DataRequired()], choices=[("carton", "carton"), ("pc", "pc"), ("kg", "kg"), ("tin", "tin"), ("box", "box"), ("unit", "unit")])
-	order_multiplier = DecimalField('Item Qty per Unit Ordered', places=4, rounding=None, validators = [DataRequired()])
+	order_unit = SelectField('Unit for Receiving', validators = [DataRequired()], choices=[("carton", "carton"), ("pc", "pc"), ("kg", "kg"), ("tin", "tin"), ("box", "box"), ("unit", "unit")])
+	order_multiplier = DecimalField('Item Quantity', places=4, rounding=None, validators = [DataRequired()])
 	submitTwo = SubmitField('Add New Item')
 
 class ExistingItemsLocation(FlaskForm):
@@ -69,5 +69,3 @@ class RemoveItem(FlaskForm):
 class RemoveTag(FlaskForm):
 	tid = SelectField('Tag', coerce=int)
 	submit = SubmitField()
-
-
