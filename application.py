@@ -41,7 +41,7 @@ import os, copy, re, csv, json_decode, imaging, pytz
 
 application = Flask(__name__, instance_relative_config=True)
 application.config.from_object('config.DevConfig') # default configurations
-application.config.from_pyfile('dogfood.py') # override with instanced configuration (in "/instance"), if any
+application.config.from_pyfile('amazonRDS.py') # override with instanced configuration (in "/instance"), if any
 #application.config.from_pyfile('myConfig1.py')
 #application.config.from_pyfile('myConfig2.py')
 
