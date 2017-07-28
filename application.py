@@ -197,7 +197,7 @@ def inventoryQuick(location):
                 "unit": d[6].encode('ascii')
                 })
     else:
-        cursor.execute("""SELECT iid, name, category, picture FROM view_item_locations
+        cursor.execute("""SELECT iid, name, category, picture, out_by FROM view_item_locations
                         WHERE tag='{}' AND reorder_pt >= 0;""".format(location))
         data = cursor.fetchall()
         conn.commit()
@@ -1497,9 +1497,11 @@ def shelf(tag_id):
                 action = info[1]
 
                 updateSuccess = stockUpdate(iid, tag_id, inputQty, user, action, now)
+            flash(updateSuccess[0], updateSuccess[1])
+            return redirect(url_for("scanner", lang_code=get_locale()))
 
-            flash(updateSucces[0], updateSucces[1])
-        except:
+        except Exception as e:
+            print("CART ERROR: %s" % e)
             flash('Oops! Something went wrong :(', 'danger')
 
     return render_template('shelf.html', things=items,
