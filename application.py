@@ -41,7 +41,7 @@ import os, copy, re, csv, json_decode, imaging, pytz
 
 application = Flask(__name__, instance_relative_config=True)
 application.config.from_object('config.DevConfig') # default configurations
-application.config.from_pyfile('amazonRDS.py') # override with instanced configuration (in "/instance"), if any
+application.config.from_pyfile('dogfood.py') # override with instanced configuration (in "/instance"), if any
 #application.config.from_pyfile('myConfig1.py')
 #application.config.from_pyfile('myConfig2.py')
 
@@ -851,7 +851,7 @@ def admin():
                 flash("Oops! Something went wrong :(", "danger")
 
             return redirect(url_for('admin', lang_code=get_locale()))
-    
+
 # ------------------Add Item Form ----------------------
         elif request.form['name-form'] =='form2':
             if form2.validate() == False:
@@ -1082,7 +1082,7 @@ def admin():
                     else:
                         qty = row[2]
                         queryOut = "DELETE FROM TagItems WHERE iid={} AND tag={};".format(iid, tagOld)
-                    
+
                     print(queryOut)
 
                     # Add the items to the new location.
@@ -1125,7 +1125,7 @@ def admin():
             print('form received')
             item = request.form["iid"]
             tag = request.form["tid"]
-            
+
             try:
                 conn = mysql.connect()
                 cursor = conn.cursor()
@@ -1138,7 +1138,7 @@ def admin():
                 flash("Oops! Something went wrong :(", "danger")
 
             return redirect(url_for('admin', lang_code=get_locale()))
-    
+
 
 # ------------------Add Tag form ----------------------
         # TODO: Change form to get appropriate values
@@ -1233,7 +1233,7 @@ def dashboard():
         return redirect(url_for("login", lang_code=get_locale()))
     if session['role'] != "supervisor":
         return redirect(url_for("scanner", lang_code=get_locale()))
-    
+
     i = getInventoryLow()
     l = getDailyLogs()
     print(l)
