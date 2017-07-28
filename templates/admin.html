@@ -147,8 +147,16 @@
                             <td>{{ user.name }}</td>
                             <td>{{ user.username }}</td>
                             <td>{{ user.role }}</td>
-                            <td {% if user.username == "supervisor" %}style="height: 52px;"{% else %}><button class="btn btn-default btn-sm" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{user.name}}" data-role="{{user.role}}" data-username="{{ user.username }}" id="#modify">{{_('Edit')}}</button>{% endif %}</td>
-                            <td>{% if user.username == "supervisor" %}{% else %}<button id="delUserBtn" class="btn btn-danger btn-xs" data-username='{{user.username}}' onclick="deleteUser('{{user.username}}')">&times;</button>{% endif %}</td>
+                            <td {% if user.username == "supervisor" or user.username == "ra" %}
+                                style="height: 52px;"
+                                {% else %}>
+                                <button class="btn btn-default btn-sm" style="margin-bottom: 5px;" data-toggle="modal" data-target="#modify-modal" data-name="{{user.name}}" data-role="{{user.role}}" data-username="{{ user.username }}" id="#modify">{{_('Edit')}}</button>
+                                {% endif %}
+                            </td>
+                            <td>{% if user.username == "supervisor" or user.username == "ra" or user.username == session["username"] %}{% else %}
+                                <button id="delUserBtn" class="btn btn-danger btn-xs" data-username='{{user.username}}' onclick="deleteUser('{{user.username}}')">&times;</button>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                         </tbody>
