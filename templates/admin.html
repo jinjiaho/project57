@@ -628,27 +628,7 @@
             </div>
         </div>
 
-        <div class="row">
-            <a href="#delTag" data-toggle="collapse"><h3>{{_("Delete a Tag")}}</h3></a>
-            <div id="delTag" class="collapse">
-                <form method="POST" id="delItemForm" action="/{{g.current_lang}}/admin" enctype=multipart/form-data >{{ removeTagForm.hidden_tag() }}<input type="hidden"  name="name-form" value='removeTagForm' >
-                    <div class="row form-group">
-                        {{ removeTagForm.tid.label }}
-                        {% if removeTagForm.tid.errors %}
-                            {% for error in removeTagForm.tid.errors %}
-                            <p class="error-message">{{ error }}</p>
-                            {% endfor %}
-                        {% endif %}
-                        <div class="form-group">
-                        {{ removeTagForm.tid(class="form-control") }}
-                        </div>
-                    </div>
-
-                    {{ removeTagForm.submit(class="width-35 pull-right btn btn-sm btn-primary") }}
-                </form>
-            </div>
-        </div>
-
+        
     </div>
 
 </div>
