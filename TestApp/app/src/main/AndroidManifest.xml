@@ -12,21 +12,28 @@
         <activity android:name=".MainActivity" android:launchMode="singleInstance" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
                 <category android:name="android.intent.category.DEFAULT"/>
+                <!--<data android:scheme="http"-->
+                <!--android:host="13.228.71.150"-->
+                <!--android:port="80" />-->
                 <data android:scheme="http"
-                    android:host="13.228.71.150"
-                    android:port="8000" />
+                    android:host="ec2-52-77-253-63.ap-southeast-1.compute.amazonaws.com"
+                    android:port="80" />
             </intent-filter>
         </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.CAMERA2" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <uses-sdk android:minSdkVersion="10"/>
 
