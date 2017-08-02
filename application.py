@@ -4,7 +4,7 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 from datetime import datetime
-from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation, RemoveItem, RemoveTag, TransferItem
+from forms import LoginForm, RetrievalForm, AddUserForm, CreateNewItem,AddNewLocation,ExistingItemsLocation, RemoveItem, TransferItem
 from apscheduler.schedulers.background import BackgroundScheduler
 # from exceptions import InsufficientQtyError, ContainsItemsError
 # from apscheduler.jobstores.mongodb import MongoDBJobStore
@@ -112,7 +112,19 @@ def storeTags():
         choices.append(pair)
     return choices
 
-
+def getAllTags():
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT tid, tname, storeroom, remarks FROM TagInfo;")
+    data = sorted(set(list(cursor.fetchall())))
+    allTags = []
+    for i in data:
+        allTags.append({
+            'tid': i[0],
+            'tname': i[1].encode('ascii'),
+            'storeroom': i[2].encode('ascii'),
+            'remarks': i[3].encode('ascii')
+            })
+    return allTags
 
 # Returns all the items based on category and amount in or out within the last month for each item
 # Called by category()
@@ -248,7 +260,7 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
 
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT tname FROM TagInfo WHERE tid={};".format(tagId))
+        cursor.execute("SELECT storeroom FROM TagInfo WHERE tid={};".format(tagId))
         location = cursor.fetchall()[0][0]
         # Log action
         # conn = mysql.connect()
@@ -300,15 +312,18 @@ def getAllLogs():
     if data != None:
         for row in data:
             print(row[5])
-            cursor.execute("SELECT name FROM Items WHERE iid={};".format(row[5]))
-            item_name = cursor.fetchall()[0][0]
+            cursor.execute("SELECT name, category FROM Items WHERE iid={};".format(row[5]))
+            info = cursor.fetchall()[0]
+            item_name = info[0].encode('ascii')
+            category = info[1].encode('ascii')
 
             things.append({"name": row[0].encode('ascii'),
                 "dateTime": row[1],
                 "action":row[2],
                 "move":row[3],
                 "remaining":row[4],
-                "item":item_name.encode('ascii'),
+                "category":category,
+                "item":item_name,
                 "location":row[6]})
             # print(things)
 
@@ -669,11 +684,12 @@ def admin():
     form3 = AddNewLocation()
     form4 = ExistingItemsLocation()
     removeItemForm = RemoveItem()
-    removeTagForm = RemoveTag()
     transferItemForm = TransferItem()
 
 
     storeTagChoices = storeTags()
+    allTags = getAllTags()
+    print allTags
     roles = choices('Permissions', 'role')
     categories = ['Guest Hamper', 'Guest Supplies', 'Kitchenware']
 
@@ -687,7 +703,6 @@ def admin():
     form3.location.choices = choices('TagInfo', 'storeroom')
     form4.tid.choices = storeTagChoices
     removeItemForm.iname.choices = choices('Items', 'name')
-    removeTagForm.tid.choices = storeTagChoices
     transferItemForm.tagOld.choices = storeTagChoices
     transferItemForm.tagNew.choices = storeTagChoices
 
@@ -750,12 +765,12 @@ def admin():
             form3=form3,
             form4=form4,
             removeItemForm=removeItemForm,
-            removeTagForm=removeTagForm,
             transferItemForm = transferItemForm,
             tagsByStore = json.dumps(storeTagChoices),
             itemTags = json.dumps(itemTags),
             cat_list = categories,
             users=things,
+            tags = allTags,
             group=group,
             item_list=flat_items)
 
@@ -773,12 +788,12 @@ def admin():
                     form3=form3,
                     form4=form4,
                     removeItemForm=removeItemForm,
-                    removeTagForm=removeTagForm,
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
                     cat_list = categories,
                     users=things,
+                    tags = allTags,
                     group=group)
             else:
                 username = form.username.data
@@ -865,12 +880,12 @@ def admin():
                     form3=form3,
                     form4=form4,
                     removeItemForm=removeItemForm,
-                    removeTagForm=removeTagForm,
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
                     cat_list = categories,
                     users=things,
+                    tags = allTags,
                     group=group)
             else:
 
@@ -922,12 +937,12 @@ def admin():
                     form3=form3,
                     form4=form4,
                     removeItemForm=removeItemForm,
-                    removeTagForm=removeTagForm,
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
                     cat_list = categories,
                     users=things,
+                    tags = allTags,
                     group=group)
 
             else:
@@ -979,12 +994,12 @@ def admin():
                     form3=form3,
                     form4=form4,
                     removeItemForm=removeItemForm,
-                    removeTagForm=removeTagForm,
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
                     cat_list = categories,
                     users=things,
+                    tags = allTags,
                     group=group)
             else:
                 itemname = form4.itemname.data
@@ -1032,12 +1047,12 @@ def admin():
                     form3=form3,
                     form4=form4,
                     removeItemForm=removeItemForm,
-                    removeTagForm=removeTagForm,
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
                     cat_list = categories,
                     users=things,
+                    tags = allTags,
                     group=group)
             else:
                 print("form validated")
@@ -1158,12 +1173,12 @@ def admin():
                     form3=form3,
                     form4=form4,
                     removeItemForm=removeItemForm,
-                    removeTagForm=removeTagForm,
                     transferItemForm = transferItemForm,
                     tagsByStore = json.dumps(storeTagChoices),
                     itemTags = json.dumps(itemTags),
                     cat_list = categories,
                     users=things,
+                    tags = allTags,
                     group=group)
             else:
                 tname = form3.tname.data
@@ -1192,44 +1207,31 @@ def admin():
 
 
 # ------------------Delete Tag form ----------------------
+        elif request.form['name-form'] =='deleteTag':
+            print('form received')
+            tid = request.form["tid"]
 
-        elif request.form['name-form'] == 'removeTagForm':
-            if removeTagForm.validate() == False:
-                flash("Failed to validate form", "danger")
-                return render_template('admin.html',
-                    form=form,
-                    form2=form2,
-                    form3=form3,
-                    form4=form4,
-                    removeItemForm=removeItemForm,
-                    removeTagForm=removeTagForm,
-                    transferItemForm = transferItemForm,
-                    tagsByStore = json.dumps(storeTagChoices),
-                    itemTags = json.dumps(itemTags),
-                    cat_list = categories,
-                    users=things,
-                    group=group)
-            else:
-                tid = removeTagForm.tid.data
-
-                try:
+            try:
+                conn = mysql.connect().cursor()
+                cursor.execute("SELECT * FROM TagItems WHERE tag={};".format(tid))
+                tagRows = cursor.fetchone()
+                if tagRows:
+                    raise ContainsItemsError("Can't delete tag because it has items assigned to it. Please remove the items from the tag before deleting the tag.")
+                else:
                     conn = mysql.connect()
                     cursor = conn.cursor()
-                    cursor.execute("SELECT * FROM TagItems WHERE tag={};".format(tid))
-                    data = cursor.fetchall()
-                    if data:
-                        print(data)
-                        raise ContainsItemsError("Coudn't delete tag as tag still has items.")
-                    query = "DELETE FROM TagInfo WHERE tid = {};".format(tid)
-                    print query
+                    query = "DELETE FROM TagInfo WHERE tid={};".format(tid)
+                    print(query)
                     cursor.execute(query)
                     conn.commit()
-                    flash('Tag deleted!', 'success')
-                except ContainsItemsError as e:
-                    flash(e.args[0], "danger")
-                except:
-                    flash('Could\'t delete tag', 'danger')
-                return redirect(url_for('admin', lang_code=get_locale()))
+                    flash("Tag deleted!", "success")
+
+            except ContainsItemsError as e:
+                flash(e.args[0], "danger")
+            except:
+                flash("Oops! Something went wrong :(", "danger")
+
+            return redirect(url_for('admin', lang_code=get_locale()))
 
 
 
@@ -1498,7 +1500,7 @@ def shelf(tag_id):
 
                 updateSuccess = stockUpdate(iid, tag_id, inputQty, user, action, now)
 
-            flash(updateSucces[0], updateSucces[1])
+            flash(updateSuccess[0], updateSuccess[1])
         except:
             flash('Oops! Something went wrong :(', 'danger')
 

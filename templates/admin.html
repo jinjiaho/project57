@@ -153,7 +153,7 @@
                                 {% endif %}
                             </td>
                             <td>{% if user.username == "supervisor" or user.username == "ra" or user.username == session["username"] %}{% else %}
-                                <button id="delUserBtn" class="btn btn-danger btn-xs" data-username='{{user.username}}' onclick="deleteUser('{{user.username}}')">&times;</button>
+                                <button id="delUserBtn_{{user.username}}" class="btn btn-danger btn-xs" data-username='{{user.username}}' onclick="deleteUser('{{user.username}}')">&times;</button>
                                 {% endif %}
                             </td>
                         </tr>
@@ -496,7 +496,7 @@
         </div>
 
         <div class="row" style="font-size: medium;">
-            <h3>{{_("List of All Tags")}}</h3>
+            <h3>{{_("List of Items by Tag")}}</h3>
             {% for key, values in group.iteritems() %}
 
             <!--find a way to create a button-->
@@ -528,6 +528,37 @@
 
 <!--#........................ TAGS TAB .............................  -->
     <div role="tabpanel" id="group" class="container-fluid tab-pane fade">
+        <div class="row">
+            <a href="#currentTags" data-toggle="collapse"><h3>{{_('Current Tags')}}</h3></a>
+            <div id="currentTags" class="collapse">
+                <div class="table-responsive">
+                    <table class="table" id="usersTable">
+                        <thead>
+                            <th>{{_('Tag Id')}}</th>
+                            <th>{{_('Tag Name')}}</th>
+                            <th>{{_('Storeroom')}}</th>
+                            <th>{{_('Remarks')}}</th>
+                            <th>{{_('Delete Tag')}}</th>
+                        </thead>
+
+                        <tbody>
+                        {% for tag in tags %}
+                        <tr>
+                            <td>{{ tag.tid }}</td>
+                            <td>{{ tag.tname }}</td>
+                            <td>{{ tag.storeroom }}</td>
+                            <td>{{ tag.remarks }}</td>
+                            <td>
+                                <button id="delTagBtn_{{tag.tid}}" class="btn btn-danger btn-xs" data-tagname='{{tag.tname}}' onclick="deleteTag('{{tag.tid}}')">&times;</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <a href="#newTag" data-toggle="collapse"><h3>{{_("Add a New Tag")}}</h3></a>
             <div id="newTag" class="collapse">
@@ -785,8 +816,7 @@ $('#deleteModal').on('show.bs.modal', function (event) {
   modal.find('.modal-body input').val(admin);
 })
 
-function deleteUser() {
-    var username = $("#delUserBtn").data('username');
+function deleteUser(username) {
     var form = document.getElementById("deleteForm");
     var input = document.createElement('input');
     var formName = document.createElement('input');
@@ -805,6 +835,29 @@ function deleteUser() {
     $('#deleteForm #delName').html(username);
 
     // $("#deleteModal h4").innerHTML += 'User';
+    $("#deleteModal").modal();
+
+}
+
+function deleteTag(tid) {
+    var tagname = $("#delTagBtn_"+tid).data('tagname');
+    var form = document.getElementById("deleteForm");
+    var input = document.createElement('input');
+    var formName = document.createElement('input');
+    console.log(tagname);
+
+    formName.value = 'deleteTag';
+    formName.name = 'name-form';
+    formName.type= "hidden";
+    form.appendChild(formName);
+
+    input.value = tid;
+    input.name = "tid";
+    input.type = "hidden";
+    form.appendChild(input);
+
+    $('#deleteForm #delName').html(tagname);
+
     $("#deleteModal").modal();
 
 }

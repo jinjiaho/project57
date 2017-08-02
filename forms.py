@@ -65,7 +65,3 @@ class TrackingForm(FlaskForm):
 class RemoveItem(FlaskForm):
 	iname = StringField('Item Name')
 	submit = SubmitField("Delete Item")
-
-class RemoveTag(FlaskForm):
-	tid = SelectField('Tag', coerce=int)
-	submit = SubmitField()
