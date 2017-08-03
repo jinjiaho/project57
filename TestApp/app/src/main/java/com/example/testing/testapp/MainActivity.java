@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     WebView myWebView;
     SwipeRefreshLayout mySwipeRefreshLayout;
-    private boolean doubleBackToExitPressedOnce;
-    private Handler mHandler = new Handler();
+//    private boolean doubleBackToExitPressedOnce;
+//    private Handler mHandler = new Handler();
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private String mCM;
@@ -106,16 +106,6 @@ public class MainActivity extends AppCompatActivity {
         myWebView.getSettings().setDomStorageEnabled(true);
         myWebView.getSettings().setDatabaseEnabled(true);
 
-//        myWebView.setDownloadListener(new DownloadListener() {
-//            @Override
-//            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-//                Log.d("baygon", "entered onDownloadStart()");
-//                Intent i = new Intent(Intent.ACTION_VIEW);
-//                i.setData(Uri.parse(url));
-//                startActivity(i);
-//            }
-//        });
-
         //myWebView.loadUrl("http://13.228.71.150:80");
         myWebView.loadUrl("http://ec2-52-77-253-63.ap-southeast-1.compute.amazonaws.com");
     }
@@ -179,38 +169,38 @@ public class MainActivity extends AppCompatActivity {
         return File.createTempFile(imageFileName, ".jpg", storageDir);
     }
 
-    private final Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            doubleBackToExitPressedOnce = false;
-        }
-    };
-
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
-
-        if(mHandler != null){
-            mHandler.removeCallbacks(mRunnable);
-        }
-    }
-
-    @Override
-    public void onBackPressed(){
-        if(myWebView.canGoBack()){
-            myWebView.goBack();
-            //myWebView.reload();
-        }
-        else{
-            if(doubleBackToExitPressedOnce){
-                super.onBackPressed();
-                return;
-            }
-
-            this.doubleBackToExitPressedOnce = true;
-            Toast.makeText(this, "Please press back again to exit", Toast.LENGTH_SHORT).show();
-
-            mHandler.postDelayed(mRunnable, 2000);
-        }
-    }
+//    private final Runnable mRunnable = new Runnable() {
+//        @Override
+//        public void run() {
+//            doubleBackToExitPressedOnce = false;
+//        }
+//    };
+//
+//    @Override
+//    protected void onDestroy(){
+//        super.onDestroy();
+//
+//        if(mHandler != null){
+//            mHandler.removeCallbacks(mRunnable);
+//        }
+//    }
+//
+//    @Override
+//    public void onBackPressed(){
+//        if(myWebView.canGoBack()){
+//            myWebView.goBack();
+//            //myWebView.reload();
+//        }
+//        else{
+//            if(doubleBackToExitPressedOnce){
+//                super.onBackPressed();
+//                return;
+//            }
+//
+//            this.doubleBackToExitPressedOnce = true;
+//            Toast.makeText(this, "Please press back again to exit", Toast.LENGTH_SHORT).show();
+//
+//            mHandler.postDelayed(mRunnable, 2000);
+//        }
+//    }
 }
