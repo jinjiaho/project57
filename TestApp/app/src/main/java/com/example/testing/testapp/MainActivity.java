@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Log.d("baygon", "entered onCreate()");
         setContentView(R.layout.activity_main);
 
         mySwipeRefreshLayout = (SwipeRefreshLayout)this.findViewById(R.id.swipeContainer);
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                         takePictureIntent = null;
                     }
                 }
-                //Log.d("baygon", "image file created");
 
                 Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -107,15 +105,15 @@ public class MainActivity extends AppCompatActivity {
         myWebView.getSettings().setDomStorageEnabled(true);
         myWebView.getSettings().setDatabaseEnabled(true);
 
-        myWebView.setDownloadListener(new DownloadListener() {
-            @Override
-            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                Log.d("baygon", "entered onDownloadStart()");
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
-            }
-        });
+//        myWebView.setDownloadListener(new DownloadListener() {
+//            @Override
+//            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+//                Log.d("baygon", "entered onDownloadStart()");
+//                Intent i = new Intent(Intent.ACTION_VIEW);
+//                i.setData(Uri.parse(url));
+//                startActivity(i);
+//            }
+//        });
 
         //myWebView.loadUrl("http://13.228.71.150:80");
         myWebView.loadUrl("http://ec2-52-77-253-63.ap-southeast-1.compute.amazonaws.com");
@@ -130,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        //Log.d("baygon", "entered onResume()");
         Intent intent = getIntent();
         if(intent!=null && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())){
             myWebView.loadUrl(String.valueOf(intent.getData()));

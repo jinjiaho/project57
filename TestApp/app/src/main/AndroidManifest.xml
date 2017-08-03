@@ -21,8 +21,7 @@
                 <!--android:host="13.228.71.150"-->
                 <!--android:port="80" />-->
                 <data android:scheme="http"
-                    android:host="ec2-52-77-253-63.ap-southeast-1.compute.amazonaws.com"
-                    android:port="80" />
+                    android:host="ec2-52-77-253-63.ap-southeast-1.compute.amazonaws.com" />
             </intent-filter>
         </activity>
     </application>
