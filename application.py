@@ -968,6 +968,16 @@ def admin():
                     cursor.execute(removeFromItems)
                     conn.commit()
 
+                    removeFromLogs = "DELETE FROM Logs WHERE item='{}';".format(iid)
+                    print "SQL: %s" % removeFromLogs
+                    cursor.execute(removeFromLogs)
+                    conn.commit()
+
+                    removeFromPriceChange = "DELETE FROM PriceChange WHERE item='{}';".format(iid)
+                    print "SQL: %s" % removeFromPriceChange
+                    cursor.execute(removeFromPriceChange)
+                    conn.commit()
+
                     removeFromTagItems = "DELETE FROM TagItems WHERE iid='{}';".format(iid)
                     print "SQL: %s" % removeFromTagItems
                     cursor.execute(removeFromTagItems)
