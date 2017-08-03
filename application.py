@@ -41,7 +41,7 @@ import os, copy, re, csv, json_decode, imaging, pytz
 
 application = Flask(__name__, instance_relative_config=True)
 application.config.from_object('config.DevConfig') # default configurations
-application.config.from_pyfile('amazonRDS.py') # override with instanced configuration (in "/instance"), if any
+application.config.from_pyfile('dogfood.py') # override with instanced configuration (in "/instance"), if any
 #application.config.from_pyfile('myConfig1.py')
 #application.config.from_pyfile('myConfig2.py')
 
@@ -1417,7 +1417,7 @@ def category(category):
 
 @application.route('/<lang_code>/storeroom/<storeroom>')
 def storeroom(storeroom):
-
+	
     # user authentication
     if not auth():
         session['next'] = request.url
@@ -1426,15 +1426,18 @@ def storeroom(storeroom):
         return redirect(url_for("scanner", lang_code=get_locale()))
 
     cursor = mysql.connect().cursor()
-    cursor.execute("SELECT tid FROM TagInfo WHERE storeroom='{}';".format(storeroom))
-    tags = cursor.fetchall()[0]
-
+    query1="SELECT tid FROM TagInfo WHERE storeroom='{}';".format(storeroom)
+    cursor.execute(query1)
+	
+    tags = cursor.fetchall()
     items = {}
 
     for t in tags:
-        cursor.execute("SELECT iid, name, picture, reorder_pt, qty_left, out_by FROM view_item_locations WHERE tag={}".format(t))
+        tagid=t[0]
+        cursor.execute("SELECT iid, name, picture, reorder_pt, qty_left, out_by FROM view_item_locations WHERE tag='{}';".format(tagid))
         data = cursor.fetchall()
         for d in data:
+		
             if d[0] in items.keys():
                 items[d[0]]['qty_left'] += d[4]
             else:
@@ -1445,7 +1448,9 @@ def storeroom(storeroom):
                     'qty_left':d[4],
                     'unit':d[5].encode('ascii')
                 }
-
+	
+	print(t)
+	print(tags)
     return render_template('storeroom.html',
         storename = storeroom,
         items = items,
