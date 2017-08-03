@@ -24,7 +24,9 @@ function updateCart() {
             + item.picture + '"/></td><td>' + item.name + '</td><td><input type="number" name="' 
             + item.iid + '" value="' + item.qty + '" class="num-input" />' 
             + item.action + '<input type="hidden" name="' + item.iid + '" value="'
-            + item.action+'" /></td>'
+            + item.action +'" /></td><td style="display:none;"><input type="text" name="'
+            + item.iid + '" value="'
+            + item.tag + '"/></td>'
             + '<td><a onclick="deleteRow(this)" href="javascript:void(0);">&times;</a></td></tr>');
         $('#'+item.iid+' option[value="'+item.action+'"]').attr('selected', 'selected');
       }
@@ -93,6 +95,7 @@ $(function () {
     var item_name = $(this).find($("#modal-input-name")).val();
     var item_qty = parseInt($(this).find($('#modal-input-qty')).val());
     var item_pic = $("#modal-picture img").attr('src');
+    var tag_id = window.location.pathname.split("/")[3];
     var action = $(this).find($("input[name='action']:checked")).val();
     console.log(item_id + ", " + item_name + ", " + item_qty + ", " + item_pic);
     
@@ -101,7 +104,7 @@ $(function () {
       console.log('no cart, creating new');
 
       // stringify the cart for HTML5 storage
-      localStorage.setItem('cart', JSON.stringify([{'iid':item_id, 'name': item_name, 'qty': item_qty, 'picture': item_pic, 'action':action}]));
+      localStorage.setItem('cart', JSON.stringify([{'iid':item_id, 'name': item_name, 'qty': item_qty, 'picture': item_pic, 'action': action, 'tag': tag_id}]));
     }
     // Or add it to the current cart
     else {
@@ -122,7 +125,7 @@ $(function () {
       // if item has not been added to the cart
       if (inCart === false) {
         // add to cart
-        thisCart.push({'iid':item_id, 'name': item_name, 'qty': item_qty, 'picture': item_pic, 'action':action});
+        thisCart.push({'iid':item_id, 'name': item_name, 'qty': item_qty, 'picture': item_pic, 'action': action, 'tag': tag_id});
         // console.log(JSON.stringify({'iid':item_iid, 'name': item_name, 'qty': item_qty, 'picture': item_pic}));
         // stringify
         localStorage.setItem('cart', JSON.stringify(thisCart));

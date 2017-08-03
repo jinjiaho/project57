@@ -230,8 +230,10 @@ def stockUpdate(iid, tagId, inputQty, user, action, time):
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
+        print(iid, tagId)
         cursor.execute("SELECT qty_left, in_out_ratio FROM view_item_locations WHERE iid='{}' AND tag='{}';".format(iid, tagId))
         data = cursor.fetchall()
+        print("data" ,data)
         old_qty = data[0][0]
 
         if action == 'out':
@@ -1513,18 +1515,16 @@ def shelf(tag_id):
     if request.method == 'POST':
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         form_data = request.form
+        print(form_data)
         user = session['username']
 
         try:
             conn = mysql.connect()
             cursor = conn.cursor()
-            for item, info in form_data.iterlists():
-                iid = item
-                inputQty = int(info[0])
-                action = info[1]
-
-                updateSuccess = stockUpdate(iid, tag_id, inputQty, user, action, now)
+            for item, [inputQty, action, tag] in form_data.iterlists(): 
+                updateSuccess = stockUpdate(item, tag, int(inputQty), user, action, now)
             flash(updateSuccess[0], updateSuccess[1])
+
             return redirect(url_for("scanner", lang_code=get_locale()))
 
         except Exception as e:
