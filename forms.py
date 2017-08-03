@@ -50,7 +50,7 @@ class RetrievalForm(FlaskForm):
 
 class AddNewLocation(FlaskForm):
 	tname = StringField('Name of New Tag', validators=[DataRequired("Please enter the name of the tag without spaces.")])
-	location = SelectField('Select Storeroom', validators = [DataRequired()])
+	location = SelectField('Select Storeroom')
 	newLocation = StringField('Add a New Storeroom')
 	remarks = StringField('Remarks (optional)')
 	submitThree = SubmitField("Enter")

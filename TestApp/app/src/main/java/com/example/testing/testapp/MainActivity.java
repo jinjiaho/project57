@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -29,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     WebView myWebView;
     SwipeRefreshLayout mySwipeRefreshLayout;
-//    private boolean doubleBackToExitPressedOnce;
-//    private Handler mHandler = new Handler();
+    private boolean doubleBackToExitPressedOnce;
+    private Handler mHandler = new Handler();
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private String mCM;
@@ -178,38 +179,38 @@ public class MainActivity extends AppCompatActivity {
         return File.createTempFile(imageFileName, ".jpg", storageDir);
     }
 
-//    private final Runnable mRunnable = new Runnable() {
-//        @Override
-//        public void run() {
-//            doubleBackToExitPressedOnce = false;
-//        }
-//    };
-//
-//    @Override
-//    protected void onDestroy(){
-//        super.onDestroy();
-//
-//        if(mHandler != null){
-//            mHandler.removeCallbacks(mRunnable);
-//        }
-//    }
-//
-//    @Override
-//    public void onBackPressed(){
-//        if(myWebView.canGoBack()){
-//            myWebView.goBack();
-//            myWebView.reload();
-//        }
-//        else{
-//            if(doubleBackToExitPressedOnce){
-//                super.onBackPressed();
-//                return;
-//            }
-//
-//            this.doubleBackToExitPressedOnce = true;
-//            Toast.makeText(this, "Please press back again to exit", Toast.LENGTH_SHORT).show();
-//
-//            mHandler.postDelayed(mRunnable, 2000);
-//        }
-//    }
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            doubleBackToExitPressedOnce = false;
+        }
+    };
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+
+        if(mHandler != null){
+            mHandler.removeCallbacks(mRunnable);
+        }
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(myWebView.canGoBack()){
+            myWebView.goBack();
+            //myWebView.reload();
+        }
+        else{
+            if(doubleBackToExitPressedOnce){
+                super.onBackPressed();
+                return;
+            }
+
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Please press back again to exit", Toast.LENGTH_SHORT).show();
+
+            mHandler.postDelayed(mRunnable, 2000);
+        }
+    }
 }
