@@ -706,7 +706,6 @@ def admin():
     transferItemForm.tagOld.choices = storeTagChoices
     transferItemForm.tagNew.choices = storeTagChoices
 
-
     #--------------users table-------------------------
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -747,6 +746,10 @@ def admin():
             group[(i, l_name)] = data3
         except:
             pass
+	
+	
+	server = "http://ec2-52-77-253-63.ap-southeast-1.compute.amazonaws.com" # For exhibition
+	# server = "13.228.71.150/" # For Ascott use
 
     if request.method =="GET":
 
@@ -772,6 +775,7 @@ def admin():
             users=things,
             tags = allTags,
             group=group,
+			server=server,
             item_list=flat_items)
 
 # ------------------All the various form tabs----------------------
@@ -794,6 +798,7 @@ def admin():
                     cat_list = categories,
                     users=things,
                     tags = allTags,
+					server=server,
                     group=group)
             else:
                 username = form.username.data
@@ -886,6 +891,7 @@ def admin():
                     cat_list = categories,
                     users=things,
                     tags = allTags,
+					server=server,
                     group=group)
             else:
 
@@ -943,6 +949,7 @@ def admin():
                     cat_list = categories,
                     users=things,
                     tags = allTags,
+					server=server,
                     group=group)
 
             else:
@@ -1000,6 +1007,7 @@ def admin():
                     cat_list = categories,
                     users=things,
                     tags = allTags,
+					server=server,
                     group=group)
             else:
                 itemname = form4.itemname.data
@@ -1053,6 +1061,7 @@ def admin():
                     cat_list = categories,
                     users=things,
                     tags = allTags,
+					server=server,
                     group=group)
             else:
                 print("form validated")
@@ -1179,6 +1188,7 @@ def admin():
                     cat_list = categories,
                     users=things,
                     tags = allTags,
+					server=server,
                     group=group)
             else:
                 tname = form3.tname.data

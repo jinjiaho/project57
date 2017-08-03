@@ -538,6 +538,7 @@
                             <th>{{_('Tag Name')}}</th>
                             <th>{{_('Storeroom')}}</th>
                             <th>{{_('Remarks')}}</th>
+							<th>{{_('Tag Data')}}</th>
                             <th>{{_('Delete Tag')}}</th>
                         </thead>
 
@@ -548,6 +549,7 @@
                             <td>{{ tag.tname }}</td>
                             <td>{{ tag.storeroom }}</td>
                             <td>{{ tag.remarks }}</td>
+							<td>{{server}}/en/shelves/{{tag.tid}}</td>
                             <td>
                                 <button id="delTagBtn_{{tag.tid}}" class="btn btn-danger btn-xs" data-tagname='{{tag.tname}}' onclick="deleteTag('{{tag.tid}}')">&times;</button>
                             </td>
