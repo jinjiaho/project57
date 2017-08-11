@@ -10,6 +10,7 @@ BABEL_DEFAULT_LOCALE = "en"
 
 
 # 3. MySQL DB connection details
+DEBUG = False
 MYSQL_DATABASE_USER = 'root'
 MYSQL_DATABASE_PASSWORD = 'classroom'
 MYSQL_DATABASE_DB = 'Ascott_InvMgmt'
