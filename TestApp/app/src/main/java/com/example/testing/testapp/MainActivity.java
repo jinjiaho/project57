@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     WebView myWebView;
     SwipeRefreshLayout mySwipeRefreshLayout;
+
+    // If want to add back function for the app, use this code
 //    private boolean doubleBackToExitPressedOnce;
 //    private Handler mHandler = new Handler();
 
@@ -106,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         myWebView.getSettings().setDomStorageEnabled(true);
         myWebView.getSettings().setDatabaseEnabled(true);
 
+        // load whichever URL the webapp has
         //myWebView.loadUrl("http://13.228.71.150:80");
         myWebView.loadUrl("http://ec2-52-77-253-63.ap-southeast-1.compute.amazonaws.com");
     }
@@ -168,6 +171,8 @@ public class MainActivity extends AppCompatActivity {
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         return File.createTempFile(imageFileName, ".jpg", storageDir);
     }
+
+    // If want to add back function for the app, use this code
 
 //    private final Runnable mRunnable = new Runnable() {
 //        @Override

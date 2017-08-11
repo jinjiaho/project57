@@ -17,9 +17,6 @@
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <!--<data android:scheme="http"-->
-                <!--android:host="13.228.71.150"-->
-                <!--android:port="80" />-->
                 <data android:scheme="http"
                     android:host="ec2-52-77-253-63.ap-southeast-1.compute.amazonaws.com" />
             </intent-filter>
